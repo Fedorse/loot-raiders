@@ -6,7 +6,7 @@
 
 	type Props = {
 		item: {
-			type: 'empty' | 'loot' | 'weapon' | 'augment' | 'shield' | 'quickUse';
+			type: 'empty' | 'loot' | 'weapon' | 'augment' | 'shield' | 'quickUse' | 'placeholder';
 			id: string;
 			image?: string;
 			count?: number;
@@ -52,12 +52,29 @@
 	} as const;
 
 	const rarityStyle = $derived(RARITY_CONFIG[item.rare ?? 'common']);
+
+	function preventDrag(e) {
+		e.stopImmediatePropagation();
+		e.preventDefault();
+	}
 </script>
 
 <div class={className}>
-	{#if item.type === 'empty'}
+	{#if item.type === 'placeholder'}
+		<div
+			class="flex h-full w-full cursor-default items-center justify-center rounded-xl border border-white/20 bg-[#0f1016]/50 text-white"
+			onmousedown={preventDrag}
+			ontouchstart={preventDrag}
+			onpointerdown={preventDrag}
+		>
+			icon placeholder
+		</div>
+	{:else if item.type === 'empty'}
 		<div
 			class="h-full w-full cursor-default rounded-xl border border-white/20 bg-[#0f1016]/50"
+			onmousedown={preventDrag}
+			ontouchstart={preventDrag}
+			onpointerdown={preventDrag}
 		></div>
 	{:else}
 		<div
