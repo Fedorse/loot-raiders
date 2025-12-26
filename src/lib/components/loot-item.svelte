@@ -60,16 +60,7 @@
 </script>
 
 <div class={className}>
-	{#if item.type === 'placeholder'}
-		<div
-			class="flex h-full w-full cursor-default items-center justify-center rounded-xl border border-white/20 bg-[#0f1016]/50 text-white"
-			onmousedown={preventDrag}
-			ontouchstart={preventDrag}
-			onpointerdown={preventDrag}
-		>
-			icon placeholder
-		</div>
-	{:else if item.type === 'empty'}
+	{#if item.type === 'empty'}
 		<div
 			class="h-full w-full cursor-default rounded-xl border border-white/20 bg-[#0f1016]/50"
 			onmousedown={preventDrag}
