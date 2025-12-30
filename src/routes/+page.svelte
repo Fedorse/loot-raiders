@@ -32,7 +32,9 @@
 	type InventorySlot = BaseItem | null;
 
 	const BACKPACK_SIZE = 20;
+	const RAIDER_CASHES = 20;
 	const FLIP_DURATION_MS = 50;
+	const QUICK_USE_SIZE = 5;
 
 	let backpack: InventorySlot[] = $state(
 		Array.from({ length: BACKPACK_SIZE }, (_, i) => {
@@ -48,53 +50,29 @@
 			return null;
 		})
 	);
+
+	let raidersCahses: InventorySlot[] = $state(
+		Array.from({ length: RAIDER_CASHES }, (_, i) => {
+			if (i === 0) return { type: 'loot', id: 'l-1', image: item, count: 50, rare: 'common' };
+			if (i === 1) return { type: 'loot', id: 'l-2', image: item1, count: 3, rare: 'uncommon' };
+			if (i === 2) return { type: 'loot', id: 'l-3', image: item2, count: 1, rare: 'epic' };
+
+			return null;
+		})
+	);
+	let usableItem = $state({
+		quickUse: Array.from({ length: QUICK_USE_SIZE }, (_, i) => {
+			return null;
+		}),
+		agumentSlots: [null, null],
+		safePocket: [null, null, null]
+	});
+
 	let weaponSlots = $state([null, null]);
 	let equipmentSlots = $state([null, null]);
 
-	const checkCompatibility = (
-		itemType: string,
-		targetContainerType: string,
-		index: number
-	): boolean => {
-		if (targetContainerType === 'backpack') return true;
-		if (targetContainerType === 'weapon') {
-			return itemType === 'weapon';
-		}
-		if (targetContainerType === 'equipment') {
-			if (index === 0) return itemType === 'augment';
-			if (index === 1) return itemType === 'shield';
-		}
-		return false;
-	};
-	function isSlotInvalid(targetType: 'weapon' | 'equipment' | 'backpack', index: number) {
-		if (!dndState.isDragging || !dndState.draggedItem) return false;
-
-		const itemType = dndState.draggedItem.item.type;
-		const isValid = checkCompatibility(itemType, targetType, index);
-
-		return !isValid;
-	}
-
-	const validateOnDragOver = (state: DragDropState<DragData>) => {
-		const { draggedItem, targetContainer } = state;
-		if (!draggedItem || !targetContainer) return;
-
-		const [type, idxStr] = targetContainer.split('-');
-		const index = parseInt(idxStr);
-		const itemType = draggedItem.item.type;
-
-		const isCompatible = checkCompatibility(itemType, type, index);
-		dndState.invalidDrop = !isCompatible;
-	};
-
-	const getListRef = (containerId: string) => {
-		const [type, idxStr] = containerId.split('-');
-		const index = parseInt(idxStr);
-		if (type === 'backpack') return { list: backpack, index };
-		if (type === 'weapon') return { list: weaponSlots, index };
-		if (type === 'equipment') return { list: equipmentSlots, index };
-		return { list: backpack, index: 0 };
-	};
+	const raidersCahsesFilled = $derived(raidersCahses.filter((item) => item !== null).length);
+	const backpackFilled = $derived(backpack.filter((item) => item !== null).length);
 
 	const dragDropCallbacks = {
 		onDragOver: (state: DragDropState<DragData>) => {
@@ -109,7 +87,6 @@
 
 			const source = getListRef(sourceContainer);
 			const target = getListRef(targetContainer);
-			console.log('source', source, 'target', target, 'dndState', dndState);
 			const itemFrom = source.list[source.index];
 			const itemTo = target.list[target.index];
 
@@ -122,118 +99,274 @@
 	};
 </script>
 
-<div class="flex h-full w-full items-start justify-center gap-6 bg-[#0f111a] pt-10 select-none">
-	<div class="flex w-[300px] flex-col gap-6">
-		<div class="flex gap-4">
-			{#each equipmentSlots as item, index (item ? item.id : `equipment-empty-${index}`)}
+<div class="flex h-full w-full items-center justify-center gap-4 px-5 py-16">
+	<div
+		class="z-10 flex h-full w-[35%] flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs"
+	>
+		<!-- header -->
+		<div class="flex items-center gap-4">
+			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
+			<span class="text-sm">{raidersCahsesFilled}/{RAIDER_CASHES}</span>
+		</div>
+		<!-- content -->
+		<div class="text-sm uppercase">filter</div>
+		<div class="grid grid-cols-4 gap-2">
+			{#each raidersCahses as item, index (item ? item.id : `empty-cashes-${index}`)}
 				<div
 					use:droppable={{
-						container: `equipment-${index}`,
+						container: `raiders-cahses-${index}`,
 						callbacks: dragDropCallbacks,
 						attributes: {
-							dragOverClass: dndState.invalidDrop ? 'invalid-drop' : 'valid-drop'
+							dragOverClass: 'valid-drop'
 						}
 					}}
-					class="flex aspect-video w-full items-center justify-center overflow-hidden
-           rounded-xl border border-white/10 bg-[#0f1016]/50 ${isSlotInvalid('equipment', index)
-						? 'border-red-500 bg-red-500/20'
-						: 'valid-drop'}"
+					class="aspect-square h-20 w-20"
+					animate:flip={{ duration: FLIP_DURATION_MS }}
 				>
 					{#if item}
 						<div
-							use:draggable={{
-								container: `equipment-${index}`,
-								dragData: { item, sourceContainerId: `equipment-${index}` }
-							}}
+							use:draggable={{ container: `backpack-${index}`, dragData: { item } }}
 							class="h-full w-full"
 						>
 							<LootItem {item} className="h-full w-full" />
 						</div>
 					{:else}
-						<div
-							class="pointer-events-none flex flex-col items-center justify-center text-white/20"
-						>
-							<span class="font-mono text-sm tracking-widest uppercase">Equipment {index + 1}</span>
-							<span class="text-xs opacity-50">Empty</span>
-						</div>
+						<LootItem
+							item={{ type: 'empty', id: `empty-${index}` }}
+							className="h-full w-full pointer-events-none"
+						/>
 					{/if}
 				</div>
 			{/each}
 		</div>
-		{#each weaponSlots as item, index (item ? item.id : `weapon-empty-${index}`)}
-			<div
-				use:droppable={{
-					container: `weapon-${index}`,
-					callbacks: dragDropCallbacks,
-					attributes: {
-						dragOverClass: dndState.invalidDrop ? 'invalid-drop' : 'valid-drop'
-					}
-				}}
-				class="flex aspect-video w-full items-center justify-center overflow-hidden
-           rounded-xl border border-white/10 bg-[#0f1016]/50 ${isSlotInvalid('weapon', index)
-					? 'border-red-500 bg-red-500/20'
-					: 'valid-drop'}"
-			>
-				{#if item}
-					<div
-						use:draggable={{
-							container: `weapon-${index}`,
-							dragData: { item, sourceContainerId: `weapon-${index}` }
-						}}
-						class="h-full w-full"
-					>
-						<LootItem {item} className="h-full w-full" />
-					</div>
-				{:else}
-					<div class="pointer-events-none flex flex-col items-center justify-center text-white/20">
-						<span class="font-mono text-sm tracking-widest uppercase">Weapon {index + 1}</span>
-						<span class="text-xs opacity-50">Empty</span>
-					</div>
-				{/if}
-			</div>
-		{/each}
 	</div>
-	<div class="grid grid-cols-4 gap-2">
-		{#each backpack as item, index (item ? item.id : `empty-${index}`)}
-			<div
-				use:droppable={{
-					container: `backpack-${index}`,
-					callbacks: dragDropCallbacks,
-					attributes: {
-						dragOverClass: 'valid-drop'
-					}
-				}}
-				class="aspect-square h-20 w-20"
-				animate:flip={{ duration: FLIP_DURATION_MS }}
-			>
-				{#if item}
-					<!-- {@const isDraggingThis = dndState.draggedItem?.item.id === item.id} -->
+	<div
+		class="z-10 flex h-full w-full flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs"
+	>
+		<!-- main header -->
+		<div class="flex items-center">
+			<h2 class="text-base font-bold uppercase">loadout</h2>
+		</div>
+		<div class="flex h-full w-full gap-10">
+			<!-- equipment slots -->
+			<div class="flex flex-col gap-4">
+				<div class="text-sm uppercase">equipment</div>
+				<div class="flex gap-4">
+					{#each equipmentSlots as item, index (item ? item.id : `equipment-empty-${index}`)}
+						<div
+							use:droppable={{
+								container: `equipment-${index}`,
+								callbacks: dragDropCallbacks,
+								attributes: {
+									dragOverClass: dndState.invalidDrop ? 'invalid-drop' : 'valid-drop'
+								}
+							}}
+							class="flex aspect-video h-20 items-center justify-center
+           rounded-lg border border-white/20"
+						>
+							{#if item}
+								<div
+									use:draggable={{
+										container: `equipment-${index}`,
+										dragData: { item, sourceContainerId: `equipment-${index}` }
+									}}
+									class="h-full w-full"
+								>
+									<LootItem {item} className="h-full w-full" />
+								</div>
+							{:else}
+								<div
+									class="pointer-events-none flex flex-col items-center justify-center text-white/20"
+								>
+									<span class="font-mono text-sm tracking-widest uppercase"
+										>Equipment {index + 1}</span
+									>
+									<span class="text-xs opacity-50">Empty</span>
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				{#each weaponSlots as item, index (item ? item.id : `weapon-empty-${index}`)}
 					<div
-						use:draggable={{ container: `backpack-${index}`, dragData: { item } }}
-						class="h-full w-full cursor-grab transition-transform hover:scale-105 active:cursor-grabbing"
+						use:droppable={{
+							container: `weapon-${index}`,
+							callbacks: dragDropCallbacks,
+							attributes: {
+								dragOverClass: dndState.invalidDrop ? 'invalid-drop' : 'valid-drop'
+							}
+						}}
+						class="flex aspect-video h-40 items-center justify-center overflow-hidden
+           rounded-lg border border-white/20"
 					>
-						<LootItem {item} className="h-full w-full" />
+						{#if item}
+							<div
+								use:draggable={{
+									container: `weapon-${index}`,
+									dragData: { item, sourceContainerId: `weapon-${index}` }
+								}}
+								class="h-full w-full"
+							>
+								<LootItem {item} className="h-full w-full" />
+							</div>
+						{:else}
+							<div
+								class="pointer-events-none flex flex-col items-center justify-center text-white/20"
+							>
+								<span class="font-mono text-sm tracking-widest uppercase">Weapon {index + 1}</span>
+								<span class="text-xs opacity-50">Empty</span>
+							</div>
+						{/if}
 					</div>
-				{:else}
-					<LootItem
-						item={{ type: 'empty', id: `empty-${index}` }}
-						className="h-full w-full pointer-events-none"
-					/>
-				{/if}
+				{/each}
 			</div>
-		{/each}
+			<!-- backpack -->
+			<div class="flex flex-col gap-4">
+				<!-- header -->
+				<div class="flex items-center gap-4">
+					<div class="text-sm uppercase">backpack</div>
+					<span class="text-sm">{backpackFilled}/{BACKPACK_SIZE}</span>
+				</div>
+				<div class="grid grid-cols-4 gap-2">
+					{#each backpack as item, index (item ? item.id : `empty-${index}`)}
+						<div
+							use:droppable={{
+								container: `backpack-${index}`,
+								callbacks: dragDropCallbacks,
+								attributes: {
+									dragOverClass: 'valid-drop'
+								}
+							}}
+							class="aspect-square h-20 w-20"
+							animate:flip={{ duration: FLIP_DURATION_MS }}
+						>
+							{#if item}
+								<!-- {@const isDraggingThis = dndState.draggedItem?.item.id === item.id} -->
+								<div
+									use:draggable={{ container: `backpack-${index}`, dragData: { item } }}
+									class="h-full w-full"
+								>
+									<LootItem {item} className="h-full w-full" />
+								</div>
+							{:else}
+								<LootItem
+									item={{ type: 'empty', id: `empty-${index}` }}
+									className="h-full w-full pointer-events-none"
+								/>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</div>
+			<!-- quick use  -->
+			<div class="flex flex-col gap-4">
+				<!-- useble item -->
+
+				<div class="flex items-center gap-4">
+					<div class="text-sm uppercase">quick use</div>
+					<span class="text-sm">{backpackFilled}/{BACKPACK_SIZE}</span>
+				</div>
+				<!-- content -->
+				<div class="grid grid-cols-3 gap-2">
+					{#each usableItem.quickUse as item, index (item ? item.id : `empty-${index}`)}
+						<div
+							use:droppable={{
+								container: `quickUse-${index}`,
+								callbacks: dragDropCallbacks,
+								attributes: {
+									dragOverClass: 'valid-drop'
+								}
+							}}
+							class="aspect-square h-20 w-20"
+							animate:flip={{ duration: FLIP_DURATION_MS }}
+						>
+							{#if item}
+								<div
+									use:draggable={{ container: `quickUse-${index}`, dragData: { item } }}
+									class="h-full w-full"
+								>
+									<LootItem {item} className="h-full w-full" />
+								</div>
+							{:else}
+								<LootItem
+									item={{ type: 'empty', id: `empty-${index}` }}
+									className="h-full w-full pointer-events-none"
+								/>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				<!-- augment slots  -->
+				<div class="flex items-center gap-4">
+					<div class="text-sm uppercase">augmented slots</div>
+					<span class="text-sm">{backpackFilled}/{BACKPACK_SIZE}</span>
+				</div>
+				<!-- content -->
+				<div class="flex gap-2">
+					{#each usableItem.agumentSlots as item, index (item ? item.id : `empty-${index}`)}
+						<div
+							use:droppable={{
+								container: `quickUse-${index}`,
+								callbacks: dragDropCallbacks,
+								attributes: {
+									dragOverClass: 'valid-drop'
+								}
+							}}
+							class="aspect-square h-20 w-20"
+							animate:flip={{ duration: FLIP_DURATION_MS }}
+						>
+							{#if item}
+								<div
+									use:draggable={{ container: `quickUse-${index}`, dragData: { item } }}
+									class="h-full w-full"
+								>
+									<LootItem {item} className="h-full w-full" />
+								</div>
+							{:else}
+								<LootItem
+									item={{ type: 'empty', id: `empty-${index}` }}
+									className="h-full w-full pointer-events-none"
+								/>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				<!-- safe pocket  -->
+				<div class="flex items-center gap-4">
+					<div class="text-sm uppercase">safe pocket</div>
+					<span class="text-sm">{backpackFilled}/{BACKPACK_SIZE}</span>
+				</div>
+				<!-- content -->
+				<div class="flex gap-2">
+					{#each usableItem.safePocket as item, index (item ? item.id : `empty-${index}`)}
+						<div
+							use:droppable={{
+								container: `quickUse-${index}`,
+								callbacks: dragDropCallbacks,
+								attributes: {
+									dragOverClass: 'valid-drop'
+								}
+							}}
+							class="aspect-square h-20 w-20"
+							animate:flip={{ duration: FLIP_DURATION_MS }}
+						>
+							{#if item}
+								<div
+									use:draggable={{ container: `quickUse-${index}`, dragData: { item } }}
+									class="h-full w-full"
+								>
+									<LootItem {item} className="h-full w-full" />
+								</div>
+							{:else}
+								<LootItem
+									item={{ type: 'empty', id: `empty-${index}` }}
+									className="h-full w-full pointer-events-none"
+								/>
+							{/if}
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
-
-<style>
-	:global(.valid-drop) {
-		border-color: rgba(34, 197, 94, 0.5) !important;
-		background-color: rgba(34, 197, 94, 0.1) !important;
-	}
-
-	:global(.invalid-drop) {
-		border-color: rgba(68, 239, 168, 0.5) !important;
-		background-color: rgba(239, 68, 68, 0.1) !important;
-		cursor: no-drop !important;
-	}
-</style>

@@ -62,18 +62,16 @@
 <div class={className}>
 	{#if item.type === 'empty'}
 		<div
-			class="h-full w-full cursor-default rounded-xl border border-white/20 bg-[#0f1016]/50"
+			class="h-full w-full cursor-default rounded-lg border border-white/20"
 			onmousedown={preventDrag}
 			ontouchstart={preventDrag}
 			onpointerdown={preventDrag}
 		></div>
 	{:else}
 		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-xl bg-linear-to-tr p-[1.5px] {rarityStyle.border}"
+			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1.5px] {rarityStyle.border}"
 		>
-			<div
-				class="relative flex h-full w-full flex-col overflow-hidden rounded-[10.5px] bg-[#0f111a]"
-			>
+			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
 				<div
 					class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
 				></div>
