@@ -96,29 +96,29 @@
 		return { list: backpack, index: 0 };
 	};
 
-const dragDropCallbacks = {
-	onDragOver: (state: DragDropState<DragData>) => {
-		validateOnDragOver(state);
-	},
-	onDrop: (state: DragDropState<DragData>) => {
-		if (dndState.invalidDrop) return;
+	const dragDropCallbacks = {
+		onDragOver: (state: DragDropState<DragData>) => {
+			validateOnDragOver(state);
+		},
+		onDrop: (state: DragDropState<DragData>) => {
+			if (dndState.invalidDrop) return;
 
-		const { sourceContainer, targetContainer } = state;
+			const { sourceContainer, targetContainer } = state;
 
-		if (!targetContainer || sourceContainer === targetContainer) return;
+			if (!targetContainer || sourceContainer === targetContainer) return;
 
-		const source = getListRef(sourceContainer);
-		const target = getListRef(targetContainer);
-		const itemFrom = source.list[source.index];
-		const itemTo = target.list[target.index];
+			const source = getListRef(sourceContainer);
+			const target = getListRef(targetContainer);
+			const itemFrom = source.list[source.index];
+			const itemTo = target.list[target.index];
 
-		target.list[target.index] = itemFrom;
-		source.list[source.index] = itemTo;
-	},
-	onDragEnd: () => {
-		dndState.invalidDrop = false;
-	}
-};
+			target.list[target.index] = itemFrom;
+			source.list[source.index] = itemTo;
+		},
+		onDragEnd: () => {
+			dndState.invalidDrop = false;
+		}
+	};
 </script>
 
 <div class="flex h-full w-full items-center justify-center gap-6 p-10 backdrop-blur-lg">
