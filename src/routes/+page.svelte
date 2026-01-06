@@ -12,6 +12,7 @@
 	import weaponImg from '$lib/assets/weapon-kettle.webp';
 	import invalid from '$lib/assets/invalid.png';
 	import { flip } from 'svelte/animate';
+	import WeaponCard from '$lib/components/weapon-card.svelte';
 
 	type ItemType = 'empty' | 'loot' | 'weapon' | 'augment' | 'shield' | 'quickUse';
 
@@ -27,7 +28,6 @@
 
 	interface DragData {
 		item: BaseItem;
-		sourceContainerId: string;
 	}
 
 	type InventorySlot = BaseItem | null;
@@ -64,7 +64,17 @@
 			return null;
 		})
 	);
-	let weaponSlots = $state([null, null]);
+	let weaponSlots = $state([
+		{
+			type: 'weapon',
+			id: 'w-4',
+			image: weaponImg,
+			count: 1,
+			rare: 'common',
+			attachments: [null, null, null, null]
+		},
+		null
+	]);
 	let equipmentSlots = $state([null, null]);
 
 	// counters
@@ -128,16 +138,11 @@
 			target.list[target.index] = itemFrom;
 			source.list[source.index] = itemTo;
 		},
-		onDragEnd: () => {
-			// console.log('onDragEnd');
-			// dndState.invalidDrop = false;
-			// dndState.isDragging = false;
-			// dndState.draggedItem = null;
-		}
+		onDragEnd: () => {}
 	};
 </script>
 
-<div class="flex h-full w-full items-center justify-center gap-4 px-5 py-16">
+<div class="flex h-full w-full items-start justify-center gap-4 px-5 py-16">
 	<div class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs">
 		<!-- header -->
 		<div class="flex items-center gap-4">
@@ -152,10 +157,7 @@
 				<div
 					use:droppable={{
 						container: `lootBack-${index}`,
-						callbacks: dragDropCallbacks,
-						attributes: {
-							dragOverClass: 'valid-drop'
-						}
+						callbacks: dragDropCallbacks
 					}}
 					class="aspect-square h-20 w-20"
 					animate:flip={{ duration: FLIP_DURATION_MS }}
@@ -184,7 +186,7 @@
 		<div class="flex items-center">
 			<h2 class="text-base font-bold uppercase">loadout</h2>
 		</div>
-		<div class="flex h-full w-full justify-center gap-10">
+		<div class="flex h-full w-full justify-center gap-8">
 			<!-- equipment slots -->
 			<div class="flex flex-col gap-4">
 				<div class="text-sm uppercase">equipment</div>
@@ -197,13 +199,10 @@
 						<div
 							use:droppable={{
 								container: `equipment-${index}`,
-								callbacks: dragDropCallbacks,
-								attributes: {
-									dragOverClass: dndState.invalidDrop ? 'invalid-drop' : 'valid-drop'
-								}
+								callbacks: dragDropCallbacks
 							}}
-							class="flex aspect-video h-20 items-center justify-center
-           rounded-lg border {isInvalid ? 'border-red-500' : 'border-white/20'}"
+							class="flex h-20 w-[120px] items-center justify-center
+           rounded-lg border border-white/20"
 						>
 							{#if item}
 								<div
@@ -246,8 +245,8 @@
 							container: `weapon-${index}`,
 							callbacks: dragDropCallbacks
 						}}
-						class="flex aspect-video h-40 items-center justify-center overflow-hidden
-           rounded-lg border {isInvalid ? 'border-red-500' : 'border-white/20'}"
+						class="flex h-44 w-64 items-center justify-center overflow-hidden
+           rounded-lg border border-white/20"
 					>
 						{#if item}
 							<div
@@ -257,7 +256,7 @@
 								}}
 								class="h-full w-full"
 							>
-								<LootItem {item} className="h-full w-full" />
+								<WeaponCard {item} className="h-full w-full" />
 							</div>
 						{:else if isInvalid}
 							<div class="pointer-events-none h-full w-full p-5">
@@ -286,10 +285,7 @@
 						<div
 							use:droppable={{
 								container: `backpack-${index}`,
-								callbacks: dragDropCallbacks,
-								attributes: {
-									dragOverClass: 'valid-drop'
-								}
+								callbacks: dragDropCallbacks
 							}}
 							class="aspect-square h-20 w-20"
 							animate:flip={{ duration: FLIP_DURATION_MS }}
