@@ -1,46 +1,24 @@
 <script lang="ts">
-	import duck from '$lib/assets/loot_assets/ARC Motion Core.png';
+	import { draggable, droppable } from '@thisux/sveltednd';
+	import LootItem from './loot-item.svelte';
 	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
-	import { draggable, droppable, dndState, type DragDropState } from '@thisux/sveltednd';
-
-	import CategoryIcon from '$lib/assets/category.webp';
 	import ammoTypeImg from '$lib/assets/ammo-type.webp';
 	import TierIcon from '$lib/components/tier-icon.svelte';
-	import LootItem from './loot-item.svelte';
-
-	type Attachment = {
-		id: string;
-		type: 'muzzle' | 'grip' | 'mag' | 'stock';
-		image?: string;
-		rare?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-	};
+	import { dndState } from '@thisux/sveltednd';
 
 	type Props = {
-		item: {
-			id: string;
-			type: 'weapon' | 'empty';
-			image?: string;
-			imageCategory?: string;
-			rare?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-			ammoCurrent: number;
-			tier?: number;
-			ammoMax?: number;
-			attachments?: Attachment[] | null;
-		};
+		item: any;
 		className?: string;
-		containerId?: string;
+		containerId: string;
 		callbacks: any;
 	};
 
 	let { item, className = 'h-40', containerId, callbacks }: Props = $props();
 
+	console.log('[weapon]', item);
+
 	const RARITY_CONFIG = {
-		common: {
-			border: 'bg-white/20',
-			bg: 'bg-white/30',
-			glow: 'bg-gray-600',
-			height: 'h-[40%]'
-		},
+		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
 		uncommon: {
 			border: 'from-green-500 via-green-500 via-5% to-slate-700 to-80%',
 			bg: 'bg-green-500',
@@ -68,73 +46,75 @@
 	} as const;
 
 	const rarityStyle = $derived(RARITY_CONFIG[item.rare ?? 'common']);
-	const attachSlots = $derived(item.attachments || [null, null, null, null]);
 
+	const attachSlots = $derived(item.attachments || [null, null, null, null]);
 	const slotName = ['MZ', 'GR', 'MG', 'ST'];
 
-	function preventDrag(e: MouseEvent | TouchEvent) {
-		e.stopImmediatePropagation();
-		e.preventDefault();
-	}
-
-	function stopProp(e: MouseEvent | TouchEvent) {
+	function handleInternalDrag(e: Event) {
 		e.stopPropagation();
 	}
 </script>
 
 <div class={className}>
 	{#if item.type === 'empty'}
-		<div
-			class="h-full w-full cursor-default rounded-lg border border-white/20"
-			onmousedown={preventDrag}
-			ontouchstart={preventDrag}
-			onpointerdown={preventDrag}
-		></div>
+		<div class="h-full w-full cursor-default rounded-lg border border-white/20"></div>
 	{:else}
 		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[0.5px] {rarityStyle.border}"
+			class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[0.5px] {rarityStyle.border}"
 		>
 			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
 				{@render absoluteGlowShadow()}
-				<div class="relative min-h-0 flex-1 items-center justify-center">
+
+				<div class="relative min-h-0 items-center justify-center">
 					{@render absoluteBlob()}
-					<img
-						src={item.image || duck1}
-						alt="Loot"
-						class="relative z-10 h-full w-full object-contain"
-					/>
+					<div
+						use:draggable={{
+							container: containerId,
+							dragData: { item },
+							disabled: dndState.isDragging && dndState.draggedItem?.item?.id !== item.id // опционально
+						}}
+						class="cursor-grab active:cursor-grabbing"
+					>
+						<img
+							src={item.image || duck1}
+							alt="Loot"
+							class="relative z-10 h-full w-full object-contain"
+						/>
+					</div>
 				</div>
-				<div class="flex h-10 items-center justify-center gap-1">
-					{#each attachSlots as attach, index}
+
+				<div class="relative z-50 mb-1 flex h-10 items-center justify-center gap-1">
+					{#each item.attachments as attach, index}
 						{@const slotId = `${containerId}-attach-${index}`}
+
 						<div
-							class="flex aspect-square size-8 items-center justify-center rounded border border-white/20"
 							use:droppable={{
 								container: slotId,
-								callbacks,
-								attributes: { dragOverClass: 'ring-1 ring-white bg-white/10' }
+								callbacks: callbacks,
+								attributes: { dragOverClass: 'bg-white/50 ring-2 ring-white' },
+								disabled: dndState.isDragging && dndState.draggedItem?.item.type === 'weapon'
 							}}
-							onmousedown={stopProp}
-							ontouchstart={stopProp}
+							onpointerdown={handleInternalDrag}
+							ondragover={(e) => e.stopPropagation()}
+							ondragenter={(e) => e.stopPropagation()}
+							class="relative z-30 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
 						>
 							{#if attach}
 								<div
+									use:draggable={{ container: slotId, dragData: { item: attach } }}
 									class="h-full w-full cursor-grab p-0.5 active:cursor-grabbing"
-									use:draggable={{
-										container: slotId,
-										dragData: { item: attach }
-									}}
 								>
-									<LootItem {item} className="h-full w-full" />
+									<LootItem item={attach} className="h-full w-full" />
 								</div>
 							{:else}
-								<div class="font-mono text-[8px] text-white/20">
+								<div class=" font-mono text-[8px] text-white/20 select-none">
 									{slotName[index]}
 								</div>
 							{/if}
 						</div>
 					{/each}
 				</div>
+
 				{@render footer()}
 			</div>
 		</div>
@@ -143,17 +123,14 @@
 
 {#snippet absoluteGlowShadow()}
 	<div
-		class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
+		class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow}"
 	></div>
 {/snippet}
 
 {#snippet absoluteBlob()}
 	<div
 		class="absolute -bottom-10.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
-		style="
-                            mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%); 
-                            -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);
-                        "
+		style="mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);"
 	></div>
 {/snippet}
 
@@ -164,12 +141,10 @@
 			<div class="flex font-mono text-xs text-white/90">
 				<p class="tabular-nums">{item.ammoCurrent || 0}</p>
 				<span class="text-white">/</span>
-
 				<p class="tabular-nums">{item.ammoMax || 30}</p>
 			</div>
 		</div>
-
-		<div class=" text-white/70">
+		<div class="text-white/70">
 			<TierIcon tier={item.tier || 3} className="size-7" />
 		</div>
 	</div>
