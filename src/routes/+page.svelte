@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { draggable, droppable, dndState, type DragDropState } from '@thisux/sveltednd';
-	import LootItem from '$lib/components/loot-item.svelte';
+	import { setInventory, type ItemType } from '$lib/state/inventory-manager.svelte';
+
+	import ItemCard from '$lib/components/item-card.svelte';
 
 	//assets
 	import item from '$lib/assets/loot_assets/ARC Motion Core.png';
@@ -10,11 +12,12 @@
 	import augment1 from '$lib/assets/augment-1.png';
 	import shield1 from '$lib/assets/shield-1.png';
 	import weaponImg from '$lib/assets/weapon-kettle.webp';
-	import invalid from '$lib/assets/invalid.png';
 	import { flip } from 'svelte/animate';
 	import WeaponCard from '$lib/components/weapon-card.svelte';
+	import DndItem from '$lib/components/dnd-item.svelte';
+	import InvalidCard from '$lib/components/invalid-card.svelte';
 
-	type ItemType = 'empty' | 'loot' | 'weapon' | 'augment' | 'shield' | 'quickUse';
+	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 
 	type RarityType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
@@ -32,141 +35,53 @@
 
 	type InventorySlot = BaseItem | null;
 
-	const BACKPACK_SIZE = 14;
-	const LOOT_BACK_SIZE = 20;
-	const FLIP_DURATION_MS = 0;
+	const inv = setInventory();
 
-	let backpack: InventorySlot[] = $state(
-		Array.from({ length: BACKPACK_SIZE }, (_, i) => {
-			if (i === 0) return { type: 'loot', id: 'l-1', image: item, count: 50, rare: 'common' };
-			if (i === 1) return { type: 'loot', id: 'l-2', image: item1, count: 3, rare: 'uncommon' };
-			if (i === 2) return { type: 'loot', id: 'l-3', image: item2, count: 1, rare: 'epic' };
-			if (i === 3) return { type: 'loot', id: 'l-4', image: item3, count: 1, rare: 'legendary' };
-			if (i === 4) return { type: 'weapon', id: 'w-1', image: weaponImg, count: 1, rare: 'common' };
-			if (i === 5)
+	inv.setup({
+		backpack: Array.from({ length: 14 }, (_, i) => {
+			if (i === 0)
+				return {
+					id: 'l-1',
+					type: 'loot',
+					rare: 'common',
+					image: item1,
+					count: 50
+				};
+			if (i === 3) {
+				return { type: 'shield', id: 'e-1', image: shield1, count: 1, rare: 'uncommon' };
+			}
+			if (i === 7) {
 				return { type: 'augment', id: 'a-1', image: augment1, count: 1, rare: 'uncommon' };
-			if (i === 6) return { type: 'shield', id: 'e-1', image: shield1, count: 1, rare: 'uncommon' };
-
-			return null;
-		})
-	);
-	let lootBack: InventorySlot[] = $state(
-		Array.from({ length: LOOT_BACK_SIZE }, (_, i) => {
-			if (i === 0) return { type: 'loot', id: 'lb-1', image: item, count: 50, rare: 'common' };
-			if (i === 1) return { type: 'loot', id: 'lb-2', image: item1, count: 3, rare: 'uncommon' };
+			}
+			if (i === 6) {
+				return { type: 'attachment', id: 'a-1', image: item3, count: 1, rare: 'uncommon' };
+			}
 			if (i === 4)
 				return {
+					id: 'w-1',
 					type: 'weapon',
-					id: 'lb-4',
+					rare: 'uncommon',
 					image: weaponImg,
 					count: 1,
-					rare: 'epic',
 					attachments: [null, null, null, null]
 				};
-			if (i === 5)
-				return { type: 'augment', id: 'lb-5', image: augment1, count: 1, rare: 'uncommon' };
-			if (i === 6)
-				return { type: 'shield', id: 'lb-6', image: shield1, count: 1, rare: 'uncommon' };
-
 			return null;
-		})
-	);
-	let weaponSlots = $state([
-		{
-			type: 'weapon',
-			id: 'w-4',
-			image: weaponImg,
-			count: 1,
-			rare: 'common',
-			attachments: [null, null, null, null]
-		},
-		null
-	]);
-	let equipmentSlots = $state([null, null]);
+		}),
+		lootBack: Array.from({ length: 20 }, (_, i) => {
+			if (i === 0)
+				return {
+					id: 'lb-1',
+					type: 'loot',
+					rare: 'epic',
+					image: item1,
+					count: 10
+				};
+			return null;
+		}),
+		equipment: [null, null]
+	});
 
-	const raidersCahsesFilled = $derived(lootBack.filter((item) => item !== null).length);
-	const backpackFilled = $derived(backpack.filter((item) => item !== null).length);
-
-	const checkCompatibility = (itemType: string, targetType: string, targetIndex: number) => {
-		if (targetType === 'backpack' || targetType === 'lootBack') return true;
-		if (targetType === 'weapon') return itemType === 'weapon';
-		if (targetType === 'weaponAttach') return true;
-
-		if (targetType === 'equipment') {
-			if (targetIndex === 0) return itemType === 'augment';
-			if (targetIndex === 1) return itemType === 'shield';
-		}
-		return false;
-	};
-
-	const getListRef = (containerId: string) => {
-		const parts = containerId.split('-');
-
-		const type = parts[0];
-		const index = parseInt(parts[1]);
-
-		if (type === 'weapon' && parts[2] === 'attach') {
-			const attachIndex = parseInt(parts[3]);
-			const weapon = weaponSlots[index];
-
-			if (!weapon || weapon.type !== 'weapon') return null;
-
-			return { list: weapon.attachments, index: attachIndex, weaponIndex: index };
-		}
-
-		if (type === 'backpack') return { list: backpack, index: index };
-		if (type === 'lootBack') return { list: lootBack, index: index };
-		if (type === 'weapon') return { list: weaponSlots, index: index };
-		if (type === 'equipment') return { list: equipmentSlots, index: index };
-
-		return { list: backpack, index: 0 };
-	};
-
-	const dragDropCallbacks = {
-		onDragOver: (state: DragDropState<DragData>) => {
-			const { draggedItem, targetContainer } = state;
-
-			if (!draggedItem || !targetContainer) return;
-
-			const parts = targetContainer.split('-');
-
-			console.log('[OVER]', {
-				source: state.sourceContainer,
-				target: state.targetContainer,
-				invalid: dndState.invalidDrop
-			});
-
-			let targetType = parts[0];
-			let targetIndx = parseInt(parts[1]);
-
-			// weapon-0-attach-2  =>  targetType = weaponAttach, targetIndx = 2
-			if (parts[0] === 'weapon' && parts[2] === 'attach') {
-				targetType = 'weaponAttach';
-				targetIndx = parseInt(parts[3]);
-			}
-
-			const isValid = checkCompatibility(draggedItem.item.type, targetType, targetIndx);
-			dndState.invalidDrop = !isValid;
-		},
-		onDrop: (state: DragDropState<DragData>) => {
-			if (dndState.invalidDrop) return;
-
-			const { sourceContainer, targetContainer } = state;
-
-			if (!targetContainer || sourceContainer === targetContainer) return;
-
-			const source = getListRef(sourceContainer);
-			const target = getListRef(targetContainer);
-
-			// swap items
-			const itemFrom = source.list[source.index];
-			const itemTo = target.list[target.index];
-
-			target.list[target.index] = itemFrom;
-			source.list[source.index] = itemTo;
-		},
-		onDragEnd: () => {}
-	};
+	const BP_ALLOWED: ItemType[] = ['loot', 'weapon', 'augment', 'shield', 'attachment'];
 </script>
 
 <!-- debug -->
@@ -188,39 +103,28 @@
 {/if}
 
 <div class="flex h-full w-full items-start justify-center gap-4 px-5 py-16">
+	<!-- lootback -->
 	<div class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs">
 		<!-- header -->
 		<div class="flex items-center gap-4">
 			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
-			<span class="text-sm">{raidersCahsesFilled}/{LOOT_BACK_SIZE}</span>
+			<span class="text-sm">{inv.lootBack.filter((i) => i).length}/20</span>
 		</div>
 		<!-- content -->
 		<div class="text-sm uppercase">filter</div>
-
 		<div class="grid grid-cols-4 gap-2">
-			{#each lootBack as item, index (item ? item.id : `lootBack-empty-${index}`)}
-				<div
-					use:droppable={{
-						container: `lootBack-${index}`,
-						callbacks: dragDropCallbacks
-					}}
-					class="aspect-square h-20 w-20"
-					animate:flip={{ duration: FLIP_DURATION_MS }}
+			{#each inv.lootBack as _, index (index)}
+				<DndItem
+					id="lootBack-{index}"
+					collection={inv.lootBack}
+					{index}
+					allowedTypes={BP_ALLOWED}
+					className="h-20 w-20 aspect-square"
 				>
-					{#if item}
-						<div
-							use:draggable={{ container: `lootBack-${index}`, dragData: { item } }}
-							class="h-full w-full"
-						>
-							<LootItem {item} className="h-full w-full" />
-						</div>
-					{:else}
-						<LootItem
-							item={{ type: 'empty', id: `lootBack-empty-${index}` }}
-							className="h-full w-full pointer-events-none"
-						/>
-					{/if}
-				</div>
+					{#snippet children(item)}
+						<ItemCard {item} className="h-full w-full" />
+					{/snippet}
+				</DndItem>
 			{/each}
 		</div>
 	</div>
@@ -232,123 +136,122 @@
 			<h2 class="text-base font-bold uppercase">loadout</h2>
 		</div>
 		<div class="flex h-full w-full justify-center gap-8">
-			<!-- equipment slots -->
 			<div class="flex flex-col gap-4">
 				<div class="text-sm uppercase">equipment</div>
 				<div class="flex gap-4">
-					{#each equipmentSlots as item, index (item ? item.id : `equipment-empty-${index}`)}
-						{@const isInvalid =
-							dndState.isDragging &&
-							dndState.draggedItem &&
-							!checkCompatibility(dndState.draggedItem.item.type, 'equipment', index)}
-						<div
-							use:droppable={{
-								container: `equipment-${index}`,
-								callbacks: dragDropCallbacks
-							}}
-							class="flex h-20 w-[120px] items-center justify-center
-           rounded-lg border border-white/20"
-						>
+					<DndItem
+						id="equipment-0"
+						collection={inv.equipmentSlots}
+						index={0}
+						allowedTypes={['augment']}
+						className="flex h-20 w-[120px] items-center justify-center rounded-lg border border-white/20"
+					>
+						{#snippet children(item, isInvalid)}
 							{#if item}
-								<div
-									use:draggable={{
-										container: `equipment-${index}`,
-										dragData: { item }
-									}}
-									class="h-full w-full"
-								>
-									<LootItem {item} className="h-full w-full" />
-								</div>
+								<ItemCard {item} className="h-full w-full" />
 							{:else if isInvalid}
-								<div class="pointer-events-none h-full w-full p-5">
-									<img
-										src={invalid}
-										alt="invalid"
-										class="h-full w-full object-contain opacity-50"
-									/>
-								</div>
+								<InvalidCard />
 							{:else}
 								<div
-									class="pointer-events-none flex flex-col items-center justify-center text-white/20"
+									class="pointer-events-none flex h-full flex-col items-center justify-center text-white/20"
 								>
-									<span class="font-mono text-sm tracking-widest uppercase"
-										>Equipment {index + 1}</span
-									>
+									<span class="font-mono text-sm tracking-widest uppercase">Equipment 1</span>
 									<span class="text-xs opacity-50">Empty</span>
 								</div>
 							{/if}
-						</div>
-					{/each}
-				</div>
-				{#each weaponSlots as item, index (item ? item.id : `weapon-empty-${index}`)}
-					{@const isInvalid =
-						dndState.isDragging &&
-						dndState.draggedItem &&
-						!checkCompatibility(dndState.draggedItem.item.type, 'weapon', index)}
-					{@const isDraggingLoot =
-						dndState.isDragging && dndState.draggedItem?.item.type !== 'weapon'}
+						{/snippet}
+					</DndItem>
 
-					<div
-						use:droppable={{
-							container: `weapon-${index}`,
-							callbacks: dragDropCallbacks,
-							disabled: dndState.isDragging && dndState.draggedItem?.item.type !== 'weapon'
-						}}
-						class="flex h-44 w-64 items-center justify-center overflow-hidden
-           rounded-lg border border-white/20"
+					<DndItem
+						id="equipment-1"
+						collection={inv.equipmentSlots}
+						index={1}
+						allowedTypes={['shield']}
+						className="flex h-20 w-[120px] items-center justify-center rounded-lg border border-white/20"
 					>
+						{#snippet children(item, isInvalid)}
+							{#if item}
+								<ItemCard {item} className="h-full w-full" />
+							{:else if isInvalid}
+								<InvalidCard />
+							{:else}
+								<div
+									class="pointer-events-none flex h-full flex-col items-center justify-center text-white/20"
+								>
+									<span class="font-mono text-sm tracking-widest uppercase">Equipment 2</span>
+									<span class="text-xs opacity-50">Empty</span>
+								</div>
+							{/if}
+						{/snippet}
+					</DndItem>
+				</div>
+				<DndItem
+					id="weapon-0"
+					collection={inv.weaponSlots}
+					index={0}
+					allowedTypes={['weapon']}
+					draggbleEnabled={false}
+					className="h-44 w-64 border border-white/20 items-center justify-center rounded-lg"
+				>
+					{#snippet children(item, isInvalid)}
 						{#if item}
-							<WeaponCard
-								{item}
-								className="h-full w-full"
-								containerId={`weapon-${index}`}
-								callbacks={dragDropCallbacks}
-							/>
+							<WeaponCard {item} containerId="weapon-0" className="h-full w-full" />
 						{:else if isInvalid}
-							<div class=" h-full w-full p-5">
-								<img src={invalid} alt="invalid" class="h-full w-full object-contain opacity-50" />
-							</div>
+							<InvalidCard />
 						{:else}
-							<div class="flex flex-col items-center justify-center text-white/20">
-								<span class="font-mono text-sm tracking-widest uppercase">Weapon {index + 1}</span>
+							<div class="flex h-full flex-col items-center justify-center text-white/20">
+								<span class="font-mono text-sm tracking-widest uppercase">Weapon 1</span>
 								<span class="text-xs opacity-50">Empty</span>
 							</div>
 						{/if}
-					</div>
-				{/each}
+					{/snippet}
+				</DndItem>
+				<DndItem
+					id="weapon-1"
+					collection={inv.weaponSlots}
+					index={1}
+					allowedTypes={['weapon']}
+					className="h-44 w-64"
+					draggbleEnabled={false}
+				>
+					{#snippet children(item, isInvalid)}
+						{#if item}
+							<WeaponCard {item} containerId="weapon-1" className="h-full w-full" />
+						{:else if isInvalid}
+							<InvalidCard />
+						{:else}
+							<div
+								class="flex h-full flex-col items-center justify-center rounded-lg border border-white/20 text-white/20"
+							>
+								<span class="font-mono text-sm tracking-widest uppercase">Weapon 2</span>
+								<span class="text-xs opacity-50">Empty</span>
+							</div>
+						{/if}
+					{/snippet}
+				</DndItem>
 			</div>
+
 			<!-- backpack -->
 			<div class="flex flex-col gap-4">
 				<!-- header -->
 				<div class="flex items-center gap-4">
 					<div class="text-sm uppercase">backpack</div>
-					<span class="text-sm">{backpackFilled}/{BACKPACK_SIZE}</span>
+					<span class="text-sm">{inv.backpack.filter((i) => i).length}/14</span>
 				</div>
+
 				<div class="grid grid-cols-4 gap-2">
-					{#each backpack as item, index (item ? item.id : `empty-${index}`)}
-						<div
-							use:droppable={{
-								container: `backpack-${index}`,
-								callbacks: dragDropCallbacks
-							}}
-							class="aspect-square h-20 w-20"
-							animate:flip={{ duration: FLIP_DURATION_MS }}
+					{#each inv.backpack as _, index (index)}
+						<DndItem
+							id="backpack-{index}"
+							collection={inv.backpack}
+							{index}
+							allowedTypes={BP_ALLOWED}
+							className="h-20 w-20 aspect-square"
 						>
-							{#if item}
-								<!-- {@const isDraggingThis = dndState.draggedItem?.item.id === item.id} -->
-								<div
-									use:draggable={{ container: `backpack-${index}`, dragData: { item } }}
-									class="h-full w-full"
-								>
-									<LootItem {item} className="h-full w-full" />
-								</div>
-							{:else}
-								<LootItem
-									item={{ type: 'empty', id: `empty-${index}` }}
-									className="h-full w-full pointer-events-none"
-								/>
-							{/if}
-						</div>
+							{#snippet children(item)}
+								<ItemCard {item} className="h-full w-full" />
+							{/snippet}
+						</DndItem>
 					{/each}
 				</div>
 			</div>

@@ -1,21 +1,21 @@
 <script lang="ts">
-	import { draggable, droppable } from '@thisux/sveltednd';
-	import LootItem from './loot-item.svelte';
+	import { draggable } from '@thisux/sveltednd';
+
 	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 	import ammoTypeImg from '$lib/assets/ammo-type.webp';
 	import TierIcon from '$lib/components/tier-icon.svelte';
 	import { dndState } from '@thisux/sveltednd';
+	import DndItem from '$lib/components/dnd-item.svelte';
+	import ItemCard from './item-card.svelte';
+	import InvalidCard from './invalid-card.svelte';
 
 	type Props = {
 		item: any;
 		className?: string;
 		containerId: string;
-		callbacks: any;
 	};
 
-	let { item, className = 'h-40', containerId, callbacks }: Props = $props();
-
-	console.log('[weapon]', item);
+	let { item, className = 'h-40', containerId }: Props = $props();
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -45,10 +45,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(RARITY_CONFIG[item.rare ?? 'common']);
-
-	const attachSlots = $derived(item.attachments || [null, null, null, null]);
-	const slotName = ['MZ', 'GR', 'MG', 'ST'];
+	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare ?? 'common'] : RARITY_CONFIG.common);
 
 	function handleInternalDrag(e: Event) {
 		e.stopPropagation();
@@ -56,69 +53,58 @@
 </script>
 
 <div class={className}>
-	{#if item.type === 'empty'}
-		<div class="h-full w-full cursor-default rounded-lg border border-white/20"></div>
-	{:else}
-		<div
-			class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[0.5px] {rarityStyle.border}"
-		>
-			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
-				{@render absoluteGlowShadow()}
+	<div
+		class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[0.5px] {rarityStyle.border}"
+	>
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
+			{@render absoluteGlowShadow()}
 
-				<div class="relative min-h-0 items-center justify-center">
-					{@render absoluteBlob()}
-					<div
-						use:draggable={{
-							container: containerId,
-							dragData: { item },
-							disabled: dndState.isDragging && dndState.draggedItem?.item?.id !== item.id // опционально
-						}}
-						class="cursor-grab active:cursor-grabbing"
+			<div
+				class="relative min-h-0 items-center justify-center"
+				use:draggable={{
+					container: containerId,
+					dragData: { item },
+					disabled: dndState.isDragging && dndState.draggedItem?.item?.id !== item.id
+				}}
+			>
+				{@render absoluteBlob()}
+
+				<img
+					src={item.image || duck1}
+					alt="weapon"
+					class="relative z-10 h-full w-full object-contain"
+				/>
+			</div>
+
+			<div class="z-20 mb-1 flex h-10 items-center justify-center gap-1">
+				{#each item.attachments as _, index}
+					{@const slotId = `${containerId}-attach-${index}`}
+					<DndItem
+						id={slotId}
+						collection={item.attachments}
+						{index}
+						allowedTypes={['attachment']}
+						className=" z-20 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
+						onpointerdown={(e) => e.stopPropagation()}
 					>
-						<img
-							src={item.image || duck1}
-							alt="Loot"
-							class="relative z-10 h-full w-full object-contain"
-						/>
-					</div>
-				</div>
-
-				<div class="relative z-50 mb-1 flex h-10 items-center justify-center gap-1">
-					{#each item.attachments as attach, index}
-						{@const slotId = `${containerId}-attach-${index}`}
-
-						<div
-							use:droppable={{
-								container: slotId,
-								callbacks: callbacks,
-								attributes: { dragOverClass: 'bg-white/50 ring-2 ring-white' },
-								disabled: dndState.isDragging && dndState.draggedItem?.item.type === 'weapon'
-							}}
-							onpointerdown={handleInternalDrag}
-							ondragover={(e) => e.stopPropagation()}
-							ondragenter={(e) => e.stopPropagation()}
-							class="relative z-30 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
-						>
-							{#if attach}
-								<div
-									use:draggable={{ container: slotId, dragData: { item: attach } }}
-									class="h-full w-full cursor-grab p-0.5 active:cursor-grabbing"
-								>
-									<LootItem item={attach} className="h-full w-full" />
-								</div>
+						{#snippet children(attachItem, isInvalid)}
+							{#if attachItem}
+								<ItemCard item={attachItem} className="h-full w-full" />
+							{:else if isInvalid}
+								<InvalidCard />
 							{:else}
 								<div class=" font-mono text-[8px] text-white/20 select-none">
-									{slotName[index]}
+									{index}
 								</div>
 							{/if}
-						</div>
-					{/each}
-				</div>
-
-				{@render footer()}
+						{/snippet}
+					</DndItem>
+				{/each}
 			</div>
+
+			{@render footer()}
 		</div>
-	{/if}
+	</div>
 </div>
 
 {#snippet absoluteGlowShadow()}
@@ -135,7 +121,9 @@
 {/snippet}
 
 {#snippet footer()}
-	<div class="z-10 flex h-[20%] w-full shrink-0 items-center justify-between bg-black pr-2 pl-0.5">
+	<div
+		class="z-10 flex h-[20%] min-h-0 w-full shrink-0 items-center justify-between bg-black pr-2 pl-0.5"
+	>
 		<div class="flex h-full items-center justify-center gap-0.5">
 			<img src={ammoTypeImg} alt="ammo" class="size-9 object-contain" />
 			<div class="flex font-mono text-xs text-white/90">

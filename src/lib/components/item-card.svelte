@@ -3,16 +3,10 @@
 	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 
 	import CategoryIcon from '$lib/assets/category.webp';
+	import { type Item } from '$lib/state/inventory-manager.svelte';
 
 	type Props = {
-		item: {
-			type: 'empty' | 'loot' | 'weapon' | 'augment' | 'shield' | 'quickUse' | 'placeholder';
-			id: string;
-			image?: string;
-			count?: number;
-			imageCategory?: string;
-			rare?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-		};
+		item: Item | null;
 		className?: string;
 	};
 
@@ -51,8 +45,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(RARITY_CONFIG[item.rare ?? 'common']);
-
+	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare ?? 'common'] : RARITY_CONFIG.common);
 	function preventDrag(e) {
 		e.stopImmediatePropagation();
 		e.preventDefault();
@@ -60,7 +53,7 @@
 </script>
 
 <div class={className}>
-	{#if item.type === 'empty'}
+	{#if !item}
 		<div
 			class="h-full w-full cursor-default rounded-lg border border-white/20"
 			onmousedown={preventDrag}
