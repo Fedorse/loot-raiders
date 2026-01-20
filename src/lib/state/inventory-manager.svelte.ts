@@ -12,6 +12,10 @@ export interface Item {
 	image?: string;
 	count?: number;
 	attachments?: (Item | null)[];
+	category: {
+		icon: string;
+		type: string;
+	};
 }
 
 interface SlotRef {

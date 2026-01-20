@@ -16,6 +16,7 @@
 	import WeaponCard from '$lib/components/weapon-card.svelte';
 	import DndItem from '$lib/components/dnd-item.svelte';
 	import InvalidCard from '$lib/components/invalid-card.svelte';
+	import ammoTypeImg from '$lib/assets/ammo-type.webp';
 
 	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 
@@ -27,6 +28,11 @@
 		image?: string;
 		count?: number;
 		rare?: RarityType;
+		category: {
+			icon: string;
+			type: string;
+		};
+		attachments: [];
 	}
 
 	interface DragData {
@@ -54,7 +60,7 @@
 				return { type: 'augment', id: 'a-1', image: augment1, count: 1, rare: 'uncommon' };
 			}
 			if (i === 6) {
-				return { type: 'attachment', id: 'a-1', image: item3, count: 1, rare: 'uncommon' };
+				return { type: 'attachment', id: 'a-1', image: item3, count: 1, rare: 'legendary' };
 			}
 			if (i === 4)
 				return {
@@ -63,6 +69,16 @@
 					rare: 'uncommon',
 					image: weaponImg,
 					count: 1,
+					category: {
+						icon: ammoTypeImg,
+						type: 'light'
+					},
+					attachmentSlots: [
+						{ type: 'muzzle', placeholder: 'MZ' },
+						{ type: 'underbarrel', placeholder: 'UB' },
+						{ type: 'light-mag', placeholder: 'LM' },
+						{ type: 'stock', placeholder: 'SK' }
+					],
 					attachments: [null, null, null, null]
 				};
 			return null;
@@ -104,7 +120,7 @@
 
 <div class="flex h-full w-full items-start justify-center gap-4 px-5 py-16">
 	<!-- lootback -->
-	<div class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs">
+	<div class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 pt-4 pb-12 backdrop-blur-xs">
 		<!-- header -->
 		<div class="flex items-center gap-4">
 			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
@@ -178,7 +194,7 @@
 								<div
 									class="pointer-events-none flex h-full flex-col items-center justify-center text-white/20"
 								>
-									<span class="font-mono text-sm tracking-widest uppercase">Equipment 2</span>
+									<span class="font-mono text-sm tracking-widest uppercase">Equipment 1</span>
 									<span class="text-xs opacity-50">Empty</span>
 								</div>
 							{/if}
@@ -211,8 +227,8 @@
 					collection={inv.weaponSlots}
 					index={1}
 					allowedTypes={['weapon']}
-					className="h-44 w-64"
 					draggbleEnabled={false}
+					className="h-44 w-64 border border-white/20 items-center justify-center rounded-lg"
 				>
 					{#snippet children(item, isInvalid)}
 						{#if item}
@@ -220,10 +236,8 @@
 						{:else if isInvalid}
 							<InvalidCard />
 						{:else}
-							<div
-								class="flex h-full flex-col items-center justify-center rounded-lg border border-white/20 text-white/20"
-							>
-								<span class="font-mono text-sm tracking-widest uppercase">Weapon 2</span>
+							<div class="flex h-full flex-col items-center justify-center text-white/20">
+								<span class="font-mono text-sm tracking-widest uppercase">Weapon 1</span>
 								<span class="text-xs opacity-50">Empty</span>
 							</div>
 						{/if}
@@ -262,6 +276,11 @@
 <style>
 	@reference "tailwindcss";
 	/* :global(.dragging) {
-		@apply opacity-50 shadow-lg ring-2 ring-blue-400;
+		@apply opacity- shadow-lg ring-2 ring-blue-400;
 	} */
+	/* Глобальные стили для призрака */
+	:global(.svelte-dnd-dragging) {
+		opacity: 0.5;
+		cursor: grabbing;
+	}
 </style>

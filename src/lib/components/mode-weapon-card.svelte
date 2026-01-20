@@ -1,17 +1,13 @@
 <script lang="ts">
-	import duck from '$lib/assets/loot_assets/ARC Motion Core.png';
 	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
-	import TierIcon from '$lib/components/tier-icon.svelte';
-
-	import CategoryIcon from '$lib/assets/category.webp';
 	import { type Item } from '$lib/state/inventory-manager.svelte';
 
 	type Props = {
-		item: Item | null;
+		mode: Item | null;
 		className?: string;
 	};
 
-	let { item, className = 'h-20 w-20' }: Props = $props();
+	let { mode, className = 'h-10 w-10' }: Props = $props();
 
 	const RARITY_CONFIG = {
 		common: {
@@ -46,8 +42,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare ?? 'common'] : RARITY_CONFIG.common);
-	const hasAttachments = $derived(item?.attachments?.some((item) => item !== null));
+	const rarityStyle = $derived(mode ? RARITY_CONFIG[mode.rare ?? 'common'] : RARITY_CONFIG.common);
 
 	function preventDrag(e) {
 		e.stopImmediatePropagation();
@@ -56,7 +51,7 @@
 </script>
 
 <div class={className}>
-	{#if !item}
+	{#if !mode}
 		<div
 			class="h-full w-full cursor-default rounded-lg border border-white/20"
 			onmousedown={preventDrag}
@@ -73,49 +68,13 @@
 				></div>
 
 				<div class="relative min-h-0 flex-1 items-center justify-center">
-					<div
-						class="absolute -bottom-0.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
-						style="
-                            mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%); 
-                            -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);
-                        "
-					></div>
-
 					<img
-						src={item.image || duck1}
+						src={mode.image || duck1}
 						alt="Loot"
 						class="relative z-10 h-full w-full object-contain"
 					/>
 				</div>
-
-				{@render footer()}
 			</div>
 		</div>
 	{/if}
 </div>
-
-{#snippet footer()}
-	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5">
-		{#if item?.type === 'weapon'}
-			<div class="text-white/70">
-				<img src={item.category.icon} alt="category" class="size-4 object-contain" />
-			</div>
-			{#if hasAttachments}
-				<div>
-					<img src={CategoryIcon} alt="category" class="size-4 object-contain opacity-50" />
-				</div>
-			{/if}
-			<div>
-				<TierIcon tier={item.tier || 3} className="size-4 opacity-50" />
-			</div>
-		{:else}
-			<div class="text-white/70">
-				<img src={CategoryIcon} alt="category" class="size-4 object-contain" />
-			</div>
-
-			<div class="font-mono text-xs font-bold tracking-wider text-white">
-				{item.count || 1}
-			</div>
-		{/if}
-	</div>
-{/snippet}

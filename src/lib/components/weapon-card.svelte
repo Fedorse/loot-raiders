@@ -8,6 +8,7 @@
 	import DndItem from '$lib/components/dnd-item.svelte';
 	import ItemCard from './item-card.svelte';
 	import InvalidCard from './invalid-card.svelte';
+	import ModeCard from './mode-weapon-card.svelte';
 
 	type Props = {
 		item: any;
@@ -77,19 +78,19 @@
 			</div>
 
 			<div class="z-20 mb-1 flex h-10 items-center justify-center gap-1">
-				{#each item.attachments as _, index}
+				{#each item.attachmentSlots as slot, index}
 					{@const slotId = `${containerId}-attach-${index}`}
 					<DndItem
 						id={slotId}
 						collection={item.attachments}
 						{index}
-						allowedTypes={['attachment']}
-						className=" z-20 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
+						allowedTypes={[slot.type]}
+						className="z-20 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
 						onpointerdown={(e) => e.stopPropagation()}
 					>
 						{#snippet children(attachItem, isInvalid)}
 							{#if attachItem}
-								<ItemCard item={attachItem} className="h-full w-full" />
+								<ModeCard mode={attachItem} className="h-full w-full" />
 							{:else if isInvalid}
 								<InvalidCard />
 							{:else}
