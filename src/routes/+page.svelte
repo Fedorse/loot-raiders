@@ -12,34 +12,30 @@
 	import augment1 from '$lib/assets/augment-1.png';
 	import shield1 from '$lib/assets/shield-1.png';
 	import weaponImg from '$lib/assets/weapon-kettle.webp';
-	import { flip } from 'svelte/animate';
 	import WeaponCard from '$lib/components/weapon-card.svelte';
 	import DndItem from '$lib/components/dnd-item.svelte';
 	import InvalidCard from '$lib/components/invalid-card.svelte';
 	import ammoTypeImg from '$lib/assets/ammo-type.webp';
 
-	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
+	type ModsType = 'muzzle' | 'optic' | 'light-mag' | 'heavy-mag' | 'stock' | 'underbarrel' | 'grip';
+
+	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | ModsType;
 
 	type RarityType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
-	interface BaseItem {
+	interface Item {
 		id: string;
 		type: ItemType;
+		rare: RarityType;
 		image?: string;
 		count?: number;
-		rare?: RarityType;
-		category: {
+		mods?: { type: ModsType; placeholder: string }[];
+		modsSlots?: (Item | null)[];
+		category?: {
 			icon: string;
 			type: string;
 		};
-		attachments: [];
 	}
-
-	interface DragData {
-		item: BaseItem;
-	}
-
-	type InventorySlot = BaseItem | null;
 
 	const inv = setInventory();
 
@@ -60,7 +56,7 @@
 				return { type: 'augment', id: 'a-1', image: augment1, count: 1, rare: 'uncommon' };
 			}
 			if (i === 6) {
-				return { type: 'attachment', id: 'a-1', image: item3, count: 1, rare: 'legendary' };
+				return { type: 'mods', id: 'a-1', image: item3, count: 1, rare: 'legendary' };
 			}
 			if (i === 4)
 				return {
@@ -73,13 +69,13 @@
 						icon: ammoTypeImg,
 						type: 'light'
 					},
-					attachmentSlots: [
-						{ type: 'muzzle', placeholder: 'MZ' },
+					mods: [
+						{ type: 'light-mag', placeholder: 'MZ' },
 						{ type: 'underbarrel', placeholder: 'UB' },
-						{ type: 'light-mag', placeholder: 'LM' },
-						{ type: 'stock', placeholder: 'SK' }
+						{ type: 'optic', placeholder: 'LM' },
+						{ type: 'grip', placeholder: 'SK' }
 					],
-					attachments: [null, null, null, null]
+					modsSlots: [null, null, null, null]
 				};
 			return null;
 		}),
@@ -92,12 +88,52 @@
 					image: item1,
 					count: 10
 				};
-			return null;
-		}),
-		equipment: [null, null]
+			if (i === 6)
+				return {
+					type: 'underbarrel',
+					id: 'a-1',
+					image: item3,
+					count: 1,
+					rare: 'legendary'
+				};
+			if (i === 4)
+				return {
+					type: 'light-mag',
+					id: 'a-4',
+					image: item1,
+					count: 1,
+					rare: 'epic'
+				};
+			if (i === 3)
+				return {
+					type: 'optic',
+					id: 'a-3',
+					image: item,
+					count: 1,
+					rare: 'common'
+				};
+			if (i === 1)
+				return {
+					type: 'grip',
+					id: 'a-2',
+					image: item2,
+					count: 1,
+					rare: 'uncommon'
+				};
+		})
 	});
 
-	const BP_ALLOWED: ItemType[] = ['loot', 'weapon', 'augment', 'shield', 'attachment'];
+	const ALL_MODS_TYPES: ModsType[] = [
+		'muzzle',
+		'optic',
+		'light-mag',
+		'heavy-mag',
+		'stock',
+		'underbarrel',
+		'grip'
+	];
+
+	const BP_ALLOWED: ItemType[] = ['loot', 'weapon', 'augment', 'shield', ...ALL_MODS_TYPES];
 </script>
 
 <!-- debug -->

@@ -10,8 +10,26 @@
 	import InvalidCard from './invalid-card.svelte';
 	import ModeCard from './mode-weapon-card.svelte';
 
+	type ModsType = 'muzzle' | 'optic' | 'light-mag' | 'heavy-mag' | 'stock' | 'underbarrel' | 'grip';
+	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | ModsType;
+	type RarityType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+
+	interface Item {
+		id: string;
+		type: ItemType;
+		rare: RarityType;
+		image?: string;
+		count?: number;
+		mods?: { type: ModsType; placeholder: string }[];
+		modsSlots?: (Item | null)[];
+		category?: {
+			icon: string;
+			type: string;
+		};
+	}
+
 	type Props = {
-		item: any;
+		item: Item;
 		className?: string;
 		containerId: string;
 	};
@@ -46,11 +64,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare ?? 'common'] : RARITY_CONFIG.common);
-
-	function handleInternalDrag(e: Event) {
-		e.stopPropagation();
-	}
+	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare] : RARITY_CONFIG.common);
 </script>
 
 <div class={className}>
@@ -78,24 +92,26 @@
 			</div>
 
 			<div class="z-20 mb-1 flex h-10 items-center justify-center gap-1">
-				{#each item.attachmentSlots as slot, index}
+				{#each item.mods as slot, index}
 					{@const slotId = `${containerId}-attach-${index}`}
 					<DndItem
 						id={slotId}
-						collection={item.attachments}
+						collection={item.modsSlots}
 						{index}
 						allowedTypes={[slot.type]}
-						className="z-20 flex aspect-square size-8 cursor-default items-center justify-center rounded border border-white/20 bg-black/40"
+						className="z-20 flex aspect-square size-8 cursor-default rounded-lg bg-black/40"
 						onpointerdown={(e) => e.stopPropagation()}
 					>
-						{#snippet children(attachItem, isInvalid)}
-							{#if attachItem}
-								<ModeCard mode={attachItem} className="h-full w-full" />
+						{#snippet children(item, isInvalid)}
+							{#if item}
+								<ModeCard mode={item} className="h-full w-full" />
 							{:else if isInvalid}
 								<InvalidCard />
 							{:else}
-								<div class=" font-mono text-[8px] text-white/20 select-none">
-									{index}
+								<div
+									class=" flex h-full items-center justify-center rounded-lg border border-white/20 font-mono text-[8px] text-white/20 select-none"
+								>
+									{slot.placeholder}
 								</div>
 							{/if}
 						{/snippet}

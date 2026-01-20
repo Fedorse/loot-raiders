@@ -68,19 +68,9 @@
 			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {rarityStyle.border}"
 		>
 			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
-				<div
-					class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
-				></div>
-
 				<div class="relative min-h-0 flex-1 items-center justify-center">
-					<div
-						class="absolute -bottom-0.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
-						style="
-                            mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%); 
-                            -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);
-                        "
-					></div>
-
+					{@render absoluteGlowShadow()}
+					{@render absoluteBlob()}
 					<img
 						src={item.image || duck1}
 						alt="Loot"
@@ -93,6 +83,22 @@
 		</div>
 	{/if}
 </div>
+
+{#snippet absoluteGlowShadow()}
+	<div
+		class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
+	></div>
+{/snippet}
+
+{#snippet absoluteBlob()}
+	<div
+		class="absolute -bottom-0.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
+		style="
+                            mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%); 
+                            -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);
+                        "
+	></div>
+{/snippet}
 
 {#snippet footer()}
 	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5">

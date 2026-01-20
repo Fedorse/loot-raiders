@@ -7,7 +7,7 @@
 		className?: string;
 	};
 
-	let { mode, className = 'h-10 w-10' }: Props = $props();
+	let { mode, className = '' }: Props = $props();
 
 	const RARITY_CONFIG = {
 		common: {
@@ -42,39 +42,25 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(mode ? RARITY_CONFIG[mode.rare ?? 'common'] : RARITY_CONFIG.common);
-
-	function preventDrag(e) {
-		e.stopImmediatePropagation();
-		e.preventDefault();
-	}
+	const rarityStyle = $derived(mode ? RARITY_CONFIG[mode.rare] : RARITY_CONFIG.common);
 </script>
 
 <div class={className}>
-	{#if !mode}
-		<div
-			class="h-full w-full cursor-default rounded-lg border border-white/20"
-			onmousedown={preventDrag}
-			ontouchstart={preventDrag}
-			onpointerdown={preventDrag}
-		></div>
-	{:else}
-		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {rarityStyle.border}"
-		>
-			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
-				<div
-					class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
-				></div>
+	<div
+		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {rarityStyle.border}"
+	>
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
+			<div
+				class="absolute bottom-0 left-0 z-0 h-[90%] w-[90%] opacity-50 blur-xl {rarityStyle.glow} "
+			></div>
 
-				<div class="relative min-h-0 flex-1 items-center justify-center">
-					<img
-						src={mode.image || duck1}
-						alt="Loot"
-						class="relative z-10 h-full w-full object-contain"
-					/>
-				</div>
+			<div class="relative min-h-0 flex-1 items-center justify-center">
+				<img
+					src={mode.image || duck1}
+					alt="Loot"
+					class="relative z-10 h-full w-full scale-105 object-contain"
+				/>
 			</div>
 		</div>
-	{/if}
+	</div>
 </div>
