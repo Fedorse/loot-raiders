@@ -65,6 +65,16 @@
 	} as const;
 
 	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare] : RARITY_CONFIG.common);
+
+	const handleDragStart = (event: DragEvent) => {
+		const img = new Image();
+		img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+		event.dataTransfer?.setDragImage(img, 0, 0);
+
+		if (event.dataTransfer) {
+			event.dataTransfer.effectAllowed = 'move';
+		}
+	};
 </script>
 
 <div class={className}>
@@ -81,6 +91,7 @@
 					dragData: { item },
 					disabled: dndState.isDragging && dndState.draggedItem?.item?.id !== item.id
 				}}
+				ondragstart={handleDragStart}
 			>
 				{@render absoluteBlob()}
 

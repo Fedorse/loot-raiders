@@ -16,6 +16,7 @@
 	import DndItem from '$lib/components/dnd-item.svelte';
 	import InvalidCard from '$lib/components/invalid-card.svelte';
 	import ammoTypeImg from '$lib/assets/ammo-type.webp';
+	import DragItemGhost from '$lib/components/drag-layer.svelte';
 
 	type ModsType = 'muzzle' | 'optic' | 'light-mag' | 'heavy-mag' | 'stock' | 'underbarrel' | 'grip';
 
@@ -308,6 +309,8 @@
 		</div>
 	</div>
 </div>
+
+<DragItemGhost />
 
 <style>
 	@reference "tailwindcss";
