@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { setDndContext } from '$lib/store/dnd-manger.svelte';
 	import './layout.css';
+
+	import { setInventory } from '$lib/store/inventory-manger.svelte';
+
 	// import bgImage from '$lib/assets/bg.webp';
 
 	let { children } = $props();

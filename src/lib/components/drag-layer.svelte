@@ -2,11 +2,16 @@
 	import { getDndContext } from '$lib/store/dnd-manger.svelte';
 	import { getDef } from '$lib/config/items';
 
+	const GHOST_SIZE = 80;
+
 	const dnd = getDndContext();
 
 	const { isDragging, pointer, offset, item, isValidDrop } = $derived(dnd.state);
 
 	let def = $derived(getDef(item?.defId));
+
+	const x = $derived(pointer.x - offset.x * GHOST_SIZE);
+	const y = $derived(pointer.y - offset.y * GHOST_SIZE);
 </script>
 
 {#if isDragging}
@@ -16,7 +21,7 @@
 			? 'bg-blue-500/50'
 			: 'bg-red-500/50'}"
 		style="
-			transform: translate3d({pointer.x - offset.x}px, {pointer.y - offset.y}px, 0) 
+			transform: translate3d({x}px, {y}px, 0) 
 		"
 	>
 		<img src={def.image} alt="" class="h-full w-full object-contain" />

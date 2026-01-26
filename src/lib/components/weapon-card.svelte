@@ -4,14 +4,13 @@
 	import TierIcon from '$lib/components/tier-icon.svelte';
 	import Socket from '$lib/components/socket.svelte';
 	import InvalidCard from './invalid-card.svelte';
-	import ModeCard from './mode-weapon-card.svelte';
+	import AttachCard from './attach-weapon-card.svelte';
 	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
 
 	type Props = {
 		item: ItemInstance;
 		className?: string;
-		containerId: string;
 	};
 
 	let { item, className = 'h-40' }: Props = $props();
@@ -52,7 +51,9 @@
 	<div
 		class="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-linear-to-tr p-[1px] {style.border}"
 	>
-		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-t-[8px] bg-[#0f111a]">
+		<div
+			class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-[#0f111a]"
+		>
 			{@render absoluteGlowShadow()}
 			{@render absoluteBlob()}
 			<div class="min-h-0 flex-1">
@@ -67,18 +68,16 @@
 					<Socket
 						collection={item.attachments}
 						{index}
-						allowedTypes={[slot.type]}
-						className="z-20 flex aspect-square size-8 cursor-default rounded-lg"
+						categories={[slot.type]}
+						className="z-20 aspect-square size-8"
 					>
 						{#snippet children(item, isInvalid)}
 							{#if item}
-								<ModeCard mode={item} className="h-full w-full" />
+								<AttachCard {item} className="h-full w-full" />
 							{:else if isInvalid}
 								<InvalidCard />
 							{:else}
-								<div
-									class=" flex h-full items-center justify-center rounded-lg border border-white/20 font-mono text-[8px] text-white/20 select-none"
-								>
+								<div class=" flex h-full items-center justify-center font-mono text-[8px]">
 									{slot.placeholder}
 								</div>
 							{/if}

@@ -1,41 +1,50 @@
 <script lang="ts">
-	import { useInventory, type Item } from '$lib/store/inventory-manger.svelte';
-	import type { ItemInstance, ItemType } from '$lib/config/items';
+	import type { ItemInstance, ItemType, ItemCategory } from '$lib/config/items';
 	import { getDndContext } from '$lib/store/dnd-manger.svelte';
 	import { droppable, draggable } from '$lib/attach/dnd';
-	import type { SlotReference } from '$lib/config/items';
+	import InvalidCard from './invalid-card.svelte';
+	import { chekValidation } from '$lib/utils/utils';
 
 	type Props = {
 		collection: (ItemInstance | null)[];
 		index: number;
-		allowedTypes: ItemType[];
+		categories: ItemCategory[];
 		children: any;
 		className: string;
+		placeholder?: any;
 	};
 
-	let { collection, index, allowedTypes, children, className = '' }: Props = $props();
+	let { collection, index, categories, children, className = '', placeholder }: Props = $props();
 
 	const dnd = getDndContext();
 
-	const { isDragging, source } = $derived(dnd.state);
+	const { isDragging, source, isValidDrop } = $derived(dnd.state);
 
 	// const isInvalid = $derived(draggedItem?.item && !allowedTypes.includes(draggedItem.item.type));
 
 	const item = $derived(collection[index]);
 	const slotRef = { collection, index };
 
-	const draggingItem = $derived(
+	const draggedItem = $derived(
 		isDragging && source?.collection === collection && source.index === index
 	);
+	let invalid = $derived(isValidDrop);
+	let validateSlot = $derived(isDragging ? chekValidation(draggedItem, categories) : true);
 </script>
 
-<div class={className} {@attach droppable(slotRef, allowedTypes, dnd)}>
-	{#if !item || draggingItem}
-		<div class="h-full w-full cursor-default rounded-lg border border-white/20"></div>
+<div class="{className} relative" {@attach droppable(slotRef, categories, dnd)}>
+	{#if !item || draggedItem}
+		<div
+			class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
+		>
+			{#if placeholder}
+				{@render placeholder()}
+			{/if}
+		</div>
 	{:else}
 		<div
 			class="h-full w-full"
-			class:opacity-0={draggingItem}
+			class:opacity-0={draggedItem}
 			{@attach draggable(item, slotRef, dnd)}
 		>
 			{#if item}
@@ -43,12 +52,9 @@
 			{/if}
 		</div>
 	{/if}
+	<!-- {#if isDragging && !validateSlot}
+		<div class="absolute inset-0 z-10">
+			<InvalidCard />
+		</div>
+	{/if} -->
 </div>
-
-<!-- <style>
-	@reference "tailwindcss";
-
-	:global(.dragging) {
-		@apply opacity-0;
-	}
-</style> -->

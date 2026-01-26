@@ -1,6 +1,6 @@
 import type { Attachment } from 'svelte/attachments';
 import type { DndManager } from '$lib/store/dnd-manger.svelte';
-import type { ItemInstance, ItemType, SlotReference } from '$lib/config/items';
+import type { ItemInstance, SlotReference, ItemCategory } from '$lib/config/items';
 
 export function draggable(
 	item: ItemInstance | null,
@@ -29,12 +29,12 @@ export function draggable(
 
 export function droppable(
 	targetRef: SlotReference,
-	allowedTypes: ItemType[],
+	categories: ItemCategory[],
 	dndManager: DndManager
 ): Attachment {
 	return (node: Element) => {
 		const handleEnter = () => {
-			dndManager.hover(targetRef, allowedTypes);
+			dndManager.hover(targetRef, categories);
 		};
 		const handleLeave = () => {
 			dndManager.leave();

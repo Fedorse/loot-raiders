@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { setInventory } from '$lib/store/inventory-manger.svelte';
-	import type { ItemType, AttachmentType, ItemInstance } from '$lib/config/items';
+	import type { ItemType, AttachmentType, ItemInstance, ItemCategory } from '$lib/config/items';
 	import ItemCard from '$lib/components/item-card.svelte';
 	import Socket from '$lib/components/socket.svelte';
 	import InvalidCard from '$lib/components/invalid-card.svelte';
@@ -8,15 +8,14 @@
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import WeaponCard from '$lib/components/weapon-card.svelte';
 
-	const inventory = setInventory();
-
 	const ATACHMENT: AttachmentType[] = ['muzzle', 'optic', 'stock', 'underbarrel', 'grip'];
 
+	const inventory = setInventory();
 	const dnd = setDndContext((source, target) => {
 		inventory.handleDrop(source, target);
 	});
 
-	const BP_ALLOWED: ItemType[] = ['loot', 'weapon', 'augment', 'shield', ...ATACHMENT];
+	const BP_CATEGORY: ItemCategory[] = ['loot', 'weapon', 'augment', 'shield', ...ATACHMENT];
 </script>
 
 <!-- debug -->
@@ -26,10 +25,16 @@
 {JSON.stringify(
 			{
 				dragged: dnd.state.item && dnd.state.item.defId,
-				target: dnd.state.target,
+				target: {
+					slot: dnd.state.target?.collection[dnd.state.target.index],
+					index: dnd.state.target?.index
+				},
 				validDrop: dnd.state.isValidDrop,
 				pointer: dnd.state.pointer,
-				offset: dnd.state.offset
+				source: {
+					item: dnd.state.source?.collection[dnd.state.source.index],
+					index: dnd.state.source?.index
+				}
 			},
 			null,
 			2
@@ -52,7 +57,7 @@
 				<Socket
 					collection={inventory.lootBack}
 					{index}
-					allowedTypes={BP_ALLOWED}
+					categories={BP_CATEGORY}
 					className="h-20 w-20 aspect-square"
 				>
 					{#snippet children(item)}
@@ -76,69 +81,71 @@
 					<Socket
 						collection={inventory.equipmentSlots}
 						index={0}
-						allowedTypes={['augment']}
+						categories={['augment']}
 						className=" h-20 w-[120px] flex-1 items-center justify-center "
 					>
 						{#snippet children(item, isInvalid)}
-							{#if item}
-								<ItemCard {item} className="h-full w-full" />
-							{:else if isInvalid}
-								<InvalidCard />
-							{/if}
+							<ItemCard {item} className="h-full w-full" />
+						{/snippet}
+						{#snippet placeholder()}
+							<img
+								src="/assets/placeholder/augment_placeholder.png"
+								alt="placeholder"
+								class="w-full object-contain opacity-50"
+							/>
 						{/snippet}
 					</Socket>
 
 					<Socket
 						collection={inventory.equipmentSlots}
 						index={1}
-						allowedTypes={['shield']}
+						categories={['shield']}
 						className="flex-1 h-20 w-[120px]  items-center justify-center "
 					>
 						{#snippet children(item, isInvalid)}
-							{#if item}
-								<ItemCard {item} className="h-full w-full" />
-							{:else if isInvalid}
-								<InvalidCard />
-							{/if}
+							<InvalidCard />
+						{/snippet}
+						{#snippet placeholder()}
+							<img
+								src="/assets/placeholder/shield_placeholder.png"
+								alt="placeholder"
+								class="w-full object-contain opacity-50"
+							/>
 						{/snippet}
 					</Socket>
 				</div>
 				<Socket
 					collection={inventory.weaponSlots}
 					index={0}
-					allowedTypes={['weapon']}
-					className="h-44 w-64 "
+					categories={['weapon']}
+					className="h-44 w-64"
 				>
 					{#snippet children(item, isInvalid)}
-						{#if item}
-							<WeaponCard {item} containerId="weapon-0" className="h-full w-full" />
-						{:else if isInvalid}
-							<InvalidCard />
-						{:else}
-							<div class="flex h-full flex-col items-center justify-center text-white/20">
-								<span class="font-mono text-sm tracking-widest uppercase">Weapon 1</span>
-								<span class="text-xs opacity-50">Empty</span>
-							</div>
-						{/if}
+						<WeaponCard {item} className="h-full w-full" />
+					{/snippet}
+					{#snippet placeholder()}
+						<img
+							src="/assets/placeholder/placeholder_weapon.png"
+							alt="placeholder"
+							class="w-1/2 object-contain opacity-50"
+						/>
 					{/snippet}
 				</Socket>
 				<Socket
 					collection={inventory.weaponSlots}
 					index={1}
-					allowedTypes={['weapon']}
+					categories={['weapon']}
 					className="h-44 w-64"
 				>
 					{#snippet children(item, isInvalid)}
-						{#if item}
-							<WeaponCard {item} className="h-full w-full" />
-						{:else if isInvalid}
-							<InvalidCard />
-						{:else}
-							<div class="flex h-full flex-col items-center justify-center text-white/20">
-								<span class="font-mono text-sm tracking-widest uppercase">Weapon 1</span>
-								<span class="text-xs opacity-50">Empty</span>
-							</div>
-						{/if}
+						<WeaponCard {item} className="h-full w-full" />
+					{/snippet}
+					{#snippet placeholder()}
+						<img
+							src="/assets/placeholder/placeholder_weapon.png"
+							alt="placeholder"
+							class="w-1/2 object-contain opacity-50"
+						/>
 					{/snippet}
 				</Socket>
 			</div>
@@ -156,7 +163,7 @@
 						<Socket
 							collection={inventory.backpack}
 							{index}
-							allowedTypes={BP_ALLOWED}
+							categories={BP_CATEGORY}
 							className="h-20 w-20 aspect-square"
 						>
 							{#snippet children(item)}

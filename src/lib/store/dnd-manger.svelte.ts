@@ -1,8 +1,10 @@
 import { getContext, setContext } from 'svelte';
-import { getDef, type ItemInstance, type ItemType } from '$lib/config/items';
+import { getDef, type ItemInstance, type ItemType, type ItemCategory } from '$lib/config/items';
+import { chekValidation } from '$lib/utils/utils';
 
 export interface SlotReference {
-	collection: (ItemInstance | null)[];
+	collection: ItemInstance[];
+	index: number;
 }
 
 interface DragState {
@@ -30,13 +32,14 @@ export class DndManager {
 
 	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, element: HTMLElement) {
 		const rect = element.getBoundingClientRect();
-		console.log(rect);
+		const clickX = e.clientX - rect.left;
+		const clickY = e.clientY - rect.top;
 
 		this.state.isDragging = true;
 		this.state.item = item;
 		this.state.source = source;
 		this.state.pointer = { x: e.clientX, y: e.clientY };
-		this.state.offset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+		this.state.offset = { x: clickX / rect.width, y: clickY / rect.height };
 		this.state.isValidDrop = true;
 
 		window.addEventListener('pointermove', this.pointerMove);
@@ -54,30 +57,12 @@ export class DndManager {
 		this.reset();
 	};
 
-	hover(target: SlotReference, allowedTypes: ItemType[]) {
-		// allowedTypes может содержать 'muzzle', 'optic' и т.д.
+	hover(target: SlotReference, categories: ItemCategory[]) {
 		if (!this.state.isDragging || !this.state.item) return;
 
 		this.state.target = target;
-		const def = getDef(this.state.item.defId);
 
-		// Логика валидации
-		let isCompatible = false;
-
-		// 1. Прямое совпадение (weapon -> weapon)
-		if (allowedTypes.includes(def.type)) {
-			isCompatible = true;
-		}
-		// 2. Совпадение по типу аттачмента (muzzle -> muzzle)
-		else if (def.type === 'attachment' && def.attachmentType) {
-			// TS может ругаться, что attachmentType нет в ItemType,
-			// поэтому можно привести типы или расширить ItemType
-			if (allowedTypes.includes(def.attachmentType as any)) {
-				isCompatible = true;
-			}
-		}
-
-		this.state.isValidDrop = isCompatible;
+		this.state.isValidDrop = chekValidation(this.state.item, categories);
 	}
 
 	leave() {

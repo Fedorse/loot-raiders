@@ -4,11 +4,12 @@ export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' | 'underbarrel';
 
+export type ItemCategory = ItemType | AttachmentType;
+
 export interface ItemInstance {
 	uid: string;
 	defId: string; // ID из базы ('wpn_kettle')
 	count: number;
-
 	attachments?: (ItemInstance | null)[];
 }
 

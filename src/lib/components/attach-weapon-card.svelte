@@ -5,13 +5,13 @@
 	import { type Item } from '$lib/store/inventory-manger.svelte';
 
 	type Props = {
-		mode: Item | null;
+		item: Item | null;
 		className?: string;
 	};
 
-	let { mode, className = '' }: Props = $props();
+	let { item, className = '' }: Props = $props();
 
-	let def = $derived(getDef(mode.defId));
+	let def = $derived(getDef(item.defId));
 
 	const RARITY_CONFIG = {
 		common: {
@@ -46,17 +46,15 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
+	const style = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
 </script>
 
 <div class={className}>
 	<div
-		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {rarityStyle.border}"
+		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 	>
-		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
-			<div
-				class="absolute bottom-0 left-0 z-0 h-[90%] w-[90%] opacity-50 blur-xl {rarityStyle.glow} "
-			></div>
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
+			{@render absoluteGlowShadow()}
 
 			<div class="relative min-h-0 flex-1 items-center justify-center">
 				<img
@@ -68,3 +66,6 @@
 		</div>
 	</div>
 </div>
+{#snippet absoluteGlowShadow()}
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-60 blur-xl {style.glow}"></div>
+{/snippet}
