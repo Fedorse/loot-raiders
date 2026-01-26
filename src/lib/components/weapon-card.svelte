@@ -1,40 +1,21 @@
 <script lang="ts">
-	import { draggable } from '@thisux/sveltednd';
-
-	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
-	import ammoTypeImg from '$lib/assets/ammo-type.webp';
+	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
+	// import ammoTypeImg from '$lib/assets/ammo-type.webp';
 	import TierIcon from '$lib/components/tier-icon.svelte';
-	import { dndState } from '@thisux/sveltednd';
-	import DndItem from '$lib/components/dnd-item.svelte';
-	import ItemCard from './item-card.svelte';
+	import Socket from '$lib/components/socket.svelte';
 	import InvalidCard from './invalid-card.svelte';
 	import ModeCard from './mode-weapon-card.svelte';
-
-	type ModsType = 'muzzle' | 'optic' | 'light-mag' | 'heavy-mag' | 'stock' | 'underbarrel' | 'grip';
-	type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | ModsType;
-	type RarityType = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-
-	interface Item {
-		id: string;
-		type: ItemType;
-		rare: RarityType;
-		image?: string;
-		count?: number;
-		mods?: { type: ModsType; placeholder: string }[];
-		modsSlots?: (Item | null)[];
-		category?: {
-			icon: string;
-			type: string;
-		};
-	}
+	import type { ItemInstance } from '$lib/config/items';
+	import { getDef } from '$lib/config/items';
 
 	type Props = {
-		item: Item;
+		item: ItemInstance;
 		className?: string;
 		containerId: string;
 	};
 
-	let { item, className = 'h-40', containerId }: Props = $props();
+	let { item, className = 'h-40' }: Props = $props();
+	let def = $derived(getDef(item.defId));
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -64,54 +45,30 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare] : RARITY_CONFIG.common);
-
-	const handleDragStart = (event: DragEvent) => {
-		const img = new Image();
-		img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-		event.dataTransfer?.setDragImage(img, 0, 0);
-
-		if (event.dataTransfer) {
-			event.dataTransfer.effectAllowed = 'move';
-		}
-	};
+	const style = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
 </script>
 
 <div class={className}>
 	<div
-		class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[0.5px] {rarityStyle.border}"
+		class="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-linear-to-tr p-[1px] {style.border}"
 	>
-		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-[#0f111a]">
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-t-[8px] bg-[#0f111a]">
 			{@render absoluteGlowShadow()}
-
-			<div
-				class="relative min-h-0 items-center justify-center"
-				use:draggable={{
-					container: containerId,
-					dragData: { item },
-					disabled: dndState.isDragging && dndState.draggedItem?.item?.id !== item.id
-				}}
-				ondragstart={handleDragStart}
-			>
-				{@render absoluteBlob()}
-
+			{@render absoluteBlob()}
+			<div class="min-h-0 flex-1">
 				<img
-					src={item.image || duck1}
+					src={def.image || duck1}
 					alt="weapon"
-					class="relative z-10 h-full w-full object-contain"
+					class="z-10 max-h-full max-w-full object-contain"
 				/>
 			</div>
-
-			<div class="z-20 mb-1 flex h-10 items-center justify-center gap-1">
-				{#each item.mods as slot, index}
-					{@const slotId = `${containerId}-attach-${index}`}
-					<DndItem
-						id={slotId}
-						collection={item.modsSlots}
+			<div class="z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
+				{#each def.attachmentSlots as slot, index}
+					<Socket
+						collection={item.attachments}
 						{index}
 						allowedTypes={[slot.type]}
-						className="z-20 flex aspect-square size-8 cursor-default rounded-lg bg-black/40"
-						onpointerdown={(e) => e.stopPropagation()}
+						className="z-20 flex aspect-square size-8 cursor-default rounded-lg"
 					>
 						{#snippet children(item, isInvalid)}
 							{#if item}
@@ -126,42 +83,41 @@
 								</div>
 							{/if}
 						{/snippet}
-					</DndItem>
+					</Socket>
 				{/each}
 			</div>
-
+		</div>
+		<div class="shrink-0">
 			{@render footer()}
 		</div>
 	</div>
 </div>
 
 {#snippet absoluteGlowShadow()}
-	<div
-		class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow}"
-	></div>
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {style.glow}"></div>
 {/snippet}
 
 {#snippet absoluteBlob()}
 	<div
-		class="absolute -bottom-10.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
+		class="absolute -bottom-1 -left-0.5 z-0 aspect-square {style.height} {style.bg}"
 		style="mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);"
 	></div>
 {/snippet}
 
 {#snippet footer()}
 	<div
-		class="z-10 flex h-[20%] min-h-0 w-full shrink-0 items-center justify-between bg-black pr-2 pl-0.5"
+		class=" z-10 flex h-8 w-full items-center justify-between rounded-b-[8px] bg-black pr-2 pl-0.5"
 	>
 		<div class="flex h-full items-center justify-center gap-0.5">
-			<img src={ammoTypeImg} alt="ammo" class="size-9 object-contain" />
+			<img src={def.categoryIcon} alt="ammo" class="size-9 object-contain" />
 			<div class="flex font-mono text-xs text-white/90">
-				<p class="tabular-nums">{item.ammoCurrent || 0}</p>
+				<p class="tabular-nums">{0}</p>
 				<span class="text-white">/</span>
-				<p class="tabular-nums">{item.ammoMax || 30}</p>
+				<p class="tabular-nums">{30}</p>
 			</div>
 		</div>
 		<div class="text-white/70">
-			<TierIcon tier={item.tier || 3} className="size-7" />
+			<TierIcon tier={def.tier || 3} className="size-7" />
 		</div>
 	</div>
 {/snippet}

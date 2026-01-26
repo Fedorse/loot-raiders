@@ -1,54 +1,25 @@
 <script lang="ts">
-	import { dndState } from '@thisux/sveltednd';
+	import { getDndContext } from '$lib/store/dnd-manger.svelte';
+	import { getDef } from '$lib/config/items';
 
-	let mouseX = $state(0);
-	let mouseY = $state(0);
-	let initFrame = $state(false);
+	const dnd = getDndContext();
 
-	function handleMove(e: DragEvent | PointerEvent) {
-		if (!dndState.isDragging) return;
+	const { isDragging, pointer, offset, item, isValidDrop } = $derived(dnd.state);
 
-		if (e.clientX !== 0 || e.clientY !== 0) {
-			mouseX = e.clientX;
-			mouseY = e.clientY;
-			initFrame = true;
-		}
-	}
-
-	const reset = () => {
-		initFrame = false;
-	};
-
-	const item = $derived(dndState.draggedItem?.item);
-
-	const isInvalid = $derived(dndState.targetContainer === null || dndState.invalidDrop);
+	let def = $derived(getDef(item?.defId));
 </script>
 
-<svelte:window
-	ondragover={(e) => {
-		if (dndState.isDragging) {
-			e.preventDefault();
-			handleMove(e);
-		}
-	}}
-	onpointermove={handleMove}
-	ondragend={reset}
-	onpointerup={reset}
-/>
-
-{#if dndState.isDragging && item && initFrame}
+{#if isDragging}
 	<div
-		class="pointer-events-none fixed z-50 flex size-20 items-center justify-center
-               rounded-lg shadow-2xl backdrop-blur-sm"
+		class="pointer-events-none fixed top-0 left-0 z-50 flex size-20 items-center justify-center rounded-lg
+               shadow-2xl backdrop-blur-sm will-change-transform {isValidDrop
+			? 'bg-blue-500/50'
+			: 'bg-red-500/50'}"
 		style="
-			left: 0; 
-			top: 0; 
-			transform: translate3d({mouseX}px, {mouseY}px, 0) translate(-50%, -50%);
-			background-color: {isInvalid ? 'rgba(239, 68, 68, 0.5)' : 'rgba(37, 99, 235, 0.3)'};
-
+			transform: translate3d({pointer.x - offset.x}px, {pointer.y - offset.y}px, 0) 
 		"
 	>
-		<img src={item.image} alt="" class="h-full w-full object-contain" />
+		<img src={def.image} alt="" class="h-full w-full object-contain" />
 		<!-- <div>
 			{item.count}
 		</div> -->

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
-	import { type Item } from '$lib/state/inventory-manager.svelte';
+	import { getDef } from '$lib/config/items';
+
+	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
+	import { type Item } from '$lib/store/inventory-manger.svelte';
 
 	type Props = {
 		mode: Item | null;
@@ -8,6 +10,8 @@
 	};
 
 	let { mode, className = '' }: Props = $props();
+
+	let def = $derived(getDef(mode.defId));
 
 	const RARITY_CONFIG = {
 		common: {
@@ -42,7 +46,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(mode ? RARITY_CONFIG[mode.rare] : RARITY_CONFIG.common);
+	const rarityStyle = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
 </script>
 
 <div class={className}>
@@ -56,7 +60,7 @@
 
 			<div class="relative min-h-0 flex-1 items-center justify-center">
 				<img
-					src={mode.image || duck1}
+					src={def.image || duck1}
 					alt="Loot"
 					class="relative z-10 h-full w-full scale-105 object-contain"
 				/>

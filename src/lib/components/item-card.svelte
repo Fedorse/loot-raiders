@@ -1,17 +1,21 @@
 <script lang="ts">
-	import duck from '$lib/assets/loot_assets/ARC Motion Core.png';
-	import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
+	// import duck from '$lib/assets/loot_assets/ARC Motion Core.png';
+	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 	import TierIcon from '$lib/components/tier-icon.svelte';
 
-	import CategoryIcon from '$lib/assets/category.webp';
-	import { type Item } from '$lib/state/inventory-manager.svelte';
+	// import CategoryIcon from '$lib/assets/category/test.png';
+	import { type Item } from '$lib/store/inventory-manger.svelte';
+	import { getDef } from '$lib/config/items';
+	import type { ItemInstance } from '$lib/config/items';
 
 	type Props = {
-		item: Item | null;
+		item: ItemInstance | null;
 		className?: string;
 	};
 
 	let { item, className = 'h-20 w-20' }: Props = $props();
+
+	const def = $derived(getDef(item?.defId));
 
 	const RARITY_CONFIG = {
 		common: {
@@ -46,7 +50,7 @@
 		}
 	} as const;
 
-	const rarityStyle = $derived(item ? RARITY_CONFIG[item.rare ?? 'common'] : RARITY_CONFIG.common);
+	const style = $derived(RARITY_CONFIG[def.rarity] || RARITY_CONFIG.common);
 	const hasAttachments = $derived(item?.attachments?.some((item) => item !== null));
 
 	function preventDrag(e) {
@@ -57,25 +61,21 @@
 
 <div class={className}>
 	{#if !item}
-		<div
+		<!-- <div
 			class="h-full w-full cursor-default rounded-lg border border-white/20"
 			onmousedown={preventDrag}
 			ontouchstart={preventDrag}
 			onpointerdown={preventDrag}
-		></div>
+		></div> -->
 	{:else}
 		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {rarityStyle.border}"
+			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 		>
 			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
 				<div class="relative min-h-0 flex-1 items-center justify-center">
 					{@render absoluteGlowShadow()}
 					{@render absoluteBlob()}
-					<img
-						src={item.image || duck1}
-						alt="Loot"
-						class="relative z-10 h-full w-full object-contain"
-					/>
+					<img src={def.image} alt="Loot" class="relative z-10 h-full w-full object-contain" />
 				</div>
 
 				{@render footer()}
@@ -85,14 +85,12 @@
 </div>
 
 {#snippet absoluteGlowShadow()}
-	<div
-		class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {rarityStyle.glow} "
-	></div>
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {style.glow} "></div>
 {/snippet}
 
 {#snippet absoluteBlob()}
 	<div
-		class="absolute -bottom-0.5 -left-0.5 z-0 aspect-square {rarityStyle.height} {rarityStyle.bg}"
+		class="absolute -bottom-0.5 -left-0.5 z-0 aspect-square {style.height} {style.bg}"
 		style="
                             mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%); 
                             -webkit-mask-image: radial-gradient(circle at 100% 0%, transparent 69%, black 70%);
@@ -104,11 +102,11 @@
 	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5">
 		{#if item?.type === 'weapon'}
 			<div class="text-white/70">
-				<img src={item.category.icon} alt="category" class="size-4 object-contain" />
+				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
 			{#if hasAttachments}
 				<div>
-					<img src={CategoryIcon} alt="category" class="size-4 object-contain opacity-50" />
+					<img src={def.categoryIcon} alt="category" class="size-4 object-contain opacity-50" />
 				</div>
 			{/if}
 			<div>
@@ -116,11 +114,11 @@
 			</div>
 		{:else}
 			<div class="text-white/70">
-				<img src={CategoryIcon} alt="category" class="size-4 object-contain" />
+				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
 
 			<div class="font-mono text-xs font-bold tracking-wider text-white">
-				{item.count || 1}
+				{def.count || 1}
 			</div>
 		{/if}
 	</div>

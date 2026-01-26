@@ -1,6 +1,6 @@
 <script lang="ts">
 	import './layout.css';
-	import bgImage from '$lib/assets/bg.webp';
+	// import bgImage from '$lib/assets/bg.webp';
 
 	let { children } = $props();
 </script>
