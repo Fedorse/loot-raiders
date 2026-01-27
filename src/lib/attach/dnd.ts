@@ -30,11 +30,12 @@ export function draggable(
 export function droppable(
 	targetRef: SlotReference,
 	categories: ItemCategory[],
-	dndManager: DndManager
+	dndManager: DndManager,
+	targetItem: ItemInstance | null
 ): Attachment {
 	return (node: Element) => {
 		const handleEnter = () => {
-			dndManager.hover(targetRef, categories);
+			dndManager.hover(targetRef, categories, targetItem);
 		};
 		const handleLeave = () => {
 			dndManager.leave();

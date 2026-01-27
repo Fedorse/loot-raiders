@@ -1,9 +1,9 @@
 import { getContext, setContext } from 'svelte';
 import { getDef, type ItemInstance, type ItemType, type ItemCategory } from '$lib/config/items';
-import { chekValidation } from '$lib/utils/utils';
+import { checkValidation } from '$lib/utils/utils';
 
 export interface SlotReference {
-	collection: ItemInstance[];
+	collection: (ItemInstance | null)[];
 	index: number;
 }
 
@@ -57,12 +57,14 @@ export class DndManager {
 		this.reset();
 	};
 
-	hover(target: SlotReference, categories: ItemCategory[]) {
+	hover(target: SlotReference, categories: ItemCategory[], targetItem: ItemInstance | null) {
 		if (!this.state.isDragging || !this.state.item) return;
+
+		console.log(target);
 
 		this.state.target = target;
 
-		this.state.isValidDrop = chekValidation(this.state.item, categories);
+		this.state.isValidDrop = checkValidation(this.state.item, categories, targetItem);
 	}
 
 	leave() {

@@ -84,7 +84,7 @@
 						categories={['augment']}
 						className=" h-20 w-[120px] flex-1 items-center justify-center "
 					>
-						{#snippet children(item, isInvalid)}
+						{#snippet children(item)}
 							<ItemCard {item} className="h-full w-full" />
 						{/snippet}
 						{#snippet placeholder()}
@@ -120,7 +120,7 @@
 					categories={['weapon']}
 					className="h-44 w-64"
 				>
-					{#snippet children(item, isInvalid)}
+					{#snippet children(item)}
 						<WeaponCard {item} className="h-full w-full" />
 					{/snippet}
 					{#snippet placeholder()}
@@ -137,7 +137,7 @@
 					categories={['weapon']}
 					className="h-44 w-64"
 				>
-					{#snippet children(item, isInvalid)}
+					{#snippet children(item)}
 						<WeaponCard {item} className="h-full w-full" />
 					{/snippet}
 					{#snippet placeholder()}

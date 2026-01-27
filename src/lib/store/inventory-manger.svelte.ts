@@ -49,7 +49,19 @@ class InventoryManager {
 		const sourceItem = source.collection[source.index];
 		const targetItem = target.collection[target.index];
 
-		if (!sourceItem) return;
+		// weapon_attachment
+		if (targetItem && target.collection === this.weaponSlots) {
+			const sourceDef = getDef(sourceItem.defId);
+			const targetDef = getDef(targetItem.defId);
+			const slotIndex = targetDef.attachmentSlots?.findIndex((s) => s.type === sourceDef.type);
+
+			if (slotIndex !== undefined && slotIndex !== -1) {
+				const oldAttch = targetItem.attachments[slotIndex];
+				targetItem.attachments[slotIndex] = sourceItem;
+				source.collection[source.index] = oldAttch;
+				return;
+			}
+		}
 
 		target.collection[target.index] = sourceItem;
 		source.collection[source.index] = targetItem;

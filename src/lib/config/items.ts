@@ -1,14 +1,25 @@
-export type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
+export type ItemType =
+	| 'loot'
+	| 'weapon'
+	| 'augment'
+	| 'shield'
+	| 'attachment'
+	| 'optic'
+	| 'muzzle'
+	| 'magazine'
+	| 'grip'
+	| 'stock'
+	| 'underbarrel';
 
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
 export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' | 'underbarrel';
 
-export type ItemCategory = ItemType | AttachmentType;
+export type ItemCategory = ItemType;
 
 export interface ItemInstance {
 	uid: string;
-	defId: string; // ID из базы ('wpn_kettle')
+	defId: string;
 	count: number;
 	attachments?: (ItemInstance | null)[];
 }
@@ -21,7 +32,7 @@ export interface SlotReference {
 export interface RecyclingResult {
 	itemId: string;
 	amount: number;
-	name: string; // Для отображения в UI без поиска ID (опционально)
+	name: string;
 }
 
 export interface ItemDefinition {
@@ -41,8 +52,6 @@ export interface ItemDefinition {
 		type: AttachmentType;
 		placeholder: string;
 	}[];
-
-	attachmentType?: AttachmentType;
 
 	recycling?: RecyclingResult[];
 }
@@ -160,8 +169,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	att_compensator_1: {
 		id: 'att_compensator_1',
 		name: 'Compensator I',
-		type: 'attachment',
-		attachmentType: 'muzzle',
+		type: 'muzzle',
 		rarity: 'uncommon',
 		image: '/assets/weapons/Compensator_I.png',
 		categoryIcon: '/assets/cattegory/test.png',
@@ -172,8 +180,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	att_stable_stock_1: {
 		id: 'att_stable_stock_1',
 		name: 'Stable Stock I',
-		type: 'attachment',
-		attachmentType: 'stock',
+		type: 'stock',
 		rarity: 'common',
 		image: '/assets/weapons/Stable_Stock_I.png',
 		categoryIcon: '/assets/cattegory/test.png',

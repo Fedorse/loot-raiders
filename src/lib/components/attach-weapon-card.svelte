@@ -1,7 +1,5 @@
 <script lang="ts">
 	import { getDef } from '$lib/config/items';
-
-	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 	import { type Item } from '$lib/store/inventory-manger.svelte';
 
 	type Props = {

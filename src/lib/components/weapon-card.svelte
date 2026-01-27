@@ -71,16 +71,8 @@
 						categories={[slot.type]}
 						className="z-20 aspect-square size-8"
 					>
-						{#snippet children(item, isInvalid)}
-							{#if item}
-								<AttachCard {item} className="h-full w-full" />
-							{:else if isInvalid}
-								<InvalidCard />
-							{:else}
-								<div class=" flex h-full items-center justify-center font-mono text-[8px]">
-									{slot.placeholder}
-								</div>
-							{/if}
+						{#snippet children(item)}
+							<AttachCard {item} className="h-full w-full" />
 						{/snippet}
 					</Socket>
 				{/each}

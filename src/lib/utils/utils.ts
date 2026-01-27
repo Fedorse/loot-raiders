@@ -1,10 +1,19 @@
 import { getDef, type ItemCategory, type ItemInstance } from '$lib/config/items';
 
-export const chekValidation = (item: ItemInstance, category: ItemCategory[]): boolean => {
-	const def = getDef(item.defId);
-	if (category.includes(def.type)) return true;
-	if (def.type === 'attachment' && category.includes(def.attachmentType)) {
-		if (category.includes(def.attachmentType)) return true;
+export const checkValidation = (
+	draggedItem: ItemInstance,
+	slotCattegories: ItemCategory[],
+	targetItem?: ItemInstance
+) => {
+	if (!draggedItem) return false;
+
+	const draggedDef = getDef(draggedItem.defId);
+
+	if (slotCattegories.includes(draggedDef.type)) return true;
+
+	if (targetItem) {
+		const targetDef = getDef(targetItem.defId);
+		return targetDef.attachmentSlots?.some((slot) => slot.type === draggedDef.type) ?? false;
 	}
 	return false;
 };
