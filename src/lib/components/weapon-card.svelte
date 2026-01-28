@@ -47,7 +47,7 @@
 	const style = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
 </script>
 
-<div class={className}>
+<div class="{className} group">
 	<div
 		class="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-linear-to-tr p-[1px] {style.border}"
 	>
@@ -60,7 +60,7 @@
 				<img
 					src={def.image || duck1}
 					alt="weapon"
-					class="z-10 max-h-full max-w-full object-contain"
+					class="z-10 max-h-full max-w-full object-contain transition-transform group-hover:scale-110"
 				/>
 			</div>
 			<div class="z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
@@ -70,6 +70,7 @@
 						{index}
 						categories={[slot.type]}
 						className="z-20 aspect-square size-8"
+						showInvalid={false}
 					>
 						{#snippet children(item)}
 							<AttachCard {item} className="h-full w-full" />

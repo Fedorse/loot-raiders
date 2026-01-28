@@ -53,6 +53,7 @@ class InventoryManager {
 		if (targetItem && target.collection === this.weaponSlots) {
 			const sourceDef = getDef(sourceItem.defId);
 			const targetDef = getDef(targetItem.defId);
+			
 			const slotIndex = targetDef.attachmentSlots?.findIndex((s) => s.type === sourceDef.type);
 
 			if (slotIndex !== undefined && slotIndex !== -1) {

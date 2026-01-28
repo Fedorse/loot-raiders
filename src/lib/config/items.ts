@@ -73,8 +73,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: 'MZ' },
 			{ type: 'underbarrel', placeholder: 'UB' },
-			{ type: 'magazine', placeholder: 'MAG' },
-			{ type: 'stock', placeholder: 'STK' }
+			{ type: 'magazine', placeholder: 'MAG' }
 		]
 	},
 	wpn_bobcat: {

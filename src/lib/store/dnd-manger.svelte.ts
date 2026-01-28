@@ -6,6 +6,11 @@ export interface SlotReference {
 	collection: (ItemInstance | null)[];
 	index: number;
 }
+interface DropZoneData {
+	ref: SlotReference;
+	categories: ItemCategory[];
+	item: ItemInstance | null;
+}
 
 interface DragState {
 	isDragging: boolean;
@@ -28,7 +33,19 @@ export class DndManager {
 		offset: { x: 0, y: 0 }
 	});
 
-	constructor(private onDropAction: (source: SlotReference, target: SlotReference) => void) {}
+	private registry = new Map<HTMLElement, DropZoneData>();
+
+	constructor(private onDropAction: (source: SlotReference, target: SlotReference) => void) {
+		console.log(this.registry);
+	}
+
+	registerZone(node: HTMLElement, data: DropZoneData) {
+		this.registry.set(node, data);
+	}
+
+	unregisterZone(node: HTMLElement) {
+		this.registry.delete(node);
+	}
 
 	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, element: HTMLElement) {
 		const rect = element.getBoundingClientRect();
@@ -44,10 +61,14 @@ export class DndManager {
 
 		window.addEventListener('pointermove', this.pointerMove);
 		window.addEventListener('pointerup', this.pointerUp);
+
+		// Сразу проверяем, где мы находимся (на случай клика без движения)
+		this.checkDropTarget(e.clientX, e.clientY);
 	}
 
 	pointerMove = (e: PointerEvent) => {
 		this.state.pointer = { x: e.clientX, y: e.clientY };
+		this.checkDropTarget(e.clientX, e.clientY);
 	};
 
 	pointerUp = (e: PointerEvent) => {
@@ -57,10 +78,36 @@ export class DndManager {
 		this.reset();
 	};
 
-	hover(target: SlotReference, categories: ItemCategory[], targetItem: ItemInstance | null) {
+	checkDropTarget(x: number, y: number) {
 		if (!this.state.isDragging || !this.state.item) return;
 
-		console.log(target);
+		const elements = document.elementsFromPoint(x, y);
+
+		let foundTarget: SlotReference | null = null;
+		let isValid = false;
+
+		for (const element of elements) {
+			const zone = this.registry.get(element);
+
+			if (zone) {
+				const valid = checkValidation(this.state.item, zone.categories, zone.item);
+
+				if (valid) {
+					foundTarget = zone.ref;
+					isValid = true;
+					break;
+				}
+			}
+		}
+
+		if (this.state.target !== foundTarget) {
+			this.state.target = foundTarget;
+		}
+		this.state.isValidDrop = isValid;
+	}
+
+	hover(target: SlotReference, categories: ItemCategory[], targetItem: ItemInstance | null) {
+		if (!this.state.isDragging || !this.state.item) return;
 
 		this.state.target = target;
 

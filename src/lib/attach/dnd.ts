@@ -34,18 +34,13 @@ export function droppable(
 	targetItem: ItemInstance | null
 ): Attachment {
 	return (node: Element) => {
-		const handleEnter = () => {
-			dndManager.hover(targetRef, categories, targetItem);
-		};
-		const handleLeave = () => {
-			dndManager.leave();
-		};
-		node.addEventListener('pointerenter', handleEnter);
-		node.addEventListener('pointerleave', handleLeave);
-
+		dndManager.registerZone(node, {
+			ref: targetRef,
+			categories,
+			item: targetItem
+		});
 		return () => {
-			node.removeEventListener('pointerenter', handleEnter);
-			node.removeEventListener('pointerleave', handleLeave);
+			dndManager.unregisterZone(node);
 		};
 	};
 }

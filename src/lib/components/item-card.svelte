@@ -59,29 +59,24 @@
 	}
 </script>
 
-<div class={className}>
-	{#if !item}
-		<!-- <div
-			class="h-full w-full cursor-default rounded-lg border border-white/20"
-			onmousedown={preventDrag}
-			ontouchstart={preventDrag}
-			onpointerdown={preventDrag}
-		></div> -->
-	{:else}
-		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
-		>
-			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
-				<div class="relative min-h-0 flex-1 items-center justify-center">
-					{@render absoluteGlowShadow()}
-					{@render absoluteBlob()}
-					<img src={def.image} alt="Loot" class="relative z-10 h-full w-full object-contain" />
-				</div>
-
-				{@render footer()}
+<div class="{className} group">
+	<div
+		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+	>
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
+			<div class="relative min-h-0 flex-1 items-center justify-center">
+				{@render absoluteGlowShadow()}
+				{@render absoluteBlob()}
+				<img
+					src={def.image}
+					alt="Loot"
+					class="relative z-10 h-full w-full object-contain transition-transform group-hover:scale-110"
+				/>
 			</div>
+
+			{@render footer()}
 		</div>
-	{/if}
+	</div>
 </div>
 
 {#snippet absoluteGlowShadow()}
@@ -100,7 +95,7 @@
 
 {#snippet footer()}
 	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5">
-		{#if item?.type === 'weapon'}
+		{#if def?.type === 'weapon'}
 			<div class="text-white/70">
 				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>

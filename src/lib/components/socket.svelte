@@ -2,7 +2,6 @@
 	import { type ItemInstance, type ItemType, type ItemCategory, getDef } from '$lib/config/items';
 	import { getDndContext } from '$lib/store/dnd-manger.svelte';
 	import { droppable, draggable } from '$lib/attach/dnd';
-	import InvalidCard from './invalid-card.svelte';
 	import { checkValidation } from '$lib/utils/utils';
 
 	type Props = {
@@ -12,19 +11,22 @@
 		children: any;
 		className: string;
 		placeholder?: any;
+		showInvalid?: boolean;
 	};
 
-	let { collection, index, categories, children, className = '', placeholder }: Props = $props();
+	let {
+		collection,
+		index,
+		categories,
+		children,
+		className = '',
+		placeholder,
+		showInvalid = true
+	}: Props = $props();
 
 	const dnd = getDndContext();
 
-	const { isDragging, source, item: draggedItem } = $derived(dnd.state);
-
-	const itemDef = $derived(getDef(draggedItem?.defId));
-
-	const isInvalid = $derived(draggedItem && !categories.includes(itemDef.type));
-
-	// const isInvalid = $derived(draggedItem?.item && !allowedTypes.includes(draggedItem.item.type));
+	const { isDragging, source, item: draggedItem, isValidDrop } = $derived(dnd.state);
 
 	const item = $derived(collection[index]);
 
@@ -34,7 +36,7 @@
 		isDragging && source?.collection === collection && source.index === index
 	);
 
-	let validation = $derived(checkValidation(draggedItem, categories));
+	const validation = $derived(checkValidation(draggedItem, categories, item));
 </script>
 
 <div class="{className}  relative" {@attach droppable(slotRef, categories, dnd, item)}>
@@ -57,9 +59,9 @@
 			{/if}
 		</div>
 	{/if}
-	<!-- {#if isDragging && isInvalid}
+	{#if isDragging && !validation && showInvalid}
 		<div class="absolute inset-0 z-10 flex w-full items-center justify-center">
-			<InvalidCard />
+			<img src="/assets/invalid.png" alt="invalid" class=" size-10 object-contain opacity-70" />
 		</div>
-	{/if} -->
+	{/if}
 </div>

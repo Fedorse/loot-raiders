@@ -102,8 +102,8 @@
 						categories={['shield']}
 						className="flex-1 h-20 w-[120px]  items-center justify-center "
 					>
-						{#snippet children(item, isInvalid)}
-							<InvalidCard />
+						{#snippet children(item)}
+							<ItemCard {item} className="h-full w-full" />
 						{/snippet}
 						{#snippet placeholder()}
 							<img
