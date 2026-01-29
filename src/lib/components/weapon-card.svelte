@@ -2,11 +2,12 @@
 	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 	// import ammoTypeImg from '$lib/assets/ammo-type.webp';
 	import TierIcon from '$lib/components/tier-icon.svelte';
-	import Socket from '$lib/components/socket.svelte';
+	import Socket from '$lib/components/slot.svelte';
 	import InvalidCard from './invalid-card.svelte';
 	import AttachCard from './attach-weapon-card.svelte';
 	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
+	import { getGameContext } from '$lib/store/game.svelte';
 
 	type Props = {
 		item: ItemInstance;
@@ -15,6 +16,7 @@
 
 	let { item, className = 'h-40' }: Props = $props();
 	let def = $derived(getDef(item.defId));
+	const { dnd } = getGameContext();
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -68,7 +70,7 @@
 					<Socket
 						collection={item.attachments}
 						{index}
-						categories={[slot.type]}
+						allowedTypes={[slot.type]}
 						className="z-20 aspect-square size-8"
 						showInvalid={false}
 					>

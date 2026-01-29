@@ -1,21 +1,14 @@
 <script lang="ts">
-	import { setInventory } from '$lib/store/inventory-manger.svelte';
 	import type { ItemType, AttachmentType, ItemInstance, ItemCategory } from '$lib/config/items';
 	import ItemCard from '$lib/components/item-card.svelte';
-	import Socket from '$lib/components/socket.svelte';
+	import Slot from '$lib/components/slot.svelte';
 	import InvalidCard from '$lib/components/invalid-card.svelte';
-	import { setDndContext } from '$lib/store/dnd-manger.svelte';
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import WeaponCard from '$lib/components/weapon-card.svelte';
+	import { initGame } from '$lib/store/game.svelte';
 
-	const ATACHMENT: AttachmentType[] = ['muzzle', 'optic', 'stock', 'underbarrel', 'grip'];
-
-	const inventory = setInventory();
-	const dnd = setDndContext((source, target) => {
-		inventory.handleDrop(source, target);
-	});
-
-	const BP_CATEGORY: ItemCategory[] = ['loot', 'weapon', 'augment', 'shield', ...ATACHMENT];
+	const game = initGame();
+	const { inventory, dnd } = game;
 </script>
 
 <!-- debug -->
@@ -54,16 +47,11 @@
 		<div class="text-sm uppercase">filter</div>
 		<div class="grid grid-cols-4 gap-2">
 			{#each inventory.lootBack as _, index (index)}
-				<Socket
-					collection={inventory.lootBack}
-					{index}
-					categories={BP_CATEGORY}
-					className="h-20 w-20 aspect-square"
-				>
+				<Slot collection={inventory.lootBack} {index} className="h-20 w-20 aspect-square">
 					{#snippet children(item)}
 						<ItemCard {item} className="h-full w-full" />
 					{/snippet}
-				</Socket>
+				</Slot>
 			{/each}
 		</div>
 	</div>
@@ -78,10 +66,10 @@
 			<div class="flex flex-col gap-4">
 				<div class="text-sm uppercase">equipment</div>
 				<div class="flex gap-4">
-					<Socket
-						collection={inventory.equipmentSlots}
+					<Slot
+						collection={inventory.equipment}
 						index={0}
-						categories={['augment']}
+						allowedTypes={['augment']}
 						className=" h-20 w-[120px] flex-1 items-center justify-center "
 					>
 						{#snippet children(item)}
@@ -94,12 +82,12 @@
 								class="w-full object-contain opacity-50"
 							/>
 						{/snippet}
-					</Socket>
+					</Slot>
 
-					<Socket
-						collection={inventory.equipmentSlots}
+					<Slot
+						collection={inventory.equipment}
 						index={1}
-						categories={['shield']}
+						allowedTypes={['shield']}
 						className="flex-1 h-20 w-[120px]  items-center justify-center "
 					>
 						{#snippet children(item)}
@@ -112,12 +100,12 @@
 								class="w-full object-contain opacity-50"
 							/>
 						{/snippet}
-					</Socket>
+					</Slot>
 				</div>
-				<Socket
-					collection={inventory.weaponSlots}
+				<Slot
+					collection={inventory.weapon}
 					index={0}
-					categories={['weapon']}
+					allowedTypes={['weapon']}
 					className="h-44 w-64"
 				>
 					{#snippet children(item)}
@@ -130,11 +118,11 @@
 							class="w-1/2 object-contain opacity-50"
 						/>
 					{/snippet}
-				</Socket>
-				<Socket
-					collection={inventory.weaponSlots}
+				</Slot>
+				<Slot
+					collection={inventory.weapon}
 					index={1}
-					categories={['weapon']}
+					allowedTypes={['weapon']}
 					className="h-44 w-64"
 				>
 					{#snippet children(item)}
@@ -147,7 +135,7 @@
 							class="w-1/2 object-contain opacity-50"
 						/>
 					{/snippet}
-				</Socket>
+				</Slot>
 			</div>
 
 			<!-- backpack -->
@@ -160,16 +148,11 @@
 
 				<div class="grid grid-cols-4 gap-2">
 					{#each inventory.backpack as _, index (index)}
-						<Socket
-							collection={inventory.backpack}
-							{index}
-							categories={BP_CATEGORY}
-							className="h-20 w-20 aspect-square"
-						>
+						<Slot collection={inventory.backpack} {index} className="h-20 w-20 aspect-square">
 							{#snippet children(item)}
 								<ItemCard {item} className="h-full w-full" />
 							{/snippet}
-						</Socket>
+						</Slot>
 					{/each}
 				</div>
 			</div>

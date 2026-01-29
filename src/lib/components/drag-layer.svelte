@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { getDndContext } from '$lib/store/dnd-manger.svelte';
 	import { getDef } from '$lib/config/items';
+	import { getGameContext } from '$lib/store/game.svelte';
 
 	const GHOST_SIZE = 80;
 
-	const dnd = getDndContext();
+	const game = getGameContext();
+	const { dnd } = game;
 
 	const { isDragging, pointer, offset, item, isValidDrop } = $derived(dnd.state);
 
@@ -18,8 +19,8 @@
 	<div
 		class="pointer-events-none fixed top-0 left-0 z-50 flex size-20 items-center justify-center rounded-lg
                shadow-2xl backdrop-blur-sm will-change-transform {isValidDrop
-			? 'bg-blue-500/50'
-			: 'bg-red-500/50'}"
+			? 'bg-blue-500/30'
+			: 'bg-red-500/30'}"
 		style="
 			transform: translate3d({x}px, {y}px, 0) 
 		"

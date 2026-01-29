@@ -1,2 +1,10 @@
 @import 'tailwindcss';
 
+body.dragging-weapon [data-slot-type='attachment'] {
+	pointer-events: none !important;
+}
+
+/* Если тащим аттачмент — они снова активны */
+body.dragging-attachment [data-slot-type='attachment'] {
+	pointer-events: auto !important;
+}

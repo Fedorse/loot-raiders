@@ -1,10 +1,6 @@
 <script lang="ts">
-	import { setDndContext } from '$lib/store/dnd-manger.svelte';
+	// import { setDndContext } from '$lib/store/dnd-manger.svelte';
 	import './layout.css';
-
-	import { setInventory } from '$lib/store/inventory-manger.svelte';
-
-	// import bgImage from '$lib/assets/bg.webp';
 
 	let { children } = $props();
 </script>
@@ -17,3 +13,14 @@
 		{@render children()}
 	</div>
 </main>
+
+<style>
+	body.dragging-weapon [data-slot-type='attachment'] {
+		pointer-events: none !important;
+	}
+
+	/* Если тащим аттачмент — они снова активны */
+	body.dragging-attachment [data-slot-type='attachment'] {
+		pointer-events: auto !important;
+	}
+</style>

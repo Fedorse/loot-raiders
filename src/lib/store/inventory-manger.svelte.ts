@@ -19,11 +19,11 @@ export interface Item {
 	};
 }
 
-class InventoryManager {
+export class InventoryManager {
 	backpack = $state<(ItemInstance | null)[]>(Array(5).fill(null));
 	lootBack = $state<(ItemInstance | null)[]>(Array(20).fill(null));
-	weaponSlots = $state<(ItemInstance | null)[]>(Array(2).fill(null));
-	equipmentSlots = $state<(ItemInstance | null)[]>(Array(2).fill(null));
+	weapon = $state<(ItemInstance | null)[]>(Array(2).fill(null));
+	equipment = $state<(ItemInstance | null)[]>(Array(2).fill(null));
 
 	constructor() {
 		this.setup();
@@ -50,10 +50,10 @@ class InventoryManager {
 		const targetItem = target.collection[target.index];
 
 		// weapon_attachment
-		if (targetItem && target.collection === this.weaponSlots) {
+		if (targetItem && target.collection === this.weapon) {
 			const sourceDef = getDef(sourceItem.defId);
 			const targetDef = getDef(targetItem.defId);
-			
+
 			const slotIndex = targetDef.attachmentSlots?.findIndex((s) => s.type === sourceDef.type);
 
 			if (slotIndex !== undefined && slotIndex !== -1) {
@@ -76,14 +76,6 @@ class InventoryManager {
 		this.lootBack[0] = this.createItem('att_compensator_1');
 		this.lootBack[1] = this.createItem('att_stable_stock_1');
 
-		this.equipmentSlots[0] = this.createItem('eqp_tactical_mk1');
+		this.equipment[0] = this.createItem('eqp_tactical_mk1');
 	}
-}
-
-const INV_KEY = Symbol('inventory');
-export function setInventory() {
-	return setContext(INV_KEY, new InventoryManager());
-}
-export function useInventory() {
-	return getContext<InventoryManager>(INV_KEY);
 }
