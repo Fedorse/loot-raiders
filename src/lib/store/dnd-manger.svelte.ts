@@ -1,78 +1,80 @@
 import { type ItemInstance, type SlotReference, type ItemCategory } from '$lib/config/items';
 import * as Rules from '$lib/store/inventory-rules';
-import { getDef } from '$lib/config/items';
-
-interface DragState {
-	isDragging: boolean;
-	item: ItemInstance | null; // Что тащим (DraggedItem)
-	source: SlotReference | null; // Откуда тащим
-	target: SlotReference | null; // Над чем висим (TargetSlot)
-	isValidDrop: boolean;
-	pointer: { x: number; y: number };
-	offset: { x: number; y: number };
-}
 
 export class DndManager {
-	state = $state<DragState>({
-		isDragging: false,
-		item: null,
-		source: null,
-		target: null,
-		isValidDrop: false,
-		pointer: { x: 0, y: 0 },
-		offset: { x: 0, y: 0 }
-	});
+	isDragging = $state(false);
+	isValidDrop = $state(false);
+	draggedItem = $state<ItemInstance | null>(null);
+	source = $state<SlotReference | null>(null);
+	target = $state<SlotReference | null>(null);
+	pointer = $state({ x: 0, y: 0 });
+	offset = $state({ x: 0, y: 0 });
 
-	constructor(private onDropAction: (source: SlotReference, target: SlotReference) => void) {}
+	constructor(
+		private onDropAction: (
+			source: SlotReference,
+			target: SlotReference,
+			draggedItem: ItemInstance
+		) => void
+	) {}
 
-	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, element: HTMLElement) {
-		const rect = element.getBoundingClientRect();
+	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, node: HTMLElement) {
+		const rect = node.getBoundingClientRect();
 
-		this.state.isDragging = true;
-		this.state.item = item;
-		this.state.source = source;
-		this.state.pointer = { x: e.clientX, y: e.clientY };
-		this.state.offset = {
+		this.isDragging = true;
+		this.draggedItem = item;
+		this.source = source;
+
+		this.pointer = { x: e.clientX, y: e.clientY };
+		this.offset = {
 			x: (e.clientX - rect.left) / rect.width,
 			y: (e.clientY - rect.top) / rect.height
 		};
-		this.state.isValidDrop = true;
 
-		window.addEventListener('pointermove', this.onPointerMove);
-		window.addEventListener('pointerup', this.onPointerUp);
+		window.addEventListener('pointermove', this.handlePointerMove);
+		window.addEventListener('pointerup', this.endDrag);
 	}
 
-	setTarget(ref: SlotReference, categories: ItemCategory[], currentItem: ItemInstance | null) {
-		if (!this.state.isDragging) return;
-		this.state.target = ref;
-		this.state.isValidDrop =
-			Rules.canPlace(this.state.item, categories) || Rules.canAttach(this.state.item, currentItem);
-	}
-
-	clearTarget(ref?: SlotReference) {
-		if (ref && this.state.target !== ref) return;
-		this.state.target = null;
-		this.state.isValidDrop = false;
-	}
-
-	private onPointerMove = (e: PointerEvent) => {
-		this.state.pointer = { x: e.clientX, y: e.clientY };
+	private handlePointerMove = (e: PointerEvent) => {
+		this.pointer = { x: e.clientX, y: e.clientY };
 	};
 
-	private onPointerUp = () => {
-		if (this.state.target && this.state.isValidDrop && this.state.source) {
-			this.onDropAction(this.state.source, this.state.target);
+	private endDrag = () => {
+		if (this.isValidDrop) {
+			this.onDropAction(this.source, this.target, this.draggedItem);
 		}
 		this.reset();
 	};
 
+	isSource(slotRef: SlotReference) {
+		return this.source?.collection === slotRef.collection && this.source.index === slotRef.index;
+	}
+
+	canAccept(collection: ItemCategory[], targetItem: ItemInstance | null) {
+		return (
+			Rules.canPlace(this.draggedItem, collection) || Rules.canAttach(this.draggedItem, targetItem)
+		);
+	}
+
+	setTarget(targetItem: SlotReference, collection: ItemCategory[], item: ItemInstance | null) {
+		if (!this.isDragging) return;
+		this.target = targetItem;
+		this.isValidDrop = this.canAccept(collection, item);
+	}
+
+	clearTarget(ref?: SlotReference) {
+		if (ref && this.target !== ref) return;
+		this.target = null;
+		this.isValidDrop = false;
+	}
+
 	private reset() {
-		this.state.isDragging = false;
-		this.state.item = null;
-		this.state.source = null;
-		this.state.target = null;
-		this.state.isValidDrop = false;
-		window.removeEventListener('pointermove', this.onPointerMove);
-		window.removeEventListener('pointerup', this.onPointerUp);
+		this.isDragging = false;
+		this.draggedItem = null;
+		this.source = null;
+		this.target = null;
+		this.isValidDrop = false;
+		window.removeEventListener('pointermove', this.handlePointerMove);
+		window.removeEventListener('pointerup', this.endDrag);
 	}
 }

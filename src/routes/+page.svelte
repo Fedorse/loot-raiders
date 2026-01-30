@@ -1,8 +1,6 @@
 <script lang="ts">
-	import type { ItemType, AttachmentType, ItemInstance, ItemCategory } from '$lib/config/items';
 	import ItemCard from '$lib/components/item-card.svelte';
 	import Slot from '$lib/components/slot.svelte';
-	import InvalidCard from '$lib/components/invalid-card.svelte';
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import WeaponCard from '$lib/components/weapon-card.svelte';
 	import { initGame } from '$lib/store/game.svelte';
@@ -12,21 +10,21 @@
 </script>
 
 <!-- debug -->
-{#if dnd.state.isDragging}
+{#if dnd.isDragging}
 	<pre
 		class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
 {JSON.stringify(
 			{
-				dragged: dnd.state.item && dnd.state.item.defId,
+				dragged: dnd.draggedItem && dnd.draggedItem.defId,
 				target: {
-					slot: dnd.state.target?.collection[dnd.state.target.index],
-					index: dnd.state.target?.index
+					slot: dnd.target?.collection[dnd.target.index],
+					index: dnd.target?.index
 				},
-				validDrop: dnd.state.isValidDrop,
-				pointer: dnd.state.pointer,
+				validDrop: dnd.isValidDrop,
+				pointer: dnd.pointer,
 				source: {
-					item: dnd.state.source?.collection[dnd.state.source.index],
-					index: dnd.state.source?.index
+					item: dnd.source?.collection[dnd.source.index],
+					index: dnd.source?.index
 				}
 			},
 			null,
@@ -36,14 +34,11 @@
 {/if}
 
 <div class="flex h-full w-full items-start justify-center gap-4 px-5 py-16">
-	<!-- lootback -->
 	<div class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 pt-4 pb-12 backdrop-blur-xs">
-		<!-- header -->
 		<div class="flex items-center gap-4">
 			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
 			<span class="text-sm">{inventory.lootBack.filter((i) => i).length}/20</span>
 		</div>
-		<!-- content -->
 		<div class="text-sm uppercase">filter</div>
 		<div class="grid grid-cols-4 gap-2">
 			{#each inventory.lootBack as _, index (index)}
@@ -58,7 +53,6 @@
 	<div
 		class="z-10 flex flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs"
 	>
-		<!-- main header -->
 		<div class="flex items-center">
 			<h2 class="text-base font-bold uppercase">loadout</h2>
 		</div>

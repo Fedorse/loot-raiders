@@ -1,10 +1,5 @@
 <script lang="ts">
-	// import duck from '$lib/assets/loot_assets/ARC Motion Core.png';
-	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
 	import TierIcon from '$lib/components/tier-icon.svelte';
-
-	// import CategoryIcon from '$lib/assets/category/test.png';
-	import { type Item } from '$lib/store/inventory-manger.svelte';
 	import { getDef } from '$lib/config/items';
 	import type { ItemInstance } from '$lib/config/items';
 
@@ -52,11 +47,6 @@
 
 	const style = $derived(RARITY_CONFIG[def.rarity] || RARITY_CONFIG.common);
 	const hasAttachments = $derived(item?.attachments?.some((item) => item !== null));
-
-	function preventDrag(e) {
-		e.stopImmediatePropagation();
-		e.preventDefault();
-	}
 </script>
 
 <div class="{className} group">
@@ -111,10 +101,11 @@
 			<div class="text-white/70">
 				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
-
-			<div class="font-mono text-xs font-bold tracking-wider text-white">
-				{def.count || 1}
-			</div>
+			{#if item.count > 1}
+				<div class="font-mono text-xs font-bold tracking-wider text-white">
+					{item.count}
+				</div>
+			{/if}
 		{/if}
 	</div>
 {/snippet}

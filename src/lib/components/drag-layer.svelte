@@ -7,9 +7,9 @@
 	const game = getGameContext();
 	const { dnd } = game;
 
-	const { isDragging, pointer, offset, item, isValidDrop } = $derived(dnd.state);
+	const { isDragging, pointer, offset, draggedItem, isValidDrop } = $derived(dnd);
 
-	let def = $derived(getDef(item?.defId));
+	let def = $derived(getDef(draggedItem?.defId));
 
 	const x = $derived(pointer.x - offset.x * GHOST_SIZE);
 	const y = $derived(pointer.y - offset.y * GHOST_SIZE);

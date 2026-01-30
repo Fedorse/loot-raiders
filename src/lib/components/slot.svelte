@@ -28,30 +28,18 @@
 
 	const { dnd } = game;
 
-	const { isDragging, source, item: draggedItem, isValidDrop } = $derived(dnd.state);
+	const { isDragging } = $derived(dnd);
 
-	const currentItem = $derived(collection[index]);
-
-	const slotRef = { collection, index };
-
-	const draggedCurrentItem = $derived(
-		isDragging && source?.collection === collection && source.index === index
-	);
-
-	const canAccept = $derived.by(() => {
-		if (!draggedItem) return true; // Если ничего не тащим, слот активен
-
-		// Слот активен, если можно ПОЛОЖИТЬ сюда или ПРИКРЕПИТЬ к тому, кто тут лежит
-		return Rules.canPlace(draggedItem, allowedTypes) || Rules.canAttach(draggedItem, currentItem);
-	});
+	const isDraggingMe = $derived(dnd.isSource({ collection, index }));
+	const item = $derived(collection[index]);
+	const valid = $derived(dnd.canAccept(allowedTypes, item));
 </script>
 
 <div
 	class="{className}  relative"
-	{@attach droppable(slotRef, allowedTypes, dnd, currentItem)}
-	data-slot-role
+	{@attach droppable({ item, slotRef: { collection, index }, allowedTypes, dnd })}
 >
-	{#if !currentItem || draggedCurrentItem}
+	{#if !item || isDraggingMe}
 		<div
 			class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
 		>
@@ -60,18 +48,14 @@
 			{/if}
 		</div>
 	{:else}
-		<div
-			class="h-full w-full"
-			class:opacity-0={draggedCurrentItem}
-			{@attach draggable(currentItem, slotRef, dnd)}
-		>
-			{#if currentItem}
-				{@render children(currentItem)}
+		<div class="h-full w-full" {@attach draggable({ item, slotRef: { collection, index }, dnd })}>
+			{#if item}
+				{@render children(item)}
 			{/if}
 		</div>
 	{/if}
 
-	{#if dnd.state.isDragging && !canAccept && showInvalid}
+	{#if isDragging && !valid && showInvalid}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>

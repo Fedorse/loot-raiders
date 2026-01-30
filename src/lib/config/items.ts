@@ -46,7 +46,7 @@ export interface ItemDefinition {
 
 	weight: number;
 	price: number;
-	stackSize?: number;
+	maxStack?: number;
 
 	attachmentSlots?: {
 		type: AttachmentType;
@@ -104,7 +104,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/cattegory/test.png',
 		price: 300,
 		weight: 1,
-		stackSize: 100,
+		maxStack: 12,
 		recycling: [{ itemId: 'res_metal_parts', amount: 1, name: 'Metal Parts' }]
 	},
 	res_toaster: {
@@ -116,7 +116,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/cattegory/test.png',
 		price: 50,
 		weight: 2,
-		stackSize: 3,
+		maxStack: 3,
 		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
 	},
 	res_bastion_cell: {
@@ -128,7 +128,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/cattegory/test.png',
 		price: 500,
 		weight: 0.5,
-		stackSize: 15
+		maxStack: 15
 	},
 	loot_cat_bed: {
 		id: 'loot_cat_bed',
@@ -139,7 +139,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/cattegory/test.png',
 		price: 150,
 		weight: 1,
-		stackSize: 5
+		maxStack: 5
 	},
 
 	eqp_tactical_mk1: {
@@ -147,7 +147,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		name: 'Tactical Mk1',
 		type: 'augment',
 		rarity: 'uncommon',
-		count: 10,
 		weight: 2,
 		price: 300,
 		image: '/assets/equip/Tactical_Mk_1.png',

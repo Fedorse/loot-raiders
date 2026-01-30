@@ -1,18 +1,20 @@
 import { setContext, getContext } from 'svelte';
 import { InventoryManager } from './inventory-manger.svelte';
 import { DndManager } from './dnd-manger.svelte';
-import type { SlotReference } from '$lib/config/items';
+import type { ItemInstance, SlotReference } from '$lib/config/items';
 
 export class Game {
 	inventory = new InventoryManager();
 	dnd: DndManager;
 
 	constructor() {
-		this.dnd = new DndManager((source, target) => this.handleDrop(source, target));
+		this.dnd = new DndManager((source, target, draggedItem) =>
+			this.handleDrop(source, target, draggedItem)
+		);
 	}
 
-	handleDrop(source: SlotReference, target: SlotReference) {
-		this.inventory.handleDrop(source, target);
+	handleDrop(source: SlotReference, target: SlotReference, draggedItem: ItemInstance) {
+		this.inventory.handleDrop(source, target, draggedItem);
 	}
 }
 
