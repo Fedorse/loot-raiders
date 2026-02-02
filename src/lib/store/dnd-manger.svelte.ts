@@ -4,6 +4,7 @@ import * as Rules from '$lib/store/inventory-rules';
 export class DndManager {
 	isDragging = $state(false);
 	isValidDrop = $state(false);
+	isSplit = $state(false);
 	draggedItem = $state<ItemInstance | null>(null);
 	source = $state<SlotReference | null>(null);
 	target = $state<SlotReference | null>(null);
@@ -15,7 +16,8 @@ export class DndManager {
 			source: SlotReference,
 			target: SlotReference,
 			draggedItem: ItemInstance
-		) => void
+		) => void,
+		private onSplitAction: (source: SlotReference) => ItemInstance | null
 	) {}
 
 	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, node: HTMLElement) {
@@ -24,6 +26,18 @@ export class DndManager {
 		this.isDragging = true;
 		this.draggedItem = item;
 		this.source = source;
+		this.isSplit = false;
+		if (e.altKey || e.shiftKey) {
+			const splitItem = this.onSplitAction(source);
+			if (splitItem) {
+				this.draggedItem = splitItem;
+				this.isSplit = true;
+			} else {
+				this.draggedItem = item;
+			}
+		} else {
+			this.draggedItem = item;
+		}
 
 		this.pointer = { x: e.clientX, y: e.clientY };
 		this.offset = {
@@ -42,6 +56,8 @@ export class DndManager {
 	private endDrag = () => {
 		if (this.isValidDrop) {
 			this.onDropAction(this.source, this.target, this.draggedItem);
+		} else if (this.isSplit) {
+			this.onDropAction(this.source, this.source, this.draggedItem);
 		}
 		this.reset();
 	};

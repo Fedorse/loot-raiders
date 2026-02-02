@@ -69,6 +69,22 @@ export class InventoryManager {
 		return true;
 	}
 
+	splitStack(source: SlotReference): ItemInstance | null {
+		const originalItem = source.collection[source.index];
+
+		if (!originalItem || originalItem.count < 2) return null;
+
+		const splitAmount = Math.ceil(originalItem.count / 2);
+
+		originalItem.count -= splitAmount;
+
+		return {
+			...originalItem,
+			uid: crypto.randomUUID(),
+			count: splitAmount
+		};
+	}
+
 	tryAttach(
 		source: SlotReference,
 		target: SlotReference,

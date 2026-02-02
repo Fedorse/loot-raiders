@@ -8,8 +8,14 @@ export class Game {
 	dnd: DndManager;
 
 	constructor() {
-		this.dnd = new DndManager((source, target, draggedItem) =>
-			this.handleDrop(source, target, draggedItem)
+		this.dnd = new DndManager(
+			(source, target, item) => {
+				this.inventory.handleDrop(source, target, item);
+			},
+
+			(source) => {
+				return this.inventory.splitStack(source);
+			}
 		);
 	}
 
