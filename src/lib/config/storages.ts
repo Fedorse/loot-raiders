@@ -10,18 +10,7 @@ export const STORAGE_CONFIGS: StorageConfig[] = [
 	{
 		name: 'lootBack',
 		size: 20,
-		allowedTypes: [
-			'loot',
-			'attachment',
-			'muzzle',
-			'optic',
-			'magazine',
-			'grip',
-			'stock',
-			'underbarrel',
-			'weapon',
-			'augment'
-		]
+		allowedTypes: ['loot', 'attachment', 'weapon', 'augment']
 	},
 	{
 		name: 'augment',
@@ -41,19 +30,7 @@ export const STORAGE_CONFIGS: StorageConfig[] = [
 	{
 		name: 'backpack',
 		size: 14,
-		allowedTypes: [
-			'loot',
-			'weapon',
-			'augment',
-			'shield',
-			'attachment',
-			'muzzle',
-			'optic',
-			'magazine',
-			'grip',
-			'stock',
-			'underbarrel'
-		]
+		allowedTypes: ['loot', 'weapon', 'augment', 'shield', 'attachment']
 	}
 ];
 

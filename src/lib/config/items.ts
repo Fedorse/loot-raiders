@@ -1,15 +1,4 @@
-export type ItemType =
-	| 'loot'
-	| 'weapon'
-	| 'augment'
-	| 'shield'
-	| 'attachment'
-	| 'optic'
-	| 'muzzle'
-	| 'magazine'
-	| 'grip'
-	| 'stock'
-	| 'underbarrel';
+export type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
@@ -25,8 +14,8 @@ export interface ItemInstance {
 }
 
 export interface SlotReference {
-	collection: (ItemInstance | null)[];
-	index: number;
+	storage: string; // имя хранилища из конфига
+	position: number; // индекс в хранилище
 }
 
 export interface RecyclingResult {
@@ -40,6 +29,7 @@ export interface ItemDefinition {
 	name: string;
 	type: ItemType;
 	rarity: ItemRarity;
+	attachmentKind?: AttachmentType; // Конкретный тип attachment (muzzle, optic и т.д.)
 
 	image: string;
 	categoryIcon: string;
@@ -167,7 +157,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	att_compensator_1: {
 		id: 'att_compensator_1',
 		name: 'Compensator I',
-		type: 'muzzle',
+		type: 'attachment',
+		attachmentKind: 'muzzle',
 		rarity: 'uncommon',
 		image: '/assets/weapons/Compensator_I.png',
 		categoryIcon: '/assets/cattegory/test.png',
@@ -178,7 +169,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	att_stable_stock_1: {
 		id: 'att_stable_stock_1',
 		name: 'Stable Stock I',
-		type: 'stock',
+		type: 'attachment',
+		attachmentKind: 'stock',
 		rarity: 'common',
 		image: '/assets/weapons/Stable_Stock_I.png',
 		categoryIcon: '/assets/cattegory/test.png',

@@ -1,13 +1,50 @@
 import { getDef, type ItemInstance, type SlotReference } from '$lib/config/items';
+import { getStorageConfig } from '$lib/config/storages';
+
+interface StoredItem {
+	item: ItemInstance;
+	storage: string;
+	position: number;
+}
 
 export class InventoryManager {
-	backpack = $state<(ItemInstance | null)[]>(Array(14).fill(null));
-	lootBack = $state<(ItemInstance | null)[]>(Array(20).fill(null));
-	weapon = $state<(ItemInstance | null)[]>(Array(2).fill(null));
-	equipment = $state<(ItemInstance | null)[]>(Array(2).fill(null));
+	items = $state<StoredItem[]>([]);
 
 	constructor() {
 		this.setup();
+	}
+
+	getItem(storage: string, position: number): ItemInstance | null {
+		const storedItem = this.items.find(
+			(item) => item.storage === storage && item.position === position
+		);
+		return storedItem?.item ?? null;
+	}
+
+	setItem(storage: string, position: number, item: ItemInstance | null): void {
+		const index = this.items.findIndex(
+			(storedItem) => storedItem.storage === storage && storedItem.position === position
+		);
+
+		if (item === null) {
+			if (index >= 0) {
+				this.items.splice(index, 1);
+			}
+			return;
+		}
+
+		if (index >= 0) {
+			this.items[index] = { item, storage, position };
+		} else {
+			this.items.push({ item, storage, position });
+		}
+	}
+
+	getStorageCollection(name: string): (ItemInstance | null)[] {
+		const config = getStorageConfig(name);
+		if (!config) return [];
+
+		return Array.from({ length: config.size }, (_, index) => this.getItem(name, index));
 	}
 
 	createItem(defId: string, count = 1): ItemInstance {
@@ -25,10 +62,12 @@ export class InventoryManager {
 	}
 
 	handleDrop(source: SlotReference, target: SlotReference, draggedItem: ItemInstance) {
-		if (source.collection === target.collection && source.index === target.index) return;
+		if (source.storage === target.storage && source.position === target.position) return;
 
-		const sourceItem = source.collection[source.index];
-		const targetItem = target.collection[target.index];
+		const sourceItem = this.getItem(source.storage, source.position);
+		const targetItem = this.getItem(target.storage, target.position);
+
+		if (!sourceItem) return;
 
 		if (this.tryAttach(source, target, sourceItem, targetItem)) return;
 		if (targetItem) {
@@ -36,7 +75,7 @@ export class InventoryManager {
 			if (stackResult) return;
 		}
 
-		this.swap(source, target, draggedItem, targetItem);
+		this.swap(source, target, sourceItem, targetItem);
 	}
 
 	swap(
@@ -45,8 +84,8 @@ export class InventoryManager {
 		sourceItem: ItemInstance,
 		targetItem: ItemInstance | null
 	) {
-		target.collection[target.index] = sourceItem;
-		source.collection[source.index] = targetItem;
+		this.setItem(target.storage, target.position, sourceItem);
+		this.setItem(source.storage, source.position, targetItem);
 	}
 	tryStack(
 		source: SlotReference,
@@ -64,19 +103,23 @@ export class InventoryManager {
 		targetItem.count += amountToMove;
 		sourceItem.count -= amountToMove;
 		if (sourceItem.count <= 0) {
-			source.collection[source.index] = null;
+			this.setItem(source.storage, source.position, null);
+		} else {
+			this.setItem(source.storage, source.position, sourceItem);
 		}
+		this.setItem(target.storage, target.position, targetItem);
 		return true;
 	}
 
 	splitStack(source: SlotReference): ItemInstance | null {
-		const originalItem = source.collection[source.index];
+		const originalItem = this.getItem(source.storage, source.position);
 
 		if (!originalItem || originalItem.count < 2) return null;
 
 		const splitAmount = Math.ceil(originalItem.count / 2);
 
 		originalItem.count -= splitAmount;
+		this.setItem(source.storage, source.position, originalItem);
 
 		return {
 			...originalItem,
@@ -89,31 +132,42 @@ export class InventoryManager {
 		source: SlotReference,
 		target: SlotReference,
 		sourceItem: ItemInstance,
-		targetItem: ItemInstance
+		targetItem: ItemInstance | null
 	): boolean {
 		if (targetItem === null) return false;
-		if (target.collection !== this.weapon) return;
+		if (target.storage !== 'weapon') return false;
 
 		const sourceDef = getDef(sourceItem.defId);
 		const targetDef = getDef(targetItem.defId);
 
-		const slotIndex = targetDef.attachmentSlots?.findIndex((s) => s.type === sourceDef.type);
+		// Проверяем attachmentKind для attachments
+		if (sourceDef.type !== 'attachment' || !sourceDef.attachmentKind) return false;
+
+		const slotIndex = targetDef.attachmentSlots?.findIndex(
+			(s) => s.type === sourceDef.attachmentKind
+		);
 		if (slotIndex == null || slotIndex < 0) return false;
-		const old = targetItem.attachments[slotIndex] ?? null;
-		targetItem.attachments[slotIndex] = sourceItem;
-		source.collection[source.index] = old;
+		if (!targetItem.attachments && targetDef.attachmentSlots) {
+			targetItem.attachments = new Array(targetDef.attachmentSlots.length).fill(null);
+		}
+		const old = targetItem.attachments?.[slotIndex] ?? null;
+		if (targetItem.attachments) {
+			targetItem.attachments[slotIndex] = sourceItem;
+		}
+		this.setItem(target.storage, target.position, targetItem);
+		this.setItem(source.storage, source.position, old);
 		return true;
 	}
 
 	setup() {
-		this.backpack[0] = this.createItem('res_arc_circuitry', 10);
-		this.backpack[10] = this.createItem('res_arc_circuitry', 5);
-		this.backpack[1] = this.createItem('eqp_tactical_mk1');
-		this.backpack[2] = this.createItem('wpn_kettle');
-		this.backpack[3] = this.createItem('wpn_bobcat');
-		this.lootBack[0] = this.createItem('att_compensator_1');
-		this.lootBack[1] = this.createItem('att_stable_stock_1');
+		this.setItem('backpack', 0, this.createItem('res_arc_circuitry', 10));
+		this.setItem('backpack', 10, this.createItem('res_arc_circuitry', 5));
+		this.setItem('backpack', 1, this.createItem('eqp_tactical_mk1'));
+		this.setItem('backpack', 2, this.createItem('wpn_kettle'));
+		this.setItem('backpack', 3, this.createItem('wpn_bobcat'));
+		this.setItem('lootBack', 0, this.createItem('att_compensator_1'));
+		this.setItem('lootBack', 1, this.createItem('att_stable_stock_1'));
 
-		this.equipment[0] = this.createItem('eqp_tactical_mk1');
+		this.setItem('augment', 0, this.createItem('eqp_tactical_mk1'));
 	}
 }

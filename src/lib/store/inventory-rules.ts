@@ -1,6 +1,5 @@
 import { getDef, type ItemInstance, type ItemCategory } from '$lib/config/items';
 
-
 export const canPlace = (item: ItemInstance | null, allowedTypes: ItemCategory[]): boolean => {
 	if (!item) return false;
 	if (!allowedTypes || allowedTypes.length === 0) return true;
@@ -12,5 +11,11 @@ export const canAttach = (item: ItemInstance | null, targetItem: ItemInstance | 
 	if (!item || !targetItem) return false;
 	const itemDef = getDef(item.defId);
 	const targetDef = getDef(targetItem.defId);
-	return targetDef.attachmentSlots?.some((slot) => slot.type === itemDef.type) ?? false;
+
+	// Для attachments проверяем attachmentKind
+	if (itemDef.type === 'attachment' && itemDef.attachmentKind) {
+		return targetDef.attachmentSlots?.some((slot) => slot.type === itemDef.attachmentKind) ?? false;
+	}
+
+	return false;
 };

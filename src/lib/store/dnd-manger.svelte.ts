@@ -1,4 +1,5 @@
 import { type ItemInstance, type SlotReference, type ItemCategory } from '$lib/config/items';
+import { getAllowedTypes } from '$lib/config/storages';
 import * as Rules from '$lib/store/inventory-rules';
 
 export class DndManager {
@@ -54,28 +55,32 @@ export class DndManager {
 	};
 
 	private endDrag = () => {
-		if (this.isValidDrop) {
-			this.onDropAction(this.source, this.target, this.draggedItem);
-		} else if (this.isSplit) {
-			this.onDropAction(this.source, this.source, this.draggedItem);
+		const draggedItem = this.draggedItem;
+		if (this.isValidDrop && this.source && this.target && draggedItem) {
+			this.onDropAction(this.source, this.target, draggedItem);
+		} else if (this.isSplit && this.source && draggedItem) {
+			this.onDropAction(this.source, this.source, draggedItem);
 		}
 		this.reset();
 	};
 
 	isSource(slotRef: SlotReference) {
-		return this.source?.collection === slotRef.collection && this.source.index === slotRef.index;
+		if (!this.source) return false;
+		return this.source.storage === slotRef.storage && this.source.position === slotRef.position;
 	}
 
-	canAccept(collection: ItemCategory[], targetItem: ItemInstance | null) {
+	canAccept(storage: string, targetItem: ItemInstance | null) {
+		const allowedTypes = getAllowedTypes(storage);
 		return (
-			Rules.canPlace(this.draggedItem, collection) || Rules.canAttach(this.draggedItem, targetItem)
+			Rules.canPlace(this.draggedItem, allowedTypes) ||
+			Rules.canAttach(this.draggedItem, targetItem)
 		);
 	}
 
-	setTarget(targetItem: SlotReference, collection: ItemCategory[], item: ItemInstance | null) {
+	setTarget(targetItem: SlotReference, storage: string, item: ItemInstance | null) {
 		if (!this.isDragging) return;
 		this.target = targetItem;
-		this.isValidDrop = this.canAccept(collection, item);
+		this.isValidDrop = this.canAccept(storage, item);
 	}
 
 	clearTarget(ref?: SlotReference) {

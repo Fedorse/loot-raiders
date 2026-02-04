@@ -53,7 +53,6 @@
 	>
 		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
 			{@render absoluteGlowShadow()}
-
 			<div class="relative min-h-0 flex-1 items-center justify-center">
 				<img
 					src={def.image || duck1}

@@ -15,6 +15,12 @@
 	const weaponConfig = getStorageConfig('weapon');
 	const augmentConfig = getStorageConfig('augment');
 	const shieldConfig = getStorageConfig('shield');
+
+	const lootBackCollection = $derived(inventory.getStorageCollection('lootBack'));
+	const backpackCollection = $derived(inventory.getStorageCollection('backpack'));
+	const weaponCollection = $derived(inventory.getStorageCollection('weapon'));
+	const augmentCollection = $derived(inventory.getStorageCollection('augment'));
+	const shieldCollection = $derived(inventory.getStorageCollection('shield'));
 </script>
 
 <!-- debug -->
@@ -25,14 +31,16 @@
 			{
 				dragged: dnd.draggedItem && dnd.draggedItem.defId,
 				target: {
-					slot: dnd.target?.collection[dnd.target.index],
-					index: dnd.target?.index
+					storage: dnd.target?.storage,
+					position: dnd.target?.position,
+					item: dnd.target && inventory.getItem(dnd.target.storage, dnd.target.position)
 				},
 				validDrop: dnd.isValidDrop,
 				pointer: dnd.pointer,
 				source: {
-					item: dnd.source?.collection[dnd.source.index],
-					index: dnd.source?.index
+					storage: dnd.source?.storage,
+					position: dnd.source?.position,
+					item: dnd.source && inventory.getItem(dnd.source.storage, dnd.source.position)
 				}
 			},
 			null,
@@ -47,7 +55,7 @@
 			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
 			{#if lootBackConfig}
 				<span class="text-sm"
-					>{inventory.lootBack.filter((i) => i).length}/{lootBackConfig.size}</span
+					>{lootBackCollection.filter((i) => i).length}/{lootBackConfig.size}</span
 				>
 			{/if}
 		</div>
@@ -55,12 +63,7 @@
 		<div class="grid grid-cols-4 gap-2">
 			{#if lootBackConfig}
 				{#each Array(lootBackConfig.size) as _, index (index)}
-					<Slot
-						collection={inventory.lootBack}
-						{index}
-						allowedTypes={lootBackConfig.allowedTypes}
-						className="h-20 w-20 aspect-square"
-					>
+					<Slot storage="lootBack" position={index} className="h-20 w-20 aspect-square">
 						{#snippet children(item: ItemInstance | null)}
 							<ItemCard {item} className="h-full w-full" />
 						{/snippet}
@@ -79,68 +82,67 @@
 			<div class="flex flex-col gap-4">
 				<div class="text-sm uppercase">equipment</div>
 				<div class="flex gap-4">
-					{#each Array(augmentConfig.size) as _, index (index)}
-						<Slot
-							collection={inventory.equipment}
-							{index}
-							allowedTypes={augmentConfig.allowedTypes}
-							className=" h-20 w-[120px] flex-1 items-center justify-center "
-						>
-							{#snippet children(item: ItemInstance | null)}
-								<ItemCard {item} className="h-full w-full" />
-							{/snippet}
-							{#snippet placeholder()}
-								<img
-									src="/assets/placeholder/augment_placeholder.png"
-									alt="placeholder"
-									class="w-full object-contain opacity-50"
-								/>
-							{/snippet}
-						</Slot>
-					{/each}
+					{#if augmentConfig}
+						{#each Array(augmentConfig.size) as _, index (index)}
+							<Slot
+								storage="augment"
+								position={index}
+								className=" h-20 w-[120px] flex-1 items-center justify-center "
+							>
+								{#snippet children(item: ItemInstance | null)}
+									<ItemCard {item} className="h-full w-full" />
+								{/snippet}
+								{#snippet placeholder()}
+									<img
+										src="/assets/placeholder/augment_placeholder.png"
+										alt="placeholder"
+										class="w-full object-contain opacity-50"
+									/>
+								{/snippet}
+							</Slot>
+						{/each}
+					{/if}
 
-					{#each Array(shieldConfig.size) as _, index (index)}
-						<Slot
-							collection={inventory.equipment}
-							index={index + (augmentConfig?.size ?? 0)}
-							allowedTypes={shieldConfig.allowedTypes}
-							className="flex-1 h-20 w-[120px]  items-center justify-center "
-						>
-							{#snippet children(item: ItemInstance | null)}
-								<ItemCard {item} className="h-full w-full" />
-							{/snippet}
-							{#snippet placeholder()}
-								<img
-									src="/assets/placeholder/shield_placeholder.png"
-									alt="placeholder"
-									class="w-full object-contain opacity-50"
-								/>
-							{/snippet}
-						</Slot>
-					{/each}
+					{#if shieldConfig}
+						{#each Array(shieldConfig.size) as _, index (index)}
+							<Slot
+								storage="shield"
+								position={index}
+								className="flex-1 h-20 w-[120px]  items-center justify-center "
+							>
+								{#snippet children(item: ItemInstance | null)}
+									<ItemCard {item} className="h-full w-full" />
+								{/snippet}
+								{#snippet placeholder()}
+									<img
+										src="/assets/placeholder/shield_placeholder.png"
+										alt="placeholder"
+										class="w-full object-contain opacity-50"
+									/>
+								{/snippet}
+							</Slot>
+						{/each}
+					{/if}
 				</div>
 
-				{#each Array(weaponConfig.size) as _, index (index)}
-					<Slot
-						collection={inventory.weapon}
-						{index}
-						allowedTypes={weaponConfig.allowedTypes}
-						className="h-44 w-64"
-					>
-						{#snippet children(item)}
-							{#if item}
-								<WeaponCard {item} className="h-full w-full" />
-							{/if}
-						{/snippet}
-						{#snippet placeholder()}
-							<img
-								src="/assets/placeholder/placeholder_weapon.png"
-								alt="placeholder"
-								class="w-1/2 object-contain opacity-50"
-							/>
-						{/snippet}
-					</Slot>
-				{/each}
+				{#if weaponConfig}
+					{#each Array(weaponConfig.size) as _, index (index)}
+						<Slot storage="weapon" position={index} className="h-44 w-64">
+							{#snippet children(item: ItemInstance | null)}
+								{#if item}
+									<WeaponCard {item} className="h-full w-full" />
+								{/if}
+							{/snippet}
+							{#snippet placeholder()}
+								<img
+									src="/assets/placeholder/placeholder_weapon.png"
+									alt="placeholder"
+									class="w-1/2 object-contain opacity-50"
+								/>
+							{/snippet}
+						</Slot>
+					{/each}
+				{/if}
 			</div>
 
 			<!-- backpack -->
@@ -150,24 +152,21 @@
 					<div class="text-sm uppercase">backpack</div>
 					{#if backpackConfig}
 						<span class="text-sm"
-							>{inventory.backpack.filter((i) => i).length}/{backpackConfig.size}</span
+							>{backpackCollection.filter((i) => i).length}/{backpackConfig.size}</span
 						>
 					{/if}
 				</div>
 
 				<div class="grid grid-cols-4 gap-2">
-					{#each Array(backpackConfig.size) as _, index (index)}
-						<Slot
-							collection={inventory.backpack}
-							{index}
-							allowedTypes={backpackConfig.allowedTypes}
-							className="h-20 w-20 aspect-square"
-						>
-							{#snippet children(item: ItemInstance | null)}
-								<ItemCard {item} className="h-full w-full" />
-							{/snippet}
-						</Slot>
-					{/each}
+					{#if backpackConfig}
+						{#each Array(backpackConfig.size) as _, index (index)}
+							<Slot storage="backpack" position={index} className="h-20 w-20 aspect-square">
+								{#snippet children(item: ItemInstance | null)}
+									<ItemCard {item} className="h-full w-full" />
+								{/snippet}
+							</Slot>
+						{/each}
+					{/if}
 				</div>
 			</div>
 		</div>

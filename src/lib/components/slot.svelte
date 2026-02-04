@@ -1,43 +1,62 @@
 <script lang="ts">
-	import { type ItemInstance, type ItemType, type ItemCategory, getDef } from '$lib/config/items';
+	import { type ItemInstance, type ItemType } from '$lib/config/items';
 	import { droppable, draggable } from '$lib/attach/dnd';
 	import { getGameContext } from '$lib/store/game.svelte';
-	import * as Rules from '$lib/store/inventory-rules';
+	import { getStorageConfig } from '$lib/config/storages';
 
 	type Props = {
-		collection: (ItemInstance | null)[];
-		index: number;
-		allowedTypes?: ItemType[];
+		storage: string;
+		position: number;
 		children: any;
 		className: string;
 		placeholder?: any;
 		showInvalid?: boolean;
+		// Для обратной совместимости с attachments в weapon-card
+		collection?: (ItemInstance | null)[];
+		index?: number;
 	};
 
 	let {
-		collection,
-		index,
-		allowedTypes = [],
+		storage,
+		position,
 		children,
 		className = '',
 		placeholder,
-		showInvalid = true
+		showInvalid = true,
+		collection,
+		index
 	}: Props = $props();
 
 	const game = getGameContext();
 
-	const { dnd } = game;
+	const { dnd, inventory } = game;
 
 	const { isDragging } = $derived(dnd);
 
-	const isDraggingMe = $derived(dnd.isSource({ collection, index }));
-	const item = $derived(collection[index]);
-	const valid = $derived(dnd.canAccept(allowedTypes, item));
+	// Поддержка старого API для attachments (collection/index)
+	const slotRef = $derived(
+		collection !== undefined && index !== undefined
+			? { storage: '', position: index } // Временный SlotReference для attachments
+			: { storage, position }
+	);
+
+	const isDraggingMe = $derived(dnd.isSource(slotRef));
+	const item = $derived(
+		collection !== undefined && index !== undefined
+			? collection[index]
+			: inventory.getItem(storage, position)
+	);
+	const storageConfig = $derived(
+		collection !== undefined && index !== undefined ? null : getStorageConfig(storage)
+	);
+	const allowedTypes = $derived(storageConfig?.allowedTypes ?? []);
+	const storageName = $derived(collection !== undefined && index !== undefined ? '' : storage);
+	const valid = $derived(dnd.canAccept(storageName, item));
 </script>
 
 <div
 	class="{className}  relative"
-	{@attach droppable({ item, slotRef: { collection, index }, allowedTypes, dnd })}
+	{@attach droppable({ item, slotRef, storage: storageName, dnd })}
 >
 	{#if !item || isDraggingMe}
 		<div
@@ -48,7 +67,7 @@
 			{/if}
 		</div>
 	{:else}
-		<div class="h-full w-full" {@attach draggable({ item, slotRef: { collection, index }, dnd })}>
+		<div class="h-full w-full" {@attach draggable({ item, slotRef, dnd })}>
 			{#if item}
 				{@render children(item)}
 			{/if}

@@ -4,7 +4,7 @@ import type { DndManager } from '$lib/store/dnd-manger.svelte';
 interface DropData {
 	item: ItemInstance | null;
 	slotRef: SlotReference;
-	allowedTypes: ItemType[];
+	storage: string;
 	dnd: DndManager;
 }
 
@@ -35,11 +35,11 @@ export function draggable(params: DragData) {
 
 export function droppable(params: DropData) {
 	return (node: HTMLElement) => {
-		const { item, slotRef, allowedTypes, dnd } = params;
+		const { item, slotRef, storage, dnd } = params;
 		const handleEnter = (e: PointerEvent) => {
 			e.stopPropagation();
 			e.preventDefault();
-			dnd.setTarget(slotRef, allowedTypes, item);
+			dnd.setTarget(slotRef, storage, item);
 		};
 
 		const handleLeave = () => {
