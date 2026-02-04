@@ -1,7 +1,7 @@
 import { getDef, type ItemInstance, type SlotReference } from '$lib/config/items';
 
 export class InventoryManager {
-	backpack = $state<(ItemInstance | null)[]>(Array(5).fill(null));
+	backpack = $state<(ItemInstance | null)[]>(Array(14).fill(null));
 	lootBack = $state<(ItemInstance | null)[]>(Array(20).fill(null));
 	weapon = $state<(ItemInstance | null)[]>(Array(2).fill(null));
 	equipment = $state<(ItemInstance | null)[]>(Array(2).fill(null));
