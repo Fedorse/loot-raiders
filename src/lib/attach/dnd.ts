@@ -1,23 +1,26 @@
-import type { ItemInstance, SlotReference, ItemCategory, ItemType } from '$lib/config/items';
-import type { DndManager } from '$lib/store/dnd-manger.svelte';
+import type { ItemInstance, SlotReference } from '$lib/config/items';
+
+import { getGameContext } from '$lib/store/game.svelte';
 
 interface DropData {
-	item: ItemInstance | null;
 	slotRef: SlotReference;
 	storage: string;
-	dnd: DndManager;
+	/** When provided (e.g. attachment slots), used instead of inventory.getItem(storage, position) */
+	item?: ItemInstance | null;
 }
 
 interface DragData {
 	item: ItemInstance | null;
 	slotRef: SlotReference;
-	dnd: DndManager;
 }
 
 export function draggable(params: DragData) {
 	return (node: HTMLElement) => {
-		const { item, slotRef, dnd } = params;
+		const { item, slotRef } = params;
 		if (!item) return;
+
+		const game = getGameContext();
+		const { dnd } = game;
 
 		const handlePointerDown = (e: PointerEvent) => {
 			e.preventDefault();
@@ -35,7 +38,10 @@ export function draggable(params: DragData) {
 
 export function droppable(params: DropData) {
 	return (node: HTMLElement) => {
-		const { item, slotRef, storage, dnd } = params;
+		const { slotRef, storage, item: itemParam } = params;
+		const game = getGameContext();
+		const { dnd, inventory } = game;
+		const item = itemParam !== undefined ? itemParam : inventory.getItem(storage, slotRef.position);
 		const handleEnter = (e: PointerEvent) => {
 			e.stopPropagation();
 			e.preventDefault();

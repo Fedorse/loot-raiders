@@ -13,7 +13,12 @@ export const checkValidation = (
 
 	if (targetItem) {
 		const targetDef = getDef(targetItem.defId);
-		return targetDef.attachmentSlots?.some((slot) => slot.type === draggedDef.type) ?? false;
+		// For attachments, slot.type is AttachmentType; match by attachmentKind
+		return (
+			targetDef.attachmentSlots?.some(
+				(slot) => draggedDef.type === 'attachment' && draggedDef.attachmentKind === slot.type
+			) ?? false
+		);
 	}
 	return false;
 };

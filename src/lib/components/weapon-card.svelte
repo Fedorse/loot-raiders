@@ -60,7 +60,7 @@
 			{@render absoluteBlob()}
 			<div class="min-h-0 flex-1">
 				<img
-					src={def.image || duck1}
+					src={def?.image ?? ''}
 					alt="weapon"
 					class="z-10 max-h-full max-w-full object-contain transition-transform group-hover:scale-110"
 				/>
@@ -71,13 +71,9 @@
 						collection={item.attachments}
 						{index}
 						allowedTypes={[slot.type]}
-						className="z-20 aspect-square size-8"
+						class="z-20 aspect-square size-8"
 						showInvalid={false}
-					>
-						{#snippet children(item)}
-							<AttachCard {item} className="h-full w-full" />
-						{/snippet}
-					</Socket>
+					/>
 				{/each}
 			</div>
 		</div>
@@ -111,7 +107,7 @@
 			</div>
 		</div>
 		<div class="text-white/70">
-			<TierIcon tier={def.tier || 3} className="size-7" />
+			<TierIcon tier={(def as { tier?: number }).tier ?? 3} className="size-7" />
 		</div>
 	</div>
 {/snippet}

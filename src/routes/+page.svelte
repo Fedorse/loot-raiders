@@ -63,11 +63,7 @@
 		<div class="grid grid-cols-4 gap-2">
 			{#if lootBackConfig}
 				{#each Array(lootBackConfig.size) as _, index (index)}
-					<Slot storage="lootBack" position={index} className="h-20 w-20 aspect-square">
-						{#snippet children(item: ItemInstance | null)}
-							<ItemCard {item} className="h-full w-full" />
-						{/snippet}
-					</Slot>
+					<Slot storage={lootBackConfig.name} position={index} class="aspect-square h-20 w-20" />
 				{/each}
 			{/if}
 		</div>
@@ -85,62 +81,34 @@
 					{#if augmentConfig}
 						{#each Array(augmentConfig.size) as _, index (index)}
 							<Slot
-								storage="augment"
+								storage={augmentConfig.name}
 								position={index}
-								className=" h-20 w-[120px] flex-1 items-center justify-center "
-							>
-								{#snippet children(item: ItemInstance | null)}
-									<ItemCard {item} className="h-full w-full" />
-								{/snippet}
-								{#snippet placeholder()}
-									<img
-										src="/assets/placeholder/augment_placeholder.png"
-										alt="placeholder"
-										class="w-full object-contain opacity-50"
-									/>
-								{/snippet}
-							</Slot>
+								placeholder={augmentConfig.placeholder}
+								class=" h-20 w-[120px] flex-1 items-center justify-center "
+							/>
 						{/each}
 					{/if}
 
 					{#if shieldConfig}
 						{#each Array(shieldConfig.size) as _, index (index)}
 							<Slot
-								storage="shield"
+								storage={shieldConfig.name}
+								placeholder={shieldConfig.placeholder}
 								position={index}
-								className="flex-1 h-20 w-[120px]  items-center justify-center "
-							>
-								{#snippet children(item: ItemInstance | null)}
-									<ItemCard {item} className="h-full w-full" />
-								{/snippet}
-								{#snippet placeholder()}
-									<img
-										src="/assets/placeholder/shield_placeholder.png"
-										alt="placeholder"
-										class="w-full object-contain opacity-50"
-									/>
-								{/snippet}
-							</Slot>
+								class="h-20 w-[120px] flex-1  items-center justify-center "
+							/>
 						{/each}
 					{/if}
 				</div>
 
 				{#if weaponConfig}
 					{#each Array(weaponConfig.size) as _, index (index)}
-						<Slot storage="weapon" position={index} className="h-44 w-64">
-							{#snippet children(item: ItemInstance | null)}
-								{#if item}
-									<WeaponCard {item} className="h-full w-full" />
-								{/if}
-							{/snippet}
-							{#snippet placeholder()}
-								<img
-									src="/assets/placeholder/placeholder_weapon.png"
-									alt="placeholder"
-									class="w-1/2 object-contain opacity-50"
-								/>
-							{/snippet}
-						</Slot>
+						<Slot
+							storage={weaponConfig.name}
+							position={index}
+							placeholder={weaponConfig.placeholder}
+							class="h-44 w-64"
+						/>
 					{/each}
 				{/if}
 			</div>
@@ -160,11 +128,11 @@
 				<div class="grid grid-cols-4 gap-2">
 					{#if backpackConfig}
 						{#each Array(backpackConfig.size) as _, index (index)}
-							<Slot storage="backpack" position={index} className="h-20 w-20 aspect-square">
-								{#snippet children(item: ItemInstance | null)}
-									<ItemCard {item} className="h-full w-full" />
-								{/snippet}
-							</Slot>
+							<Slot
+								storage={backpackConfig.name}
+								position={index}
+								class="aspect-square h-20 w-20"
+							/>
 						{/each}
 					{/if}
 				</div>

@@ -4,6 +4,7 @@ export interface StorageConfig {
 	name: string;
 	size: number;
 	allowedTypes: ItemType[];
+	placeholder?: string;
 }
 
 export const STORAGE_CONFIGS: StorageConfig[] = [
@@ -15,17 +16,20 @@ export const STORAGE_CONFIGS: StorageConfig[] = [
 	{
 		name: 'augment',
 		size: 1,
-		allowedTypes: ['augment']
+		allowedTypes: ['augment'],
+		placeholder: '/assets/placeholder/augment_placeholder.png'
 	},
 	{
 		name: 'shield',
 		size: 1,
-		allowedTypes: ['shield']
+		allowedTypes: ['shield'],
+		placeholder: '/assets/placeholder/shield_placeholder.png'
 	},
 	{
 		name: 'weapon',
 		size: 2,
-		allowedTypes: ['weapon']
+		allowedTypes: ['weapon'],
+		placeholder: '/assets/placeholder/placeholder_weapon.png'
 	},
 	{
 		name: 'backpack',

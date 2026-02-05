@@ -1,19 +1,14 @@
 <script lang="ts">
 	import { type ItemInstance, type ItemType, type AttachmentType } from '$lib/config/items';
-
+	import { droppable, draggable } from '$lib/attach/dnd';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
-	import ItemSlot from './item-slot.svelte';
-	import EmptySlot from './empty-slot.svelte';
 
 	type Props = {
-		/** Omitted when using collection/index (e.g. attachment slots) */
 		storage?: string;
-		/** Omitted when using collection/index */
 		position?: number;
-		class: string;
-		placeholder?: any;
-		showInvalid?: boolean;
+		className: string;
+		placeholder?: string;
 		// Для обратной совместимости с attachments в weapon-card
 		collection?: (ItemInstance | null)[];
 		index?: number;
@@ -23,9 +18,9 @@
 	let {
 		storage,
 		position,
-		class: className = '',
+		className = '',
 		placeholder,
-		showInvalid = true,
+
 		collection,
 		index,
 		allowedTypes
@@ -37,29 +32,34 @@
 
 	const { isDragging } = $derived(dnd);
 
+	// Поддержка старого API для attachments (collection/index)
 	const slotRef = $derived(
 		collection !== undefined && index !== undefined
 			? { storage: '', position: index }
 			: { storage: storage ?? '', position: position ?? 0 }
 	);
 
-	const item = $derived(inventory.getItem(storage, position));
-
-	const valid = $derived(dnd.canAccept(storage, item));
-
 	const isDraggingMe = $derived(dnd.isSource(slotRef));
+	const item = $derived(
+		collection !== undefined && index !== undefined
+			? collection[index]
+			: inventory.getItem(storage ?? '', position ?? 0)
+	);
+
+	const storageConfig = $derived(
+		collection !== undefined && index !== undefined ? null : getStorageConfig(storage ?? '')
+	);
+	const storageName: string = $derived(
+		collection !== undefined && index !== undefined ? '' : (storage ?? '')
+	);
 </script>
 
-<div class="{className}  relative">
-	{#if item}
-		<ItemSlot {item} {storage} {position} {className} {collection} {index} {allowedTypes} />
-	{:else}
-		<EmptySlot {storage} {position} {placeholder} {className} {collection} {index} {allowedTypes} />
-	{/if}
-
-	{#if isDragging && !valid && showInvalid}
-		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
-		</div>
-	{/if}
+<div class={className} {@attach droppable({ slotRef, storage: storageName, item })}>
+	<div
+		class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
+	>
+		{#if placeholder}
+			<img src={placeholder} alt="placeholder" class="w-full object-contain opacity-50" />
+		{/if}
+	</div>
 </div>

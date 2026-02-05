@@ -9,7 +9,7 @@
 
 	const { isDragging, pointer, offset, draggedItem, isValidDrop } = $derived(dnd);
 
-	let def = $derived(getDef(draggedItem?.defId));
+	let def = $derived(draggedItem?.defId != null ? getDef(draggedItem.defId) : null);
 
 	const x = $derived(pointer.x - offset.x * GHOST_SIZE);
 	const y = $derived(pointer.y - offset.y * GHOST_SIZE);
@@ -25,7 +25,9 @@
 			transform: translate3d({x}px, {y}px, 0) 
 		"
 	>
-		<img src={def.image} alt="" class="h-full w-full object-contain" />
+		{#if def}
+			<img src={def.image} alt="" class="h-full w-full object-contain" />
+		{/if}
 		<!-- <div>
 			{item.count}
 		</div> -->
