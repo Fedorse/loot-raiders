@@ -7,17 +7,11 @@
 	import EmptySlot from './empty-slot.svelte';
 
 	type Props = {
-		/** Omitted when using collection/index (e.g. attachment slots) */
 		storage?: string;
-		/** Omitted when using collection/index */
 		position?: number;
 		class: string;
 		placeholder?: any;
 		showInvalid?: boolean;
-		// Для обратной совместимости с attachments в weapon-card
-		collection?: (ItemInstance | null)[];
-		index?: number;
-		allowedTypes?: (ItemType | AttachmentType)[];
 	};
 
 	let {
@@ -25,10 +19,7 @@
 		position,
 		class: className = '',
 		placeholder,
-		showInvalid = true,
-		collection,
-		index,
-		allowedTypes
+		showInvalid = true
 	}: Props = $props();
 
 	const game = getGameContext();
@@ -37,29 +28,27 @@
 
 	const { isDragging } = $derived(dnd);
 
-	const slotRef = $derived(
-		collection !== undefined && index !== undefined
-			? { storage: '', position: index }
-			: { storage: storage ?? '', position: position ?? 0 }
-	);
-
 	const item = $derived(inventory.getItem(storage, position));
+	$inspect(item);
 
 	const valid = $derived(dnd.canAccept(storage, item));
 
-	const isDraggingMe = $derived(dnd.isSource(slotRef));
+	// const isDraggingMe = $derived(dnd.isSource(slotRef));
 </script>
 
 <div class="{className}  relative">
 	{#if item}
-		<ItemSlot {item} {storage} {position} {className} {collection} {index} {allowedTypes} />
+		<ItemSlot {item} {storage} {position} {className} />
 	{:else}
-		<EmptySlot {storage} {position} {placeholder} {className} {collection} {index} {allowedTypes} />
+		<EmptySlot {storage} {position} {placeholder} {className} />
 	{/if}
+	{@render invalidIcon()}
+</div>
 
+{#snippet invalidIcon()}
 	{#if isDragging && !valid && showInvalid}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>
 	{/if}
-</div>
+{/snippet}

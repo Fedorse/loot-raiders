@@ -1,10 +1,6 @@
 <script lang="ts">
-	// import duck1 from '$lib/assets/loot_assets/Camera Lens.png';
-	// import ammoTypeImg from '$lib/assets/ammo-type.webp';
 	import TierIcon from '$lib/components/tier-icon.svelte';
-	import Socket from '$lib/components/slot.svelte';
-	import InvalidCard from './invalid-card.svelte';
-	import AttachCard from './attach-weapon-card.svelte';
+	import Slot from '$lib/components/slot.svelte';
 	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
 	import { getGameContext } from '$lib/store/game.svelte';
@@ -12,11 +8,14 @@
 	type Props = {
 		item: ItemInstance;
 		className?: string;
+		/** Где хранится это оружие (для attachment операций) */
+		weaponStorage?: string;
+		/** Позиция оружия в хранилище */
+		weaponPosition?: number;
 	};
 
-	let { item, className = 'h-40' }: Props = $props();
+	let { item, className = 'h-40', weaponStorage, weaponPosition }: Props = $props();
 	let def = $derived(getDef(item.defId));
-	const { dnd } = getGameContext();
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -66,11 +65,10 @@
 				/>
 			</div>
 			<div class="z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
-				{#each def.attachmentSlots as slot, index}
-					<Socket
-						collection={item.attachments}
-						{index}
-						allowedTypes={[slot.type]}
+				{#each def.attachmentSlots as _, index}
+					<Slot
+						storage={`${weaponStorage}:${weaponPosition}:attachment`}
+						position={index}
 						class="z-20 aspect-square size-8"
 						showInvalid={false}
 					/>

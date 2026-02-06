@@ -38,10 +38,12 @@ export function draggable(params: DragData) {
 
 export function droppable(params: DropData) {
 	return (node: HTMLElement) => {
-		const { slotRef, storage, item: itemParam } = params;
+		const { slotRef, storage, item } = params;
+
 		const game = getGameContext();
-		const { dnd, inventory } = game;
-		const item = itemParam !== undefined ? itemParam : inventory.getItem(storage, slotRef.position);
+
+		const { dnd } = game;
+
 		const handleEnter = (e: PointerEvent) => {
 			e.stopPropagation();
 			e.preventDefault();

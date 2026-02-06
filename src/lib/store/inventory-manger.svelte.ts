@@ -14,14 +14,73 @@ export class InventoryManager {
 		this.setup();
 	}
 
+	private parseAttachmentStorage(storage: string): {
+		weaponStorage: string;
+		weaponPosition: number;
+	} | null {
+		const match = storage.match(/^(.+):(\d+):attachment$/);
+		if (!match) return null;
+		return {
+			weaponStorage: match[1],
+			weaponPosition: parseInt(match[2])
+		};
+	}
+
+	/**
+	 * Создает имя виртуального хранилища для attachments оружия
+	 */
+	private createAttachmentStorage(weaponStorage: string, weaponPosition: number): string {
+		return `${weaponStorage}:${weaponPosition}:attachment`;
+	}
+
 	getItem(storage: string, position: number): ItemInstance | null {
+		// Если это виртуальное хранилище attachments
+		if (storage.includes(':attachment')) {
+			const storedItem = this.items.find(
+				(item) => item.storage === storage && item.position === position
+			);
+			return storedItem?.item ?? null;
+		}
+
+		// Обычное хранилище
 		const storedItem = this.items.find(
 			(item) => item.storage === storage && item.position === position
 		);
+
 		return storedItem?.item ?? null;
 	}
 
 	setItem(storage: string, position: number, item: ItemInstance | null): void {
+		// Если это виртуальное хранилище attachments
+		if (storage.includes(':attachment')) {
+			const attachmentInfo = this.parseAttachmentStorage(storage);
+			if (!attachmentInfo) return;
+
+			const index = this.items.findIndex(
+				(storedItem) => storedItem.storage === storage && storedItem.position === position
+			);
+
+			if (item === null) {
+				if (index >= 0) {
+					this.items.splice(index, 1);
+				}
+				// Синхронизируем массив attachments оружия
+				this.syncAttachmentToWeaponArray(attachmentInfo, position, null);
+				return;
+			}
+
+			if (index >= 0) {
+				this.items[index] = { item, storage, position };
+			} else {
+				this.items.push({ item, storage, position });
+			}
+
+			// Синхронизируем массив attachments оружия
+			this.syncAttachmentToWeaponArray(attachmentInfo, position, item);
+			return;
+		}
+
+		// Обычное хранилище
 		const index = this.items.findIndex(
 			(storedItem) => storedItem.storage === storage && storedItem.position === position
 		);
@@ -37,6 +96,47 @@ export class InventoryManager {
 			this.items[index] = { item, storage, position };
 		} else {
 			this.items.push({ item, storage, position });
+		}
+	}
+
+	/**
+	 * Синхронизирует attachment в виртуальном хранилище с массивом attachments оружия
+	 */
+	private syncAttachmentToWeaponArray(
+		attachmentInfo: { weaponStorage: string; weaponPosition: number },
+		slotIndex: number,
+		attachment: ItemInstance | null
+	): void {
+		const weaponStored = this.items.find(
+			(item) =>
+				item.storage === attachmentInfo.weaponStorage &&
+				item.position === attachmentInfo.weaponPosition
+		);
+
+		if (!weaponStored) return;
+
+		const weaponItem = weaponStored.item;
+
+		// Инициализируем массив attachments если нужно
+		if (!weaponItem.attachments) {
+			const def = getDef(weaponItem.defId);
+			if (def.attachmentSlots) {
+				weaponItem.attachments = new Array(def.attachmentSlots.length).fill(null);
+			}
+		}
+
+		// Обновляем attachment в массиве
+		if (weaponItem.attachments) {
+			weaponItem.attachments[slotIndex] = attachment;
+			// Обновляем оружие в inventory (триггерит реактивность)
+			const weaponIndex = this.items.findIndex(
+				(item) =>
+					item.storage === attachmentInfo.weaponStorage &&
+					item.position === attachmentInfo.weaponPosition
+			);
+			if (weaponIndex >= 0) {
+				this.items[weaponIndex] = { ...this.items[weaponIndex], item: weaponItem };
+			}
 		}
 	}
 
@@ -65,11 +165,29 @@ export class InventoryManager {
 		if (source.storage === target.storage && source.position === target.position) return;
 
 		const sourceItem = this.getItem(source.storage, source.position);
-		const targetItem = this.getItem(target.storage, target.position);
+
+		// Если target - виртуальное хранилище attachments, получаем родительское оружие
+		let targetItem: ItemInstance | null = null;
+		if (target.storage.includes(':attachment')) {
+			const attachmentInfo = this.parseAttachmentStorage(target.storage);
+			if (attachmentInfo) {
+				targetItem = this.getItem(attachmentInfo.weaponStorage, attachmentInfo.weaponPosition);
+			}
+		} else {
+			targetItem = this.getItem(target.storage, target.position);
+		}
 
 		if (!sourceItem) return;
 
+		// Пробуем прикрепить attachment
 		if (this.tryAttach(source, target, sourceItem, targetItem)) return;
+
+		// Если target - виртуальное хранилище, не делаем swap/stack
+		if (target.storage.includes(':attachment')) return;
+
+		// Если source - виртуальное хранилище, не делаем swap/stack
+		if (source.storage.includes(':attachment')) return;
+
 		if (targetItem) {
 			const stackResult = this.tryStack(source, target, sourceItem, targetItem);
 			if (stackResult) return;
@@ -135,7 +253,6 @@ export class InventoryManager {
 		targetItem: ItemInstance | null
 	): boolean {
 		if (targetItem === null) return false;
-		if (target.storage !== 'weapon') return false;
 
 		const sourceDef = getDef(sourceItem.defId);
 		const targetDef = getDef(targetItem.defId);
@@ -143,19 +260,41 @@ export class InventoryManager {
 		// Проверяем attachmentKind для attachments
 		if (sourceDef.type !== 'attachment' || !sourceDef.attachmentKind) return false;
 
-		const slotIndex = targetDef.attachmentSlots?.findIndex(
-			(s) => s.type === sourceDef.attachmentKind
-		);
-		if (slotIndex == null || slotIndex < 0) return false;
-		if (!targetItem.attachments && targetDef.attachmentSlots) {
-			targetItem.attachments = new Array(targetDef.attachmentSlots.length).fill(null);
+		// Определяем slotIndex и attachmentStorage
+		let slotIndex: number;
+		let attachmentStorage: string;
+
+		// Если target - виртуальное хранилище attachment
+		if (target.storage.includes(':attachment')) {
+			const attachmentInfo = this.parseAttachmentStorage(target.storage);
+			if (!attachmentInfo) return false;
+			slotIndex = target.position;
+			attachmentStorage = target.storage;
+
+			// Проверяем, что тип attachment соответствует слоту
+			const slotDef = targetDef.attachmentSlots?.[slotIndex];
+			if (!slotDef || slotDef.type !== sourceDef.attachmentKind) {
+				return false;
+			}
+		} else {
+			// Старый способ: ищем слот по типу (для обратной совместимости)
+			if (target.storage !== 'weapon') return false;
+
+			const foundSlotIndex = targetDef.attachmentSlots?.findIndex(
+				(s) => s.type === sourceDef.attachmentKind
+			);
+			if (foundSlotIndex == null || foundSlotIndex < 0) return false;
+			slotIndex = foundSlotIndex;
+			attachmentStorage = this.createAttachmentStorage(target.storage, target.position);
 		}
-		const old = targetItem.attachments?.[slotIndex] ?? null;
-		if (targetItem.attachments) {
-			targetItem.attachments[slotIndex] = sourceItem;
-		}
-		this.setItem(target.storage, target.position, targetItem);
-		this.setItem(source.storage, source.position, old);
+
+		// Получаем старый attachment (если был)
+		const oldAttachment = this.getItem(attachmentStorage, slotIndex);
+
+		// Перемещаем attachment из source в виртуальное хранилище
+		this.setItem(attachmentStorage, slotIndex, sourceItem);
+		this.setItem(source.storage, source.position, oldAttachment);
+
 		return true;
 	}
 

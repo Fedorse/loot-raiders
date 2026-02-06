@@ -18,9 +18,6 @@
 
 	const lootBackCollection = $derived(inventory.getStorageCollection('lootBack'));
 	const backpackCollection = $derived(inventory.getStorageCollection('backpack'));
-	const weaponCollection = $derived(inventory.getStorageCollection('weapon'));
-	const augmentCollection = $derived(inventory.getStorageCollection('augment'));
-	const shieldCollection = $derived(inventory.getStorageCollection('shield'));
 </script>
 
 <!-- debug -->
@@ -113,9 +110,7 @@
 				{/if}
 			</div>
 
-			<!-- backpack -->
 			<div class="flex flex-col gap-4">
-				<!-- header -->
 				<div class="flex items-center gap-4">
 					<div class="text-sm uppercase">backpack</div>
 					{#if backpackConfig}

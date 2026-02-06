@@ -17,8 +17,7 @@ export class DndManager {
 			source: SlotReference,
 			target: SlotReference,
 			draggedItem: ItemInstance
-		) => void,
-		private onSplitAction: (source: SlotReference) => ItemInstance | null
+		) => void
 	) {}
 
 	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, node: HTMLElement) {
@@ -26,19 +25,11 @@ export class DndManager {
 
 		this.isDragging = true;
 		this.draggedItem = item;
+		console.log('item', item);
 		this.source = source;
 		this.isSplit = false;
-		if (e.altKey || e.shiftKey) {
-			const splitItem = this.onSplitAction(source);
-			if (splitItem) {
-				this.draggedItem = splitItem;
-				this.isSplit = true;
-			} else {
-				this.draggedItem = item;
-			}
-		} else {
-			this.draggedItem = item;
-		}
+
+		this.draggedItem = item;
 
 		this.pointer = { x: e.clientX, y: e.clientY };
 		this.offset = {
@@ -70,6 +61,15 @@ export class DndManager {
 	}
 
 	canAccept(storage: string, targetItem: ItemInstance | null) {
+		if (!this.draggedItem) return false;
+
+		// Если это виртуальное хранилище attachments
+		if (storage.includes(':attachment')) {
+			// Для attachment слотов проверяем только canAttach
+			return Rules.canAttach(this.draggedItem, targetItem);
+		}
+
+		// Обычное хранилище
 		const allowedTypes = getAllowedTypes(storage);
 		return (
 			Rules.canPlace(this.draggedItem, allowedTypes) ||
