@@ -1,44 +1,43 @@
-import { type ItemInstance, type SlotReference, type ItemCategory } from '$lib/config/items';
-import { getAllowedTypes } from '$lib/config/storages';
-import * as Rules from '$lib/store/inventory-rules';
+import { type DropTarget } from '$lib/config/items';
+import type { StoredItem } from '$lib/store/inventory-manger.svelte';
+import { canDrop } from '$lib/store/inventory-validation';
+
+export type { DropTarget } from '$lib/config/items';
 
 export class DndManager {
-	isDragging = $state(false);
 	isValidDrop = $state(false);
-	isSplit = $state(false);
-	draggedItem = $state<ItemInstance | null>(null);
-	source = $state<SlotReference | null>(null);
-	target = $state<SlotReference | null>(null);
+	dragOrigin = $state<StoredItem | null>(null);
+	dropTarget = $state<DropTarget | null>(null);
 	pointer = $state({ x: 0, y: 0 });
 	offset = $state({ x: 0, y: 0 });
 
-	constructor(
-		private onDropAction: (
-			source: SlotReference,
-			target: SlotReference,
-			draggedItem: ItemInstance
-		) => void
-	) {}
+	constructor(private onDropAction: (dragOrigin: StoredItem, dropTarget: DropTarget) => void) {}
 
-	startDrag(item: ItemInstance, source: SlotReference, e: PointerEvent, node: HTMLElement) {
+	startDrag(dragged: StoredItem, e: PointerEvent, node: HTMLElement) {
 		const rect = node.getBoundingClientRect();
-
-		this.isDragging = true;
-		this.draggedItem = item;
-		console.log('item', item);
-		this.source = source;
-		this.isSplit = false;
-
-		this.draggedItem = item;
-
+		this.dragOrigin = dragged;
 		this.pointer = { x: e.clientX, y: e.clientY };
 		this.offset = {
 			x: (e.clientX - rect.left) / rect.width,
 			y: (e.clientY - rect.top) / rect.height
 		};
-
 		window.addEventListener('pointermove', this.handlePointerMove);
 		window.addEventListener('pointerup', this.endDrag);
+	}
+
+	setDropTarget(dropTarget: DropTarget) {
+		this.dropTarget = dropTarget;
+		this.isValidDrop = this.canAccept(dropTarget);
+	}
+
+	canAccept(dropTarget: DropTarget): boolean {
+		if (!this.dragOrigin) return false;
+		return canDrop(this.dragOrigin, dropTarget);
+	}
+
+	clearDropTarget() {
+		this.dropTarget = null;
+		this.isValidDrop = false;
 	}
 
 	private handlePointerMove = (e: PointerEvent) => {
@@ -46,54 +45,15 @@ export class DndManager {
 	};
 
 	private endDrag = () => {
-		const draggedItem = this.draggedItem;
-		if (this.isValidDrop && this.source && this.target && draggedItem) {
-			this.onDropAction(this.source, this.target, draggedItem);
-		} else if (this.isSplit && this.source && draggedItem) {
-			this.onDropAction(this.source, this.source, draggedItem);
+		if (this.isValidDrop) {
+			this.onDropAction(this.dragOrigin, this.dropTarget);
 		}
 		this.reset();
 	};
 
-	isSource(slotRef: SlotReference) {
-		if (!this.source) return false;
-		return this.source.storage === slotRef.storage && this.source.position === slotRef.position;
-	}
-
-	canAccept(storage: string, targetItem: ItemInstance | null) {
-		if (!this.draggedItem) return false;
-
-		// Если это виртуальное хранилище attachments
-		if (storage.includes(':attachment')) {
-			// Для attachment слотов проверяем только canAttach
-			return Rules.canAttach(this.draggedItem, targetItem);
-		}
-
-		// Обычное хранилище
-		const allowedTypes = getAllowedTypes(storage);
-		return (
-			Rules.canPlace(this.draggedItem, allowedTypes) ||
-			Rules.canAttach(this.draggedItem, targetItem)
-		);
-	}
-
-	setTarget(targetItem: SlotReference, storage: string, item: ItemInstance | null) {
-		if (!this.isDragging) return;
-		this.target = targetItem;
-		this.isValidDrop = this.canAccept(storage, item);
-	}
-
-	clearTarget(ref?: SlotReference) {
-		if (ref && this.target !== ref) return;
-		this.target = null;
-		this.isValidDrop = false;
-	}
-
 	private reset() {
-		this.isDragging = false;
-		this.draggedItem = null;
-		this.source = null;
-		this.target = null;
+		this.dragOrigin = null;
+		this.dropTarget = null;
 		this.isValidDrop = false;
 		window.removeEventListener('pointermove', this.handlePointerMove);
 		window.removeEventListener('pointerup', this.endDrag);

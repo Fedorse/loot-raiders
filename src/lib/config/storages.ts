@@ -42,11 +42,6 @@ export function getStorageConfig(name: string): StorageConfig | undefined {
 	return STORAGE_CONFIGS.find((config) => config.name === name);
 }
 
-export function getStorageSize(name: string): number {
-	const config = getStorageConfig(name);
-	return config?.size ?? 0;
-}
-
 export function getAllowedTypes(name: string): ItemType[] {
 	const config = getStorageConfig(name);
 	return config?.allowedTypes ?? [];

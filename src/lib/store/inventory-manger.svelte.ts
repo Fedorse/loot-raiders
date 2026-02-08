@@ -1,7 +1,7 @@
-import { getDef, type ItemInstance, type SlotReference } from '$lib/config/items';
+import { getDef, type ItemInstance, type SlotReference, type DropTarget } from '$lib/config/items';
 import { getStorageConfig } from '$lib/config/storages';
 
-interface StoredItem {
+export interface StoredItem {
 	item: ItemInstance;
 	storage: string;
 	position: number;
@@ -33,21 +33,11 @@ export class InventoryManager {
 		return `${weaponStorage}:${weaponPosition}:attachment`;
 	}
 
-	getItem(storage: string, position: number): ItemInstance | null {
-		// Если это виртуальное хранилище attachments
-		if (storage.includes(':attachment')) {
-			const storedItem = this.items.find(
-				(item) => item.storage === storage && item.position === position
-			);
-			return storedItem?.item ?? null;
-		}
-
-		// Обычное хранилище
+	getItem(storage: string, position: number): StoredItem | null {
 		const storedItem = this.items.find(
 			(item) => item.storage === storage && item.position === position
 		);
-
-		return storedItem?.item ?? null;
+		return storedItem ?? null;
 	}
 
 	setItem(storage: string, position: number, item: ItemInstance | null): void {
@@ -144,7 +134,10 @@ export class InventoryManager {
 		const config = getStorageConfig(name);
 		if (!config) return [];
 
-		return Array.from({ length: config.size }, (_, index) => this.getItem(name, index));
+		return Array.from({ length: config.size }, (_, index) => {
+			const stored = this.getItem(name, index);
+			return stored?.item ?? null;
+		});
 	}
 
 	createItem(defId: string, count = 1): ItemInstance {
@@ -161,78 +154,54 @@ export class InventoryManager {
 		return item;
 	}
 
-	handleDrop(source: SlotReference, target: SlotReference, draggedItem: ItemInstance) {
-		if (source.storage === target.storage && source.position === target.position) return;
+	handleDrop(dragOrigin: StoredItem, dropTarget: DropTarget) {
+		if (dragOrigin.storage === dropTarget.storage && dragOrigin.position === dropTarget.position)
+			return;
+		const draggedItem = dragOrigin.item;
+		const itemInSlot = dropTarget.item;
 
-		const sourceItem = this.getItem(source.storage, source.position);
-
-		// Если target - виртуальное хранилище attachments, получаем родительское оружие
-		let targetItem: ItemInstance | null = null;
-		if (target.storage.includes(':attachment')) {
-			const attachmentInfo = this.parseAttachmentStorage(target.storage);
-			if (attachmentInfo) {
-				targetItem = this.getItem(attachmentInfo.weaponStorage, attachmentInfo.weaponPosition);
-			}
-		} else {
-			targetItem = this.getItem(target.storage, target.position);
-		}
-
-		if (!sourceItem) return;
-
-		// Пробуем прикрепить attachment
-		if (this.tryAttach(source, target, sourceItem, targetItem)) return;
-
-		// Если target - виртуальное хранилище, не делаем swap/stack
-		if (target.storage.includes(':attachment')) return;
-
-		// Если source - виртуальное хранилище, не делаем swap/stack
-		if (source.storage.includes(':attachment')) return;
-
-		if (targetItem) {
-			const stackResult = this.tryStack(source, target, sourceItem, targetItem);
-			if (stackResult) return;
-		}
-
-		this.swap(source, target, sourceItem, targetItem);
+		if (this.tryAttach(dragOrigin, dropTarget)) return;
+		if (dropTarget.storage.includes(':attachment')) return;
+		if (dragOrigin.storage.includes(':attachment')) return;
+		if (itemInSlot && this.tryStack(dragOrigin, dropTarget, draggedItem, itemInSlot)) return;
+		this.swap(dragOrigin, dropTarget);
 	}
 
-	swap(
-		source: SlotReference,
-		target: SlotReference,
-		sourceItem: ItemInstance,
-		targetItem: ItemInstance | null
-	) {
-		this.setItem(target.storage, target.position, sourceItem);
-		this.setItem(source.storage, source.position, targetItem);
+	swap(dragOrigin: StoredItem, dropTarget: DropTarget) {
+		this.setItem(dropTarget.storage, dropTarget.position, dragOrigin.item);
+		this.setItem(dragOrigin.storage, dragOrigin.position, dropTarget.item);
 	}
+
 	tryStack(
-		source: SlotReference,
-		target: SlotReference,
-		sourceItem: ItemInstance,
-		targetItem: ItemInstance
+		dragOrigin: StoredItem,
+		dropTarget: DropTarget,
+		draggedItem: ItemInstance,
+		itemInSlot: ItemInstance
 	): boolean {
-		if (sourceItem.defId !== targetItem.defId) return false;
-		const def = getDef(sourceItem.defId);
+		if (draggedItem.defId !== itemInSlot.defId) return false;
+		const def = getDef(draggedItem.defId);
 		const maxStack = def.maxStack ?? 1;
 		if (maxStack <= 1) return false;
-		if (targetItem.count >= maxStack) return false;
-		const spaceAvailable = maxStack - targetItem.count;
-		const amountToMove = Math.min(spaceAvailable, sourceItem.count);
-		targetItem.count += amountToMove;
-		sourceItem.count -= amountToMove;
-		if (sourceItem.count <= 0) {
-			this.setItem(source.storage, source.position, null);
+		if (itemInSlot.count >= maxStack) return false;
+		const spaceAvailable = maxStack - itemInSlot.count;
+		const amountToMove = Math.min(spaceAvailable, draggedItem.count);
+		itemInSlot.count += amountToMove;
+		draggedItem.count -= amountToMove;
+		if (draggedItem.count <= 0) {
+			this.setItem(dragOrigin.storage, dragOrigin.position, null);
 		} else {
-			this.setItem(source.storage, source.position, sourceItem);
+			this.setItem(dragOrigin.storage, dragOrigin.position, draggedItem);
 		}
-		this.setItem(target.storage, target.position, targetItem);
+		this.setItem(dropTarget.storage, dropTarget.position, itemInSlot);
 		return true;
 	}
 
 	splitStack(source: SlotReference): ItemInstance | null {
-		const originalItem = this.getItem(source.storage, source.position);
+		const stored = this.getItem(source.storage, source.position);
+		if (!stored) return null;
+		const originalItem = stored.item;
 
-		if (!originalItem || originalItem.count < 2) return null;
+		if (originalItem.count < 2) return null;
 
 		const splitAmount = Math.ceil(originalItem.count / 2);
 
@@ -246,14 +215,11 @@ export class InventoryManager {
 		};
 	}
 
-	tryAttach(
-		source: SlotReference,
-		target: SlotReference,
-		sourceItem: ItemInstance,
-		targetItem: ItemInstance | null
-	): boolean {
+	tryAttach(dragOrigin: StoredItem, dropTarget: DropTarget): boolean {
+		const targetItem = dropTarget.item;
 		if (targetItem === null) return false;
 
+		const sourceItem = dragOrigin.item;
 		const sourceDef = getDef(sourceItem.defId);
 		const targetDef = getDef(targetItem.defId);
 
@@ -264,12 +230,12 @@ export class InventoryManager {
 		let slotIndex: number;
 		let attachmentStorage: string;
 
-		// Если target - виртуальное хранилище attachment
-		if (target.storage.includes(':attachment')) {
-			const attachmentInfo = this.parseAttachmentStorage(target.storage);
+		// Если dropTarget - виртуальное хранилище attachment
+		if (dropTarget.storage.includes(':attachment')) {
+			const attachmentInfo = this.parseAttachmentStorage(dropTarget.storage);
 			if (!attachmentInfo) return false;
-			slotIndex = target.position;
-			attachmentStorage = target.storage;
+			slotIndex = dropTarget.position;
+			attachmentStorage = dropTarget.storage;
 
 			// Проверяем, что тип attachment соответствует слоту
 			const slotDef = targetDef.attachmentSlots?.[slotIndex];
@@ -278,22 +244,23 @@ export class InventoryManager {
 			}
 		} else {
 			// Старый способ: ищем слот по типу (для обратной совместимости)
-			if (target.storage !== 'weapon') return false;
+			if (dropTarget.storage !== 'weapon') return false;
 
 			const foundSlotIndex = targetDef.attachmentSlots?.findIndex(
 				(s) => s.type === sourceDef.attachmentKind
 			);
 			if (foundSlotIndex == null || foundSlotIndex < 0) return false;
 			slotIndex = foundSlotIndex;
-			attachmentStorage = this.createAttachmentStorage(target.storage, target.position);
+			attachmentStorage = this.createAttachmentStorage(dropTarget.storage, dropTarget.position);
 		}
 
 		// Получаем старый attachment (если был)
-		const oldAttachment = this.getItem(attachmentStorage, slotIndex);
+		const oldStored = this.getItem(attachmentStorage, slotIndex);
+		const oldAttachment = oldStored?.item ?? null;
 
-		// Перемещаем attachment из source в виртуальное хранилище
+		// Перемещаем attachment из dragOrigin в виртуальное хранилище
 		this.setItem(attachmentStorage, slotIndex, sourceItem);
-		this.setItem(source.storage, source.position, oldAttachment);
+		this.setItem(dragOrigin.storage, dragOrigin.position, oldAttachment);
 
 		return true;
 	}

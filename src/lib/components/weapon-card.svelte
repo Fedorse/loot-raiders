@@ -70,7 +70,6 @@
 						storage={`${weaponStorage}:${weaponPosition}:attachment`}
 						position={index}
 						class="z-20 aspect-square size-8"
-						showInvalid={false}
 					/>
 				{/each}
 			</div>

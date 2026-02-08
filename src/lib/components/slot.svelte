@@ -1,44 +1,38 @@
 <script lang="ts">
-	import { type ItemInstance, type ItemType, type AttachmentType } from '$lib/config/items';
-
 	import { getGameContext } from '$lib/store/game.svelte';
-	import { getStorageConfig } from '$lib/config/storages';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
 
 	type Props = {
-		storage?: string;
-		position?: number;
+		storage: string;
+		position: number;
 		class: string;
 		placeholder?: any;
-		showInvalid?: boolean;
 	};
 
-	let {
-		storage,
-		position,
-		class: className = '',
-		placeholder,
-		showInvalid = true
-	}: Props = $props();
+	let { storage, position, class: className = '', placeholder }: Props = $props();
 
 	const game = getGameContext();
 
 	const { dnd, inventory } = game;
 
-	const { isDragging } = $derived(dnd);
+	const { dragOrigin } = $derived(dnd);
 
-	const item = $derived(inventory.getItem(storage, position));
-	$inspect(item);
+	const storedItem = $derived(inventory.getItem(storage, position));
+	const dragOriginSlot = $derived(dragOrigin?.item === storedItem?.item);
 
-	const valid = $derived(dnd.canAccept(storage, item));
-
-	// const isDraggingMe = $derived(dnd.isSource(slotRef));
+	const validSlot = $derived(
+		dnd.canAccept({
+			storage: storage ?? '',
+			position: position ?? 0,
+			item: storedItem?.item ?? null
+		})
+	);
 </script>
 
 <div class="{className}  relative">
-	{#if item}
-		<ItemSlot {item} {storage} {position} {className} />
+	{#if storedItem && !dragOriginSlot}
+		<ItemSlot {storedItem} {className} />
 	{:else}
 		<EmptySlot {storage} {position} {placeholder} {className} />
 	{/if}
@@ -46,7 +40,7 @@
 </div>
 
 {#snippet invalidIcon()}
-	{#if isDragging && !valid && showInvalid}
+	{#if dragOrigin && !validSlot && !storage.includes(':attachment')}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>

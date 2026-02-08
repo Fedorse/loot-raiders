@@ -1,20 +1,21 @@
 import { setContext, getContext } from 'svelte';
 import { InventoryManager } from './inventory-manger.svelte';
 import { DndManager } from './ui-state.svelte';
-import type { ItemInstance, SlotReference } from '$lib/config/items';
+import type { StoredItem } from '$lib/store/inventory-manger.svelte';
+import type { DropTarget } from '$lib/config/items';
 
 export class Game {
 	inventory = new InventoryManager();
 	dnd: DndManager;
 
 	constructor() {
-		this.dnd = new DndManager((source, target, item) => {
-			this.inventory.handleDrop(source, target, item);
+		this.dnd = new DndManager((dragOrigin: StoredItem, dropTarget: DropTarget) => {
+			this.inventory.handleDrop(dragOrigin, dropTarget);
 		});
 	}
 
-	handleDrop(source: SlotReference, target: SlotReference, draggedItem: ItemInstance) {
-		this.inventory.handleDrop(source, target, draggedItem);
+	handleDrop(dragOrigin: StoredItem, dropTarget: DropTarget) {
+		this.inventory.handleDrop(dragOrigin, dropTarget);
 	}
 }
 

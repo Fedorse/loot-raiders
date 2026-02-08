@@ -21,24 +21,23 @@
 </script>
 
 <!-- debug -->
-{#if dnd.isDragging}
+{#if dnd.dragOrigin}
 	<pre
 		class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
 {JSON.stringify(
 			{
-				dragged: dnd.draggedItem && dnd.draggedItem.defId,
-				target: {
-					storage: dnd.target?.storage,
-					position: dnd.target?.position,
-					item: dnd.target && inventory.getItem(dnd.target.storage, dnd.target.position)
+				dragOrigin: dnd.dragOrigin && {
+					storage: dnd.dragOrigin.storage,
+					position: dnd.dragOrigin.position,
+					item: dnd.dragOrigin.item.defId
+				},
+				dropTarget: dnd.dropTarget && {
+					storage: dnd.dropTarget.storage,
+					position: dnd.dropTarget.position,
+					item: dnd.dropTarget.item?.defId ?? null
 				},
 				validDrop: dnd.isValidDrop,
-				pointer: dnd.pointer,
-				source: {
-					storage: dnd.source?.storage,
-					position: dnd.source?.position,
-					item: dnd.source && inventory.getItem(dnd.source.storage, dnd.source.position)
-				}
+				pointer: dnd.pointer
 			},
 			null,
 			2

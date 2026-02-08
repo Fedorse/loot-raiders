@@ -18,6 +18,12 @@ export interface SlotReference {
 	position: number; // индекс в хранилище
 }
 
+export interface DropTarget {
+	storage: string;
+	position: number;
+	item: ItemInstance | null;
+}
+
 export interface RecyclingResult {
 	itemId: string;
 	amount: number;
