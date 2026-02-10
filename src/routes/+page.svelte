@@ -15,9 +15,6 @@
 	const weaponConfig = getStorageConfig('weapon');
 	const augmentConfig = getStorageConfig('augment');
 	const shieldConfig = getStorageConfig('shield');
-
-	const lootBackCollection = $derived(inventory.getStorageCollection('lootBack'));
-	const backpackCollection = $derived(inventory.getStorageCollection('backpack'));
 </script>
 
 <!-- debug -->
@@ -28,12 +25,10 @@
 			{
 				dragOrigin: dnd.dragOrigin && {
 					storage: dnd.dragOrigin.storage,
-					position: dnd.dragOrigin.position,
 					item: dnd.dragOrigin.item.defId
 				},
 				dropTarget: dnd.dropTarget && {
 					storage: dnd.dropTarget.storage,
-					position: dnd.dropTarget.position,
 					item: dnd.dropTarget.item?.defId ?? null
 				},
 				validDrop: dnd.isValidDrop,
@@ -50,16 +45,17 @@
 		<div class="flex items-center gap-4">
 			<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
 			{#if lootBackConfig}
-				<span class="text-sm"
-					>{lootBackCollection.filter((i) => i).length}/{lootBackConfig.size}</span
-				>
+				<span class="text-sm">{inventory.lootBack.length}/{lootBackConfig.size}</span>
 			{/if}
 		</div>
 		<div class="text-sm uppercase">filter</div>
 		<div class="grid grid-cols-4 gap-2">
 			{#if lootBackConfig}
 				{#each Array(lootBackConfig.size) as _, index (index)}
-					<Slot storage={lootBackConfig.name} position={index} class="aspect-square h-20 w-20" />
+					<Slot
+						slotRef={{ storageId: lootBackConfig.name, index }}
+						class="aspect-square h-20 w-20"
+					/>
 				{/each}
 			{/if}
 		</div>
@@ -77,8 +73,7 @@
 					{#if augmentConfig}
 						{#each Array(augmentConfig.size) as _, index (index)}
 							<Slot
-								storage={augmentConfig.name}
-								position={index}
+								slotRef={{ storageId: augmentConfig.name, index }}
 								placeholder={augmentConfig.placeholder}
 								class=" h-20 w-[120px] flex-1 items-center justify-center "
 							/>
@@ -88,9 +83,8 @@
 					{#if shieldConfig}
 						{#each Array(shieldConfig.size) as _, index (index)}
 							<Slot
-								storage={shieldConfig.name}
+								slotRef={{ storageId: shieldConfig.name, index }}
 								placeholder={shieldConfig.placeholder}
-								position={index}
 								class="h-20 w-[120px] flex-1  items-center justify-center "
 							/>
 						{/each}
@@ -100,8 +94,7 @@
 				{#if weaponConfig}
 					{#each Array(weaponConfig.size) as _, index (index)}
 						<Slot
-							storage={weaponConfig.name}
-							position={index}
+							slotRef={{ storageId: weaponConfig.name, index }}
 							placeholder={weaponConfig.placeholder}
 							class="h-44 w-64"
 						/>
@@ -113,9 +106,7 @@
 				<div class="flex items-center gap-4">
 					<div class="text-sm uppercase">backpack</div>
 					{#if backpackConfig}
-						<span class="text-sm"
-							>{backpackCollection.filter((i) => i).length}/{backpackConfig.size}</span
-						>
+						<span class="text-sm">{inventory.backpack.length}/{backpackConfig.size}</span>
 					{/if}
 				</div>
 
@@ -123,8 +114,7 @@
 					{#if backpackConfig}
 						{#each Array(backpackConfig.size) as _, index (index)}
 							<Slot
-								storage={backpackConfig.name}
-								position={index}
+								slotRef={{ storageId: backpackConfig.name, index }}
 								class="aspect-square h-20 w-20"
 							/>
 						{/each}

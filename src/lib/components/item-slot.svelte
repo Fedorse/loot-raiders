@@ -13,15 +13,15 @@
 
 	let { storedItem, className = '' }: Props = $props();
 
-	const { item, storage, position } = $derived(storedItem);
-
+	const { item, storage } = $derived(storedItem);
 	const dropTarget = $derived({
 		storage: storedItem.storage,
-		position: storedItem.position,
 		item: storedItem.item
 	});
-
 	const def = $derived(getDef(item.defId));
+
+	const isWeapon = $derived(storage.storageId === 'weapon' && !('attachIndex' in storage));
+	const isAttachmentInWeapon = $derived('attachIndex' in storage);
 </script>
 
 <div
@@ -29,14 +29,14 @@
 	{@attach droppable(dropTarget)}
 	{@attach draggable(storedItem)}
 >
-	{#if storage === 'weapon'}
+	{#if isWeapon}
 		<WeaponCard
 			{item}
 			className="h-full w-full"
-			weaponStorage={storage}
-			weaponPosition={position}
+			weaponStorage={storage.storageId}
+			weaponPosition={storage.index}
 		/>
-	{:else if def.type === 'attachment' && storage.includes(':attachment')}
+	{:else if isAttachmentInWeapon}
 		<AttachCard {item} className="h-full w-full" />
 	{:else}
 		<ItemCard {item} className="h-full w-full" />

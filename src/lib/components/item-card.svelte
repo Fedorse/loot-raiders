@@ -48,7 +48,8 @@
 	const style = $derived(
 		def ? RARITY_CONFIG[def.rarity] || RARITY_CONFIG.common : RARITY_CONFIG.common
 	);
-	const hasAttachments = $derived(item?.attachments?.some((a) => a !== null));
+	// Attachments are now stored in inventory by slot (attachIndex); no longer on item
+	const hasAttachments = $derived(false);
 </script>
 
 {#if item && def}

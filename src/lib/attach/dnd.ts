@@ -25,13 +25,13 @@ export function droppable(dropTarget: DropTarget) {
 			e.preventDefault();
 			game.dnd.setDropTarget(dropTarget);
 		};
-		const handleLeave = () => game.dnd.clearDropTarget(dropTarget);
+		const handleLeave = () => game.dnd.clearDropTarget();
 		node.addEventListener('pointerover', handleEnter);
 		node.addEventListener('pointerleave', handleLeave);
 		return () => {
 			node.removeEventListener('pointerover', handleEnter);
 			node.removeEventListener('pointerleave', handleLeave);
-			game.dnd.clearDropTarget(dropTarget);
+			game.dnd.clearDropTarget();
 		};
 	};
 }

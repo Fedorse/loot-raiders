@@ -1,20 +1,17 @@
 <script lang="ts">
 	import { droppable } from '$lib/attach/dnd';
+	import type { SlotRef } from '$lib/config/items';
 
 	type Props = {
-		storage?: string;
-		position?: number;
+		slotRef: SlotRef;
 		className: string;
 		placeholder?: string;
 	};
 
-	let { storage, position, className = '', placeholder }: Props = $props();
+	let { slotRef, className = '', placeholder }: Props = $props();
 </script>
 
-<div
-	class={className}
-	{@attach droppable({ storage: storage ?? '', position: position ?? 0, item: null })}
->
+<div class={className} {@attach droppable({ storage: slotRef, item: null })}>
 	<div
 		class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
 	>

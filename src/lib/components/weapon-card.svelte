@@ -16,6 +16,7 @@
 
 	let { item, className = 'h-40', weaponStorage, weaponPosition }: Props = $props();
 	let def = $derived(getDef(item.defId));
+	const game = getGameContext();
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -67,8 +68,11 @@
 			<div class="z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
 				{#each def.attachmentSlots as _, index}
 					<Slot
-						storage={`${weaponStorage}:${weaponPosition}:attachment`}
-						position={index}
+						slotRef={{
+							storageId: weaponStorage ?? '',
+							index: weaponPosition ?? 0,
+							attachIndex: index
+						}}
 						class="z-20 aspect-square size-8"
 					/>
 				{/each}

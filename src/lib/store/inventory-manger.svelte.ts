@@ -1,279 +1,124 @@
-import { getDef, type ItemInstance, type SlotReference, type DropTarget } from '$lib/config/items';
-import { getStorageConfig } from '$lib/config/storages';
+import { isEqual } from 'es-toolkit';
+import { getDef, type ItemInstance, type SlotRef, type DropTarget } from '$lib/config/items';
+import { canDrop } from './inventory-validation';
 
 export interface StoredItem {
+	storage: SlotRef;
 	item: ItemInstance;
-	storage: string;
-	position: number;
 }
 
 export class InventoryManager {
 	items = $state<StoredItem[]>([]);
+	attachments = $derived(this.items.filter((i) => 'attachIndex' in i.storage));
+	nonAttachmentItems = $derived(this.items.filter((i) => !('attachIndex' in i.storage)));
+	backpack = $derived(this.items.filter((i) => i.storage.storageId === 'backpack'));
+	lootBack = $derived(this.items.filter((i) => i.storage.storageId === 'lootBack'));
+	weapon = $derived(this.items.filter((i) => i.storage.storageId === 'weapon'));
 
 	constructor() {
 		this.setup();
 	}
 
-	private parseAttachmentStorage(storage: string): {
-		weaponStorage: string;
-		weaponPosition: number;
-	} | null {
-		const match = storage.match(/^(.+):(\d+):attachment$/);
-		if (!match) return null;
-		return {
-			weaponStorage: match[1],
-			weaponPosition: parseInt(match[2])
-		};
+	getItem(slotRef: SlotRef): StoredItem | null {
+		return this.items.find((i) => isEqual(i.storage, slotRef)) ?? null;
 	}
 
-	/**
-	 * Создает имя виртуального хранилища для attachments оружия
-	 */
-	private createAttachmentStorage(weaponStorage: string, weaponPosition: number): string {
-		return `${weaponStorage}:${weaponPosition}:attachment`;
+	insertItem(slotRef: SlotRef, item: ItemInstance): void {
+		this.items.push({ storage: slotRef, item });
 	}
 
-	getItem(storage: string, position: number): StoredItem | null {
-		const storedItem = this.items.find(
-			(item) => item.storage === storage && item.position === position
-		);
-		return storedItem ?? null;
+	updateItem(slotRef: SlotRef, newItem: ItemInstance): void {
+		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
+		this.items[idx].item = newItem;
 	}
 
-	setItem(storage: string, position: number, item: ItemInstance | null): void {
-		// Если это виртуальное хранилище attachments
-		if (storage.includes(':attachment')) {
-			const attachmentInfo = this.parseAttachmentStorage(storage);
-			if (!attachmentInfo) return;
+	removeItem(slotRef: SlotRef): void {
+		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
+		if (idx !== -1) {
+			this.items.splice(idx, 1);
+		}
+	}
 
-			const index = this.items.findIndex(
-				(storedItem) => storedItem.storage === storage && storedItem.position === position
+	handleDrop(dragOrigin: StoredItem, dropTarget: DropTarget) {
+		if (isEqual(dragOrigin.storage, dropTarget.storage)) return;
+
+		if (this.#tryAttach(dragOrigin, dropTarget)) return;
+
+		this.#moveOrSwap(dragOrigin, dropTarget);
+	}
+
+	#moveOrSwap(origin: StoredItem, target: DropTarget) {
+		if (target.item) {
+			const reverseCheckValidation = canDrop(target, origin);
+			if (!reverseCheckValidation) return;
+		}
+		const itemA = origin.item;
+		const itemB = target.item;
+
+		this.removeItem(origin.storage);
+		this.removeItem(target.storage);
+
+		this.insertItem(target.storage, itemA);
+		if (itemB) {
+			this.insertItem(origin.storage, itemB);
+		}
+	}
+	#tryAttach(dragOrigin: StoredItem, dropTarget: DropTarget): boolean {
+		const dragDef = getDef(dragOrigin.item.defId);
+		if (dragDef.type !== 'attachment' || !dragDef.attachmentKind) return false;
+
+		let attachSlot: SlotRef | null = null;
+
+		if ('attachIndex' in dropTarget.storage) {
+			attachSlot = dropTarget.storage;
+		} else if (dropTarget.item && getDef(dropTarget.item.defId).type === 'weapon') {
+			const targetDef = getDef(dropTarget.item.defId);
+			const slotIdx = targetDef.attachmentSlots?.findIndex(
+				(s) => s.type === dragDef.attachmentKind
 			);
-
-			if (item === null) {
-				if (index >= 0) {
-					this.items.splice(index, 1);
-				}
-				// Синхронизируем массив attachments оружия
-				this.syncAttachmentToWeaponArray(attachmentInfo, position, null);
-				return;
-			}
-
-			if (index >= 0) {
-				this.items[index] = { item, storage, position };
-			} else {
-				this.items.push({ item, storage, position });
-			}
-
-			// Синхронизируем массив attachments оружия
-			this.syncAttachmentToWeaponArray(attachmentInfo, position, item);
-			return;
-		}
-
-		// Обычное хранилище
-		const index = this.items.findIndex(
-			(storedItem) => storedItem.storage === storage && storedItem.position === position
-		);
-
-		if (item === null) {
-			if (index >= 0) {
-				this.items.splice(index, 1);
-			}
-			return;
-		}
-
-		if (index >= 0) {
-			this.items[index] = { item, storage, position };
-		} else {
-			this.items.push({ item, storage, position });
-		}
-	}
-
-	/**
-	 * Синхронизирует attachment в виртуальном хранилище с массивом attachments оружия
-	 */
-	private syncAttachmentToWeaponArray(
-		attachmentInfo: { weaponStorage: string; weaponPosition: number },
-		slotIndex: number,
-		attachment: ItemInstance | null
-	): void {
-		const weaponStored = this.items.find(
-			(item) =>
-				item.storage === attachmentInfo.weaponStorage &&
-				item.position === attachmentInfo.weaponPosition
-		);
-
-		if (!weaponStored) return;
-
-		const weaponItem = weaponStored.item;
-
-		// Инициализируем массив attachments если нужно
-		if (!weaponItem.attachments) {
-			const def = getDef(weaponItem.defId);
-			if (def.attachmentSlots) {
-				weaponItem.attachments = new Array(def.attachmentSlots.length).fill(null);
+			if (slotIdx !== undefined && slotIdx !== -1) {
+				attachSlot = { ...dropTarget.storage, attachIndex: slotIdx };
 			}
 		}
 
-		// Обновляем attachment в массиве
-		if (weaponItem.attachments) {
-			weaponItem.attachments[slotIndex] = attachment;
-			// Обновляем оружие в inventory (триггерит реактивность)
-			const weaponIndex = this.items.findIndex(
-				(item) =>
-					item.storage === attachmentInfo.weaponStorage &&
-					item.position === attachmentInfo.weaponPosition
-			);
-			if (weaponIndex >= 0) {
-				this.items[weaponIndex] = { ...this.items[weaponIndex], item: weaponItem };
-			}
+		if (!attachSlot) return false;
+
+		// Проверка совместимости...
+		const oldAttachment = this.getItem(attachSlot);
+
+		// Логика CRUD:
+		this.removeItem(dragOrigin.storage); // Убираем аттач из руки
+		this.removeItem(attachSlot); // Убираем старый аттач из слота (если был)
+
+		this.insertItem(attachSlot, dragOrigin.item); // Ставим новый
+		if (oldAttachment) {
+			this.insertItem(dragOrigin.storage, oldAttachment.item); // Возвращаем старый в инвентарь
 		}
-	}
 
-	getStorageCollection(name: string): (ItemInstance | null)[] {
-		const config = getStorageConfig(name);
-		if (!config) return [];
-
-		return Array.from({ length: config.size }, (_, index) => {
-			const stored = this.getItem(name, index);
-			return stored?.item ?? null;
-		});
+		return true;
 	}
 
 	createItem(defId: string, count = 1): ItemInstance {
-		const def = getDef(defId);
-		const item: ItemInstance = {
+		return {
 			uid: crypto.randomUUID(),
 			defId,
 			count
 		};
+	}
 
-		if (def.type === 'weapon' && def.attachmentSlots) {
-			item.attachments = new Array(def.attachmentSlots.length).fill(null);
+	setup(): void {
+		const initial: [SlotRef, ItemInstance][] = [
+			[{ storageId: 'backpack', index: 0 }, this.createItem('res_arc_circuitry', 10)],
+			[{ storageId: 'backpack', index: 10 }, this.createItem('res_arc_circuitry', 5)],
+			[{ storageId: 'backpack', index: 1 }, this.createItem('eqp_tactical_mk1')],
+			[{ storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
+			[{ storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
+			[{ storageId: 'lootBack', index: 0 }, this.createItem('att_compensator_1')],
+			[{ storageId: 'lootBack', index: 1 }, this.createItem('att_stable_stock_1')],
+			[{ storageId: 'augment', index: 0 }, this.createItem('eqp_tactical_mk1')]
+		];
+		for (const [slotRef, item] of initial) {
+			this.items.push({ storage: slotRef, item });
 		}
-		return item;
-	}
-
-	handleDrop(dragOrigin: StoredItem, dropTarget: DropTarget) {
-		if (dragOrigin.storage === dropTarget.storage && dragOrigin.position === dropTarget.position)
-			return;
-		const draggedItem = dragOrigin.item;
-		const itemInSlot = dropTarget.item;
-
-		if (this.tryAttach(dragOrigin, dropTarget)) return;
-		if (dropTarget.storage.includes(':attachment')) return;
-		if (dragOrigin.storage.includes(':attachment')) return;
-		if (itemInSlot && this.tryStack(dragOrigin, dropTarget, draggedItem, itemInSlot)) return;
-		this.swap(dragOrigin, dropTarget);
-	}
-
-	swap(dragOrigin: StoredItem, dropTarget: DropTarget) {
-		this.setItem(dropTarget.storage, dropTarget.position, dragOrigin.item);
-		this.setItem(dragOrigin.storage, dragOrigin.position, dropTarget.item);
-	}
-
-	tryStack(
-		dragOrigin: StoredItem,
-		dropTarget: DropTarget,
-		draggedItem: ItemInstance,
-		itemInSlot: ItemInstance
-	): boolean {
-		if (draggedItem.defId !== itemInSlot.defId) return false;
-		const def = getDef(draggedItem.defId);
-		const maxStack = def.maxStack ?? 1;
-		if (maxStack <= 1) return false;
-		if (itemInSlot.count >= maxStack) return false;
-		const spaceAvailable = maxStack - itemInSlot.count;
-		const amountToMove = Math.min(spaceAvailable, draggedItem.count);
-		itemInSlot.count += amountToMove;
-		draggedItem.count -= amountToMove;
-		if (draggedItem.count <= 0) {
-			this.setItem(dragOrigin.storage, dragOrigin.position, null);
-		} else {
-			this.setItem(dragOrigin.storage, dragOrigin.position, draggedItem);
-		}
-		this.setItem(dropTarget.storage, dropTarget.position, itemInSlot);
-		return true;
-	}
-
-	splitStack(source: SlotReference): ItemInstance | null {
-		const stored = this.getItem(source.storage, source.position);
-		if (!stored) return null;
-		const originalItem = stored.item;
-
-		if (originalItem.count < 2) return null;
-
-		const splitAmount = Math.ceil(originalItem.count / 2);
-
-		originalItem.count -= splitAmount;
-		this.setItem(source.storage, source.position, originalItem);
-
-		return {
-			...originalItem,
-			uid: crypto.randomUUID(),
-			count: splitAmount
-		};
-	}
-
-	tryAttach(dragOrigin: StoredItem, dropTarget: DropTarget): boolean {
-		const targetItem = dropTarget.item;
-		if (targetItem === null) return false;
-
-		const sourceItem = dragOrigin.item;
-		const sourceDef = getDef(sourceItem.defId);
-		const targetDef = getDef(targetItem.defId);
-
-		// Проверяем attachmentKind для attachments
-		if (sourceDef.type !== 'attachment' || !sourceDef.attachmentKind) return false;
-
-		// Определяем slotIndex и attachmentStorage
-		let slotIndex: number;
-		let attachmentStorage: string;
-
-		// Если dropTarget - виртуальное хранилище attachment
-		if (dropTarget.storage.includes(':attachment')) {
-			const attachmentInfo = this.parseAttachmentStorage(dropTarget.storage);
-			if (!attachmentInfo) return false;
-			slotIndex = dropTarget.position;
-			attachmentStorage = dropTarget.storage;
-
-			// Проверяем, что тип attachment соответствует слоту
-			const slotDef = targetDef.attachmentSlots?.[slotIndex];
-			if (!slotDef || slotDef.type !== sourceDef.attachmentKind) {
-				return false;
-			}
-		} else {
-			// Старый способ: ищем слот по типу (для обратной совместимости)
-			if (dropTarget.storage !== 'weapon') return false;
-
-			const foundSlotIndex = targetDef.attachmentSlots?.findIndex(
-				(s) => s.type === sourceDef.attachmentKind
-			);
-			if (foundSlotIndex == null || foundSlotIndex < 0) return false;
-			slotIndex = foundSlotIndex;
-			attachmentStorage = this.createAttachmentStorage(dropTarget.storage, dropTarget.position);
-		}
-
-		// Получаем старый attachment (если был)
-		const oldStored = this.getItem(attachmentStorage, slotIndex);
-		const oldAttachment = oldStored?.item ?? null;
-
-		// Перемещаем attachment из dragOrigin в виртуальное хранилище
-		this.setItem(attachmentStorage, slotIndex, sourceItem);
-		this.setItem(dragOrigin.storage, dragOrigin.position, oldAttachment);
-
-		return true;
-	}
-
-	setup() {
-		this.setItem('backpack', 0, this.createItem('res_arc_circuitry', 10));
-		this.setItem('backpack', 10, this.createItem('res_arc_circuitry', 5));
-		this.setItem('backpack', 1, this.createItem('eqp_tactical_mk1'));
-		this.setItem('backpack', 2, this.createItem('wpn_kettle'));
-		this.setItem('backpack', 3, this.createItem('wpn_bobcat'));
-		this.setItem('lootBack', 0, this.createItem('att_compensator_1'));
-		this.setItem('lootBack', 1, this.createItem('att_stable_stock_1'));
-
-		this.setItem('augment', 0, this.createItem('eqp_tactical_mk1'));
 	}
 }

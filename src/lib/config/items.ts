@@ -10,17 +10,25 @@ export interface ItemInstance {
 	uid: string;
 	defId: string;
 	count: number;
-	attachments?: (ItemInstance | null)[];
 }
 
-export interface SlotReference {
-	storage: string; // имя хранилища из конфига
-	position: number; // индекс в хранилище
+export interface StorageSlot {
+	storageId: string;
+	index: number;
 }
+
+export interface AttachmentSlot {
+	storageId: string;
+	index: number;
+	attachIndex: number;
+}
+
+export type SlotRef = StorageSlot | AttachmentSlot;
+
+export type SlotReference = SlotRef;
 
 export interface DropTarget {
-	storage: string;
-	position: number;
+	storage: SlotRef;
 	item: ItemInstance | null;
 }
 

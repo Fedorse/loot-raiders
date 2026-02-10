@@ -45,7 +45,7 @@ export class DndManager {
 	};
 
 	private endDrag = () => {
-		if (this.isValidDrop) {
+		if (this.isValidDrop && this.dragOrigin != null && this.dropTarget != null) {
 			this.onDropAction(this.dragOrigin, this.dropTarget);
 		}
 		this.reset();
