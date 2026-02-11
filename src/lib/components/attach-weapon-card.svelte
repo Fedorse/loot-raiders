@@ -51,7 +51,7 @@
 		<div
 			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 		>
-			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
+			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-[#0f111a]">
 				{@render absoluteGlowShadow()}
 				<div class="relative min-h-0 flex-1 items-center justify-center">
 					<img

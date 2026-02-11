@@ -18,14 +18,13 @@
 		storage: storedItem.storage,
 		item: storedItem.item
 	});
-	const def = $derived(getDef(item.defId));
 
 	const isWeapon = $derived(storage.storageId === 'weapon' && !('attachIndex' in storage));
 	const isAttachmentInWeapon = $derived('attachIndex' in storage);
 </script>
 
 <div
-	class="{className} relative h-full w-full"
+	class="{className} h-full w-full"
 	{@attach droppable(dropTarget)}
 	{@attach draggable(storedItem)}
 >

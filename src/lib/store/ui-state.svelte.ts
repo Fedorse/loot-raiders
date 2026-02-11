@@ -1,6 +1,8 @@
-import { type DropTarget } from '$lib/config/items';
+import { type DropTarget, type SlotRef } from '$lib/config/items';
 import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 import { canDrop } from '$lib/store/inventory-validation';
+import { isEqual } from 'es-toolkit';
+import { isBaseSlot, isAttachment } from '$lib/utils';
 
 export type { DropTarget } from '$lib/config/items';
 
@@ -23,6 +25,19 @@ export class DndManager {
 		};
 		window.addEventListener('pointermove', this.handlePointerMove);
 		window.addEventListener('pointerup', this.endDrag);
+	}
+
+	highlightHoverSlot(slotRef: SlotRef) {
+		if (!this.dropTarget) return false;
+		const target = this.dropTarget.storage;
+
+		if (isEqual(target, slotRef)) return true;
+
+		if (isBaseSlot(slotRef) && isAttachment(target)) {
+			return target.storageId === slotRef.storageId && target.index === slotRef.index;
+		}
+
+		return false;
 	}
 
 	setDropTarget(dropTarget: DropTarget) {

@@ -49,7 +49,7 @@
 			{/if}
 		</div>
 		<div class="text-sm uppercase">filter</div>
-		<div class="grid grid-cols-4 gap-2">
+		<div class="grid grid-cols-4 gap-1">
 			{#if lootBackConfig}
 				{#each Array(lootBackConfig.size) as _, index (index)}
 					<Slot
@@ -110,7 +110,7 @@
 					{/if}
 				</div>
 
-				<div class="grid grid-cols-4 gap-2">
+				<div class="grid grid-cols-4 gap-1">
 					{#if backpackConfig}
 						{#each Array(backpackConfig.size) as _, index (index)}
 							<Slot

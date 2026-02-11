@@ -10,7 +10,7 @@
 
 	let { item, className = 'h-20 w-20' }: Props = $props();
 
-	const def = $derived(item?.defId != null ? getDef(item.defId) : null);
+	const def = $derived(getDef(item?.defId));
 
 	const RARITY_CONFIG = {
 		common: {
@@ -45,34 +45,29 @@
 		}
 	} as const;
 
-	const style = $derived(
-		def ? RARITY_CONFIG[def.rarity] || RARITY_CONFIG.common : RARITY_CONFIG.common
-	);
-	// Attachments are now stored in inventory by slot (attachIndex); no longer on item
-	const hasAttachments = $derived(false);
+	const style = $derived(RARITY_CONFIG[def.rarity] || RARITY_CONFIG.common);
+	const hasAttachments = $derived(item?.attachments?.some((item) => item !== null));
 </script>
 
-{#if item && def}
-	<div class="{className} group">
-		<div
-			class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
-		>
-			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
-				<div class="relative min-h-0 flex-1 items-center justify-center">
-					{@render absoluteGlowShadow()}
-					{@render absoluteBlob()}
-					<img
-						src={def.image}
-						alt="Loot"
-						class="relative z-10 h-full w-full object-contain transition-transform group-hover:scale-110"
-					/>
-				</div>
-
-				{@render footer()}
+<div class="{className} group">
+	<div
+		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+	>
+		<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-[#0f111a]">
+			<div class="relative min-h-0 flex-1 items-center justify-center">
+				{@render absoluteGlowShadow()}
+				{@render absoluteBlob()}
+				<img
+					src={def.image}
+					alt="Loot"
+					class="relative z-10 h-full w-full object-contain transition-transform group-hover:scale-110"
+				/>
 			</div>
+
+			{@render footer()}
 		</div>
 	</div>
-{/if}
+</div>
 
 {#snippet absoluteGlowShadow()}
 	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {style.glow} "></div>
@@ -100,13 +95,13 @@
 				</div>
 			{/if}
 			<div>
-				<TierIcon tier={(item as { tier?: number }).tier ?? 3} className="size-4 opacity-50" />
+				<TierIcon tier={item.tier || 3} className="size-4 opacity-50" />
 			</div>
 		{:else}
 			<div class="text-white/70">
-				<img src={def?.categoryIcon} alt="category" class="size-4 object-contain" />
+				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
-			{#if item && item.count > 1}
+			{#if item.count > 1}
 				<div class="font-mono text-xs font-bold tracking-wider text-white">
 					{item.count}
 				</div>

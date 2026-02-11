@@ -3,7 +3,6 @@
 	import Slot from '$lib/components/slot.svelte';
 	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
-	import { getGameContext } from '$lib/store/game.svelte';
 
 	type Props = {
 		item: ItemInstance;
@@ -16,7 +15,6 @@
 
 	let { item, className = 'h-40', weaponStorage, weaponPosition }: Props = $props();
 	let def = $derived(getDef(item.defId));
-	const game = getGameContext();
 
 	const RARITY_CONFIG = {
 		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
@@ -49,12 +47,12 @@
 	const style = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
 </script>
 
-<div class="{className} group">
+<div class="{className} weapon-card group/weapon">
 	<div
-		class="flex h-full w-full flex-col overflow-hidden rounded-[8px] bg-linear-to-tr p-[1px] {style.border}"
+		class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 	>
 		<div
-			class="relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-[#0f111a]"
+			class="weapon-card__body relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-[#0f111a] transition-shadow duration-300"
 		>
 			{@render absoluteGlowShadow()}
 			{@render absoluteBlob()}
@@ -62,10 +60,10 @@
 				<img
 					src={def?.image ?? ''}
 					alt="weapon"
-					class="z-10 max-h-full max-w-full object-contain transition-transform group-hover:scale-110"
+					class="z-10 max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
 				/>
 			</div>
-			<div class="z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
+			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
 				{#each def.attachmentSlots as _, index}
 					<Slot
 						slotRef={{
@@ -112,3 +110,11 @@
 		</div>
 	</div>
 {/snippet}
+
+<style>
+	/* Подсветка оружия при наведении на слот атачмента или когда слот — дроп-таргет */
+	.weapon-card:has(.weapon-card__slots .slot-root:hover) .weapon-card__body,
+	.weapon-card:has(.weapon-card__slots .is-drop-target) .weapon-card__body {
+		box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.4);
+	}
+</style>

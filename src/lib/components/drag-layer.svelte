@@ -10,6 +10,7 @@
 	const { dragOrigin, pointer, offset, isValidDrop } = $derived(dnd);
 
 	const draggedItem = $derived(dragOrigin?.item ?? null);
+
 	let def = $derived(draggedItem?.defId != null ? getDef(draggedItem.defId) : null);
 
 	const x = $derived(pointer.x - offset.x * GHOST_SIZE);
