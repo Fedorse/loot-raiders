@@ -1,6 +1,10 @@
 import type { StoredItem } from '$lib/store/inventory-manger.svelte';
-import type { DropTarget } from '$lib/config/items';
+import type { DropTarget, SlotRef } from '$lib/config/items';
 import { getGameContext } from '$lib/store/game.svelte';
+import { isEqual } from 'es-toolkit';
+
+const DBL_TAP_MS = 350;
+let lastTap: { slotRef: SlotRef; time: number } | null = null;
 
 export function draggable(stored: StoredItem) {
 	return (node: HTMLElement) => {
@@ -33,5 +37,30 @@ export function droppable(dropTarget: DropTarget) {
 			node.removeEventListener('pointerleave', handleLeave);
 			game.dnd.clearDropTarget();
 		};
+	};
+}
+
+export function quickActions(stored: StoredItem) {
+	return (node: HTMLElement) => {
+		const { inventory } = getGameContext();
+		const slotRef = stored.storage;
+
+		const handlePointerDown = (e: PointerEvent) => {
+			const now = Date.now();
+			const isDoubleTap =
+				lastTap && isEqual(lastTap.slotRef, slotRef) && now - lastTap.time < DBL_TAP_MS;
+			lastTap = { slotRef, time: now };
+
+			if (e.shiftKey || isDoubleTap) {
+				e.preventDefault();
+				e.stopPropagation();
+				inventory.quickMove(stored);
+				return;
+			}
+		};
+
+		// capture: true — срабатываем раньше draggable, тогда успеваем отменить драг
+		node.addEventListener('pointerdown', handlePointerDown, { capture: true });
+		return () => node.removeEventListener('pointerdown', handlePointerDown, { capture: true });
 	};
 }

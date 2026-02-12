@@ -1,5 +1,6 @@
 import { isEqual } from 'es-toolkit';
 import { getDef, type ItemInstance, type SlotRef, type DropTarget } from '$lib/config/items';
+import { getStorageConfig } from '$lib/config/storages';
 import { canDrop } from './inventory-validation';
 
 export interface StoredItem {
@@ -49,8 +50,9 @@ export class InventoryManager {
 
 	#moveOrSwap(origin: StoredItem, target: DropTarget) {
 		if (target.item) {
-			const reverseCheckValidation = canDrop(target, origin);
-			if (!reverseCheckValidation) return;
+			const reverseStored: StoredItem = { storage: target.storage, item: target.item };
+			const reverseDropTarget: DropTarget = { storage: origin.storage, item: origin.item };
+			if (!canDrop(reverseStored, reverseDropTarget)) return;
 		}
 		const itemA = origin.item;
 		const itemB = target.item;
@@ -104,6 +106,36 @@ export class InventoryManager {
 			defId,
 			count
 		};
+	}
+
+	getQuickMoveTargetStorage(currentStorageId: string): string {
+		if (currentStorageId === 'lootBack') return 'backpack';
+		if (currentStorageId === 'backpack') return 'lootBack';
+		return 'backpack';
+	}
+
+	getFirstEmptySlotRef(storageId: string): SlotRef | null {
+		const config = getStorageConfig(storageId);
+		if (!config) return null;
+		for (let i = 0; i < config.size; i++) {
+			const ref: SlotRef = { storageId, index: i };
+			if (!this.getItem(ref)) return ref;
+		}
+		return null;
+	}
+
+	quickMove(storedItem: StoredItem): boolean {
+		const storageId =
+			'attachIndex' in storedItem.storage
+				? storedItem.storage.storageId
+				: storedItem.storage.storageId;
+		const targetId = this.getQuickMoveTargetStorage(storageId);
+		const empty = this.getFirstEmptySlotRef(targetId);
+		if (!empty) return false;
+		const dropTarget: DropTarget = { storage: empty, item: null };
+		if (!canDrop(storedItem, dropTarget)) return false;
+		this.handleDrop(storedItem, dropTarget);
+		return true;
 	}
 
 	setup(): void {

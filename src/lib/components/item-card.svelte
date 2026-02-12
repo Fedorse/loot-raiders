@@ -102,8 +102,13 @@
 				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
 			{#if item.count > 1}
-				<div class="font-mono text-xs font-bold tracking-wider text-white">
-					{item.count}
+				<div
+					class="flex items-baseline items-center gap-0.5 text-xs leading-none font-medium text-white"
+				>
+					<span class="text-[9px]">x</span>
+					<span class="font-sans text-xs tracking-[-0.05em]">
+						{item.count}
+					</span>
 				</div>
 			{/if}
 		{/if}

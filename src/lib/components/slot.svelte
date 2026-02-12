@@ -61,7 +61,7 @@
 	.glow-ring-mask {
 		border-radius: inherit;
 
-		padding: 1.5px;
+		padding: 1px;
 
 		-webkit-mask:
 			linear-gradient(#fff 0 0) content-box,

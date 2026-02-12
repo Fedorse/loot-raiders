@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { getDef } from '$lib/config/items';
-	import { droppable, draggable } from '$lib/attach/dnd';
+	import { droppable, draggable, quickActions } from '$lib/actions/inventory';
 	import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 	import WeaponCard from './weapon-card.svelte';
 	import ItemCard from './item-card.svelte';
@@ -26,6 +25,7 @@
 <div
 	class="{className} h-full w-full"
 	{@attach droppable(dropTarget)}
+	{@attach quickActions(storedItem)}
 	{@attach draggable(storedItem)}
 >
 	{#if isWeapon}

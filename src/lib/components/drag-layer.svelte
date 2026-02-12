@@ -9,9 +9,8 @@
 
 	const { dragOrigin, pointer, offset, isValidDrop } = $derived(dnd);
 
-	const draggedItem = $derived(dragOrigin?.item ?? null);
-
-	let def = $derived(draggedItem?.defId != null ? getDef(draggedItem.defId) : null);
+	const draggedItem = $derived(dragOrigin?.item);
+	const def = $derived(getDef(draggedItem?.defId ?? ''));
 
 	const x = $derived(pointer.x - offset.x * GHOST_SIZE);
 	const y = $derived(pointer.y - offset.y * GHOST_SIZE);
@@ -19,19 +18,29 @@
 
 {#if dragOrigin}
 	<div
-		class="pointer-events-none fixed top-0 left-0 z-50 flex size-20 items-center justify-center rounded-lg
-               shadow-2xl backdrop-blur-sm will-change-transform {isValidDrop
-			? 'bg-blue-500/30'
-			: 'bg-red-500/30'}"
+		class="pointer-events-none fixed top-0 left-0 z-50 flex h-20 w-20 items-center justify-center rounded-lg
+                will-change-transform {isValidDrop ? ' bg-sky-900/60' : ' bg-[#251212]/90'}"
 		style="
 			transform: translate3d({x}px, {y}px, 0) 
 		"
 	>
-		{#if def}
-			<img src={def.image} alt="" class="h-full w-full object-contain" />
+		<img
+			src={def.image}
+			alt=""
+			class=" object-contain {(draggedItem?.count ?? 1) > 1
+				? 'h-[80%] w-[80%]'
+				: 'h-[95%] w-[95%]'}"
+		/>
+
+		{#if (draggedItem?.count ?? 1) > 1}
+			<div
+				class="absolute right-2 bottom-1.5 flex items-baseline gap-0.5 leading-none font-medium text-white"
+			>
+				<span class="text-[9px]">×</span>
+				<span class=" font-sans text-xs tracking-[-0.05em]">
+					{draggedItem?.count ?? 1}
+				</span>
+			</div>
 		{/if}
-		<!-- <div>
-			{item.count}
-		</div> -->
 	</div>
 {/if}
