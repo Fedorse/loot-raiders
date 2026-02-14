@@ -42,7 +42,7 @@ export function droppable(dropTarget: DropTarget) {
 
 export function quickActions(stored: StoredItem) {
 	return (node: HTMLElement) => {
-		const { inventory } = getGameContext();
+		const { inventoryOperations } = getGameContext();
 		const slotRef = stored.storage;
 
 		const handlePointerDown = (e: PointerEvent) => {
@@ -54,7 +54,7 @@ export function quickActions(stored: StoredItem) {
 			if (e.shiftKey || isDoubleTap) {
 				e.preventDefault();
 				e.stopPropagation();
-				inventory.quickMove(stored);
+				inventoryOperations.quickMove(stored);
 				return;
 			}
 		};

@@ -43,7 +43,7 @@ export interface ItemDefinition {
 	name: string;
 	type: ItemType;
 	rarity: ItemRarity;
-	attachmentKind?: AttachmentType; // Конкретный тип attachment (muzzle, optic и т.д.)
+	attachmentKind?: AttachmentType;
 
 	image: string;
 	categoryIcon: string;
