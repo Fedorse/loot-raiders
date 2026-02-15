@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { droppable, draggable, quickActions } from '$lib/actions/inventory';
+	import { droppable, draggable, quickActions } from '$lib/actions/actions';
 	import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 	import WeaponCard from './weapon-card.svelte';
 	import ItemCard from './item-card.svelte';

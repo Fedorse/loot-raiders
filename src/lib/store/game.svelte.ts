@@ -1,6 +1,6 @@
 import { setContext, getContext } from 'svelte';
 import { InventoryManager } from './inventory-manger.svelte';
-import { InventoryOperations } from './inventory-operations';
+import { InventoryOperations } from './inventory-operations.ts';
 import { DndManager } from './ui-state.svelte';
 import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 import type { DropTarget } from '$lib/config/items';

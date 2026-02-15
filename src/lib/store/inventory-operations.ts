@@ -1,5 +1,6 @@
 import { isEqual } from 'es-toolkit';
-import { getDef, type ItemInstance, type SlotRef, type DropTarget } from '$lib/config/items';
+import { getDef, type ItemDefinition, type SlotRef, type DropTarget } from '$lib/config/items';
+import { isAttachment, isWeapon } from '$lib/utils';
 import type { InventoryManager } from './inventory-manger.svelte';
 import type { StoredItem } from './inventory-manger.svelte';
 import { canDrop } from './inventory-validation';
@@ -7,61 +8,73 @@ import { canDrop } from './inventory-validation';
 export class InventoryOperations {
 	constructor(private inventory: InventoryManager) {}
 
-	handleDrop(dragOrigin: StoredItem, dropTarget: DropTarget): void {
-		if (isEqual(dragOrigin.storage, dropTarget.storage)) return;
+	handleDrop(dragItem: StoredItem, targetDrop: DropTarget): void {
+		if (isEqual(dragItem.storage, targetDrop.storage)) return;
 
-		if (this.#tryAttach(dragOrigin, dropTarget)) return;
+		if (this.#tryAttach(dragItem, targetDrop)) return;
 
-		this.#moveOrSwap(dragOrigin, dropTarget);
+		this.#moveOrSwap(dragItem, targetDrop);
 	}
 
-	#moveOrSwap(origin: StoredItem, target: DropTarget): void {
-		if (target.item) {
-			const reverseStored: StoredItem = { storage: target.storage, item: target.item };
-			const reverseDropTarget: DropTarget = { storage: origin.storage, item: origin.item };
-			if (!canDrop(reverseStored, reverseDropTarget)) return;
-		}
-		const itemA = origin.item;
-		const itemB = target.item;
-
-		this.inventory.removeItem(origin.storage);
-		this.inventory.removeItem(target.storage);
-
-		this.inventory.insertItem(target.storage, itemA);
-		if (itemB) {
-			this.inventory.insertItem(origin.storage, itemB);
+	#moveOrSwap(dragItem: StoredItem, targetDrop: DropTarget): void {
+		if (targetDrop.item) {
+			this.#swapItems(dragItem, targetDrop);
+		} else {
+			this.#moveToEmptySlot(dragItem, targetDrop);
 		}
 	}
 
-	#tryAttach(dragOrigin: StoredItem, dropTarget: DropTarget): boolean {
-		const dragDef = getDef(dragOrigin.item.defId);
-		if (dragDef.type !== 'attachment' || !dragDef.attachmentKind) return false;
+	#moveToEmptySlot(dragItem: StoredItem, targetDrop: DropTarget): void {
+		this.inventory.removeItem(dragItem.storage);
+		this.inventory.insertItem(targetDrop.storage, dragItem.item);
+	}
 
-		let attachSlot: SlotRef | null = null;
+	#swapItems(dragItem: StoredItem, dropItem: DropTarget): void {
+		if (!dropItem.item) return;
+		const itemToTarget = dragItem.item;
+		const itemToBack = dropItem.item;
 
-		if ('attachIndex' in dropTarget.storage) {
-			attachSlot = dropTarget.storage;
-		} else if (dropTarget.item && getDef(dropTarget.item.defId).type === 'weapon') {
-			const targetDef = getDef(dropTarget.item.defId);
+		const canReturnBack = canDrop(
+			{ storage: dragItem.storage, item: itemToBack },
+			{ storage: dropItem.storage, item: itemToTarget }
+		);
+		if (!canReturnBack) {
+			console.warn('Cannot return back item to original slot');
+			return;
+		}
+
+		this.inventory.removeItem(dragItem.storage);
+		this.inventory.removeItem(dropItem.storage);
+
+		this.inventory.insertItem(dropItem.storage, itemToTarget);
+		this.inventory.insertItem(dragItem.storage, itemToBack);
+	}
+
+	#tryAttach(dragItem: StoredItem, dropTarget: DropTarget): boolean {
+		const dragDef = getDef(dragItem.item.defId);
+		if (dragDef.type !== 'attachment') return false;
+
+		let targetSlotRef: SlotRef | null = null;
+		if (isAttachment(dropTarget.storage)) {
+			targetSlotRef = dropTarget.storage;
+		} else if (isWeapon(dropTarget.item)) {
+			const targetDef = getDef(dropTarget.item!.defId);
 			const slotIdx = targetDef.attachmentSlots?.findIndex(
 				(s) => s.type === dragDef.attachmentKind
 			);
 			if (slotIdx !== undefined && slotIdx !== -1) {
-				attachSlot = { ...dropTarget.storage, attachIndex: slotIdx };
+				targetSlotRef = { ...dropTarget.storage, attachIndex: slotIdx };
 			}
 		}
+		if (!targetSlotRef) return false;
 
-		if (!attachSlot) return false;
+		const attachmentDropTarget: DropTarget = {
+			storage: targetSlotRef,
 
-		const oldAttachment = this.inventory.getItem(attachSlot);
+			item: this.inventory.getItem(targetSlotRef)?.item ?? null
+		};
 
-		this.inventory.removeItem(dragOrigin.storage);
-		this.inventory.removeItem(attachSlot);
-
-		this.inventory.insertItem(attachSlot, dragOrigin.item);
-		if (oldAttachment) {
-			this.inventory.insertItem(dragOrigin.storage, oldAttachment.item);
-		}
+		this.#moveOrSwap(dragItem, attachmentDropTarget);
 
 		return true;
 	}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { droppable } from '$lib/actions/inventory';
+	import { droppable } from '$lib/actions/actions';
 	import type { SlotRef } from '$lib/config/items';
 
 	type Props = {
