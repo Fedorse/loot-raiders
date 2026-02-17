@@ -5,9 +5,9 @@
 	const GHOST_SIZE = 80;
 
 	const game = getGameContext();
-	const { dnd } = game;
+	const { interaction } = game;
 
-	const { dragOrigin, pointer, offset, isValidDrop } = $derived(dnd);
+	const { dragOrigin, pointer, offset, isValidDrop } = $derived(interaction);
 
 	const draggedItem = $derived(dragOrigin?.item);
 	const def = $derived(getDef(draggedItem?.defId ?? ''));

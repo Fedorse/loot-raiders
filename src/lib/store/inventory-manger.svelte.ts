@@ -1,6 +1,8 @@
 import { isEqual } from 'es-toolkit';
 import { type ItemInstance, type SlotRef } from '$lib/config/items';
 import { getStorageConfig } from '$lib/config/storages';
+import { SvelteSet } from 'svelte/reactivity';
+import { isAttachment } from '$lib/utils';
 
 export interface StoredItem {
 	storage: SlotRef;
@@ -9,6 +11,8 @@ export interface StoredItem {
 
 export class InventoryManager {
 	items = $state<StoredItem[]>([]);
+	selectedIds = new SvelteSet<string>();
+
 	attachments = $derived(this.items.filter((i) => 'attachIndex' in i.storage));
 	nonAttachmentItems = $derived(this.items.filter((i) => !('attachIndex' in i.storage)));
 	backpack = $derived(this.items.filter((i) => i.storage.storageId === 'backpack'));
@@ -35,8 +39,14 @@ export class InventoryManager {
 	removeItem(slotRef: SlotRef): void {
 		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
 		if (idx !== -1) {
+			const uid = this.items[idx].item.uid;
+			this.selectedIds.delete(uid);
 			this.items.splice(idx, 1);
 		}
+	}
+
+	selectedItem(uid: string): boolean {
+		return this.selectedIds.has(uid);
 	}
 
 	createItem(defId: string, count = 1): ItemInstance {

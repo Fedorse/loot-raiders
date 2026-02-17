@@ -3,7 +3,6 @@
 	import type { SlotRef } from '$lib/config/items';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
-	import { isEqual } from 'es-toolkit';
 
 	type Props = {
 		slotRef: SlotRef;
@@ -14,15 +13,16 @@
 	let { slotRef, class: className = '', placeholder }: Props = $props();
 
 	const game = getGameContext();
-	const { dnd, inventory } = game;
-	const { dragOrigin } = $derived(dnd);
-	const highlightHoverSlot = $derived(dnd.highlightHoverSlot(slotRef));
+	const { interaction, inventory } = game;
+	const { dragOrigin } = $derived(interaction);
+	const highlightHoverSlot = $derived(interaction.highlightHoverSlot(slotRef));
 
 	const storedItem = $derived(inventory.getItem(slotRef));
 	const dragOriginSlot = $derived(dragOrigin?.item === storedItem?.item);
+	const selectedItem = $derived(inventory.selectedItem(storedItem?.item?.uid ?? ''));
 
 	const validSlot = $derived(
-		dnd.canAccept({
+		interaction.canAccept({
 			storage: slotRef,
 			item: storedItem?.item ?? null
 		})
@@ -33,7 +33,7 @@
 	{@render gradientBorder()}
 	<div class="relative z-20 h-full w-full p-[3.5px]">
 		{#if storedItem && !dragOriginSlot}
-			<ItemSlot {storedItem} className="h-full w-full" />
+			<ItemSlot {storedItem} {selectedItem} className="h-full w-full" />
 		{:else}
 			<EmptySlot {slotRef} {placeholder} className="h-full w-full" />
 		{/if}

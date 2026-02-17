@@ -1,5 +1,5 @@
 import { isEqual } from 'es-toolkit';
-import { getDef, type ItemDefinition, type SlotRef, type DropTarget } from '$lib/config/items';
+import { getDef, type SlotRef, type DropTarget } from '$lib/config/items';
 import { isAttachment, isWeapon } from '$lib/utils';
 import type { InventoryManager } from './inventory-manger.svelte';
 import type { StoredItem } from './inventory-manger.svelte';
@@ -14,6 +14,21 @@ export class InventoryOperations {
 		if (this.#tryAttach(dragItem, targetDrop)) return;
 
 		this.#moveOrSwap(dragItem, targetDrop);
+	}
+
+	selectSingle(uid: string): void {
+		this.inventory.selectedIds.clear();
+		this.inventory.selectedIds.add(uid);
+	}
+	toggleSelection(uid: string): void {
+		if (this.inventory.selectedIds.has(uid)) {
+			this.inventory.selectedIds.delete(uid);
+		} else {
+			this.inventory.selectedIds.add(uid);
+		}
+	}
+	clearSelection(): void {
+		this.inventory.selectedIds.clear();
 	}
 
 	#moveOrSwap(dragItem: StoredItem, targetDrop: DropTarget): void {
@@ -80,11 +95,7 @@ export class InventoryOperations {
 	}
 
 	quickMove(storedItem: StoredItem): boolean {
-		const storageId =
-			'attachIndex' in storedItem.storage
-				? storedItem.storage.storageId
-				: storedItem.storage.storageId;
-		const targetId = this.inventory.getQuickMoveTargetStorage(storageId);
+		const targetId = this.inventory.getQuickMoveTargetStorage(storedItem.storage.storageId);
 		const empty = this.inventory.getFirstEmptySlotRef(targetId);
 		if (!empty) return false;
 		const dropTarget: DropTarget = { storage: empty, item: null };

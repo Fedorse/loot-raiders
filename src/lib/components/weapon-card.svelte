@@ -3,48 +3,20 @@
 	import Slot from '$lib/components/slot.svelte';
 	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
+	import { getRarityStyle } from '$lib/config/rarity';
 
 	type Props = {
 		item: ItemInstance;
 		className?: string;
-		/** Где хранится это оружие (для attachment операций) */
 		weaponStorage?: string;
-		/** Позиция оружия в хранилище */
 		weaponPosition?: number;
+		selected: boolean;
 	};
 
-	let { item, className = 'h-40', weaponStorage, weaponPosition }: Props = $props();
+	let { item, className = 'h-40', weaponStorage, weaponPosition, selected }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
-	const RARITY_CONFIG = {
-		common: { border: 'bg-white/20', bg: 'bg-white/30', glow: 'bg-gray-600', height: 'h-[40%]' },
-		uncommon: {
-			border: 'from-green-500 via-green-500 via-5% to-slate-700 to-80%',
-			bg: 'bg-green-500',
-			glow: 'bg-green-400',
-			height: 'h-[50%]'
-		},
-		rare: {
-			border: 'from-blue-500 via-blue-400 via-5% to-slate-700 to-80%',
-			bg: 'bg-blue-500',
-			glow: 'bg-blue-400',
-			height: 'h-[60%]'
-		},
-		epic: {
-			border: 'from-purple-500 via-purple-500 via-5% to-slate-700 to-80%',
-			bg: 'bg-purple-500',
-			glow: 'bg-purple-400',
-			height: 'h-[70%]'
-		},
-		legendary: {
-			border: 'from-yellow-400 via-yellow-500 via-5% to-slate-700 to-80%',
-			bg: 'bg-yellow-400',
-			glow: 'bg-yellow-300',
-			height: 'h-[80%]'
-		}
-	} as const;
-
-	const style = $derived(def ? RARITY_CONFIG[def.rarity] : RARITY_CONFIG.common);
+	const style = $derived(getRarityStyle(def.rarity));
 </script>
 
 <div class="{className} weapon-card group/weapon">

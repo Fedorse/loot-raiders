@@ -1,15 +1,12 @@
 <script lang="ts">
-	import ItemCard from '$lib/components/item-card.svelte';
 	import Slot from '$lib/components/slot.svelte';
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
-	import WeaponCard from '$lib/components/weapon-card.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
-	import type { ItemInstance } from '$lib/config/items';
 
 	const game = initGame();
-	const { inventory, dnd } = game;
+	const { inventory, interaction } = game;
 
 	const lootBackConfig = getStorageConfig('lootBack');
 	const backpackConfig = getStorageConfig('backpack');
@@ -19,21 +16,21 @@
 </script>
 
 <!-- debug -->
-{#if dnd.dragOrigin}
+{#if interaction.dragOrigin}
 	<pre
 		class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
 {JSON.stringify(
 			{
-				dragOrigin: dnd.dragOrigin && {
-					storage: dnd.dragOrigin.storage,
-					item: dnd.dragOrigin.item.defId
+				dragOrigin: interaction.dragOrigin && {
+					storage: interaction.dragOrigin.storage,
+					item: interaction.dragOrigin.item.defId
 				},
-				dropTarget: dnd.dropTarget && {
-					storage: dnd.dropTarget.storage,
-					item: dnd.dropTarget.item?.defId ?? null
+				dropTarget: interaction.dropTarget && {
+					storage: interaction.dropTarget.storage,
+					item: interaction.dropTarget.item?.defId ?? null
 				},
-				validDrop: dnd.isValidDrop,
-				pointer: dnd.pointer
+				validDrop: interaction.isValidDrop,
+				pointer: interaction.pointer
 			},
 			null,
 			2
