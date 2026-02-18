@@ -4,38 +4,40 @@
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
+	import StorageGrid from '$lib/components/storage-grid.svelte';
 
 	const game = initGame();
 	const { inventory, interaction } = game;
 
 	const lootBackConfig = getStorageConfig('lootBack');
 	const backpackConfig = getStorageConfig('backpack');
-	const weaponConfig = getStorageConfig('weapon');
-	const augmentConfig = getStorageConfig('augment');
-	const shieldConfig = getStorageConfig('shield');
+
+	let debugOpen = $state(false);
 </script>
 
 <!-- debug -->
-{#if interaction.dragOrigin}
-	<pre
-		class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
+{#if debugOpen}
+	{#if interaction.dragOrigin}
+		<pre
+			class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
 {JSON.stringify(
-			{
-				dragOrigin: interaction.dragOrigin && {
-					storage: interaction.dragOrigin.storage,
-					item: interaction.dragOrigin.item.defId
+				{
+					dragOrigin: interaction.dragOrigin && {
+						storage: interaction.dragOrigin.storage,
+						item: interaction.dragOrigin.item.defId
+					},
+					dropTarget: interaction.dropTarget && {
+						storage: interaction.dropTarget.storage,
+						item: interaction.dropTarget.item?.defId ?? null
+					},
+					validDrop: interaction.isValidDrop,
+					pointer: interaction.pointer
 				},
-				dropTarget: interaction.dropTarget && {
-					storage: interaction.dropTarget.storage,
-					item: interaction.dropTarget.item?.defId ?? null
-				},
-				validDrop: interaction.isValidDrop,
-				pointer: interaction.pointer
-			},
-			null,
-			2
-		)}
+				null,
+				2
+			)}
 	</pre>
+	{/if}
 {/if}
 
 <div class="flex h-full w-full flex-col items-center gap-6 px-5 py-16">
@@ -51,14 +53,7 @@
 			</div>
 			<div class="text-sm uppercase">filter</div>
 			<div class="grid grid-cols-4">
-				{#if lootBackConfig}
-					{#each Array(lootBackConfig.size) as _, index (index)}
-						<Slot
-							slotRef={{ storageId: lootBackConfig.name, index }}
-							class="aspect-square h-20 w-20"
-						/>
-					{/each}
-				{/if}
+				<StorageGrid storageId="lootBack" class="aspect-square h-20 w-20" />
 			</div>
 		</div>
 		<div
@@ -71,36 +66,10 @@
 				<div class="flex flex-col gap-4">
 					<div class="text-sm uppercase">equipment</div>
 					<div class="flex gap-4">
-						{#if augmentConfig}
-							{#each Array(augmentConfig.size) as _, index (index)}
-								<Slot
-									slotRef={{ storageId: augmentConfig.name, index }}
-									placeholder={augmentConfig.placeholder}
-									class=" h-20 w-[120px] flex-1 items-center justify-center "
-								/>
-							{/each}
-						{/if}
-
-						{#if shieldConfig}
-							{#each Array(shieldConfig.size) as _, index (index)}
-								<Slot
-									slotRef={{ storageId: shieldConfig.name, index }}
-									placeholder={shieldConfig.placeholder}
-									class="h-20 w-[120px] flex-1  items-center justify-center "
-								/>
-							{/each}
-						{/if}
+						<StorageGrid storageId="augment" class="h-20 w-[120px] " />
+						<StorageGrid storageId="shield" class="h-20 w-[120px] " />
 					</div>
-
-					{#if weaponConfig}
-						{#each Array(weaponConfig.size) as _, index (index)}
-							<Slot
-								slotRef={{ storageId: weaponConfig.name, index }}
-								placeholder={weaponConfig.placeholder}
-								class="h-44 w-64"
-							/>
-						{/each}
-					{/if}
+					<StorageGrid storageId="weapon" class="h-44 w-64" />
 				</div>
 
 				<div class="flex flex-col gap-4">
@@ -112,14 +81,7 @@
 					</div>
 
 					<div class="grid grid-cols-4">
-						{#if backpackConfig}
-							{#each Array(backpackConfig.size) as _, index (index)}
-								<Slot
-									slotRef={{ storageId: backpackConfig.name, index }}
-									class="aspect-square h-20 w-20"
-								/>
-							{/each}
-						{/if}
+						<StorageGrid storageId="backpack" class="aspect-square h-20 w-20" />
 					</div>
 				</div>
 			</div>
