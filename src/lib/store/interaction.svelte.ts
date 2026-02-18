@@ -1,22 +1,15 @@
 import { canDrop } from '$lib/store/inventory-validation';
 import { isEqual } from 'es-toolkit';
 import { isBaseSlot, isAttachment } from '$lib/utils';
+import type { Inventory } from './inventory.svelte';
 
 import type { DropTarget, SlotRef, StoredItem } from '$lib/types';
-
-export type { DropTarget } from '$lib/config/items';
 
 const DRAG_THRESHOLD = 5;
 const DOUBLE_CLICK_DELAY = 300;
 
-export interface InteractionCallbacks {
-	onDrop: (origin: StoredItem, target: DropTarget) => void;
-	onSelectSingle: (uid: string) => void;
-	onToggleSelection: (uid: string) => void;
-	onQuickMove: (item: StoredItem) => void;
-}
-
-export class InteractionManager {
+export class Interaction {
+	private inventory: Inventory;
 	isValidDrop = $state(false);
 	dragOrigin = $state<StoredItem | null>(null);
 	dropTarget = $state<DropTarget | null>(null);
@@ -32,10 +25,13 @@ export class InteractionManager {
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	constructor(private callbacks: InteractionCallbacks) {}
+	constructor(inventory: Inventory) {
+		this.inventory = inventory;
+	}
 
 	handlePointerDown(storedItem: StoredItem, e: PointerEvent, node: HTMLElement) {
 		if (e.button !== 0) return;
+		if (this.pending || this.dragOrigin) return;
 		e.stopPropagation();
 		e.preventDefault();
 
@@ -126,7 +122,7 @@ export class InteractionManager {
 		}
 
 		if (e.shiftKey) {
-			this.callbacks.onToggleSelection(uid);
+			this.inventory.toggleSelectionItem(uid);
 			return;
 		}
 
@@ -134,11 +130,11 @@ export class InteractionManager {
 		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === uid;
 
 		if (isDouble) {
-			this.callbacks.onQuickMove(storedItem);
+			this.inventory.quickMove(storedItem);
 			this.lastClickTime = 0;
 			this.lastClickUid = '';
 		} else {
-			this.callbacks.onSelectSingle(uid);
+			this.inventory.selectSingleItem(uid);
 			this.lastClickTime = now;
 			this.lastClickUid = uid;
 		}
@@ -146,7 +142,7 @@ export class InteractionManager {
 
 	private endDrag() {
 		if (this.isValidDrop && this.dragOrigin != null && this.dropTarget != null) {
-			this.callbacks.onDrop(this.dragOrigin, this.dropTarget);
+			this.inventory.handleDrop(this.dragOrigin, this.dropTarget);
 		}
 		this.reset();
 	}

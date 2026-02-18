@@ -19,7 +19,7 @@
 
 	const storedItem = $derived(inventory.getItem(slotRef));
 	const dragOriginSlot = $derived(dragOrigin?.item === storedItem?.item);
-	const selectedItem = $derived(inventory.selectedItem(storedItem?.item?.uid ?? ''));
+	const selectedItem = $derived(inventory.isSelected(storedItem?.item?.uid ?? ''));
 
 	const validSlot = $derived(
 		interaction.canAccept({
