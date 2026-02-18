@@ -1,9 +1,10 @@
 import { isEqual } from 'es-toolkit';
-import { getDef, type SlotRef, type DropTarget } from '$lib/config/items';
+import { getDef } from '$lib/config/items';
 import { isAttachment, isWeapon } from '$lib/utils';
 import type { InventoryManager } from './inventory-manger.svelte';
-import type { StoredItem } from './inventory-manger.svelte';
 import { canDrop } from './inventory-validation';
+
+import type { StoredItem, SlotRef, DropTarget } from '$lib/types';
 
 export class InventoryOperations {
 	constructor(private inventory: InventoryManager) {}

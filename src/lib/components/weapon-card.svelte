@@ -1,12 +1,12 @@
 <script lang="ts">
 	import TierIcon from '$lib/components/tier-icon.svelte';
 	import Slot from '$lib/components/slot.svelte';
-	import type { ItemInstance } from '$lib/config/items';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
+	import type { InstanceItem } from '$lib/types';
 
 	type Props = {
-		item: ItemInstance;
+		item: InstanceItem;
 		className?: string;
 		weaponStorage?: string;
 		weaponPosition?: number;

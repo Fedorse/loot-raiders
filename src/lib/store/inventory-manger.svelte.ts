@@ -1,13 +1,7 @@
 import { isEqual } from 'es-toolkit';
-import { type ItemInstance, type SlotRef } from '$lib/config/items';
 import { getStorageConfig } from '$lib/config/storages';
 import { SvelteSet } from 'svelte/reactivity';
-import { isAttachment } from '$lib/utils';
-
-export interface StoredItem {
-	storage: SlotRef;
-	item: ItemInstance;
-}
+import type { StoredItem, InstanceItem, SlotRef, StorageId } from '$lib/types';
 
 export class InventoryManager {
 	items = $state<StoredItem[]>([]);
@@ -27,11 +21,11 @@ export class InventoryManager {
 		return this.items.find((i) => isEqual(i.storage, slotRef)) ?? null;
 	}
 
-	insertItem(slotRef: SlotRef, item: ItemInstance): void {
+	insertItem(slotRef: SlotRef, item: InstanceItem): void {
 		this.items.push({ storage: slotRef, item });
 	}
 
-	updateItem(slotRef: SlotRef, newItem: ItemInstance): void {
+	updateItem(slotRef: SlotRef, newItem: InstanceItem): void {
 		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
 		this.items[idx].item = newItem;
 	}
@@ -49,7 +43,7 @@ export class InventoryManager {
 		return this.selectedIds.has(uid);
 	}
 
-	createItem(defId: string, count = 1): ItemInstance {
+	createItem(defId: string, count = 1): InstanceItem {
 		return {
 			uid: crypto.randomUUID(),
 			defId,
@@ -57,13 +51,13 @@ export class InventoryManager {
 		};
 	}
 
-	getQuickMoveTargetStorage(currentStorageId: string): string {
+	getQuickMoveTargetStorage(currentStorageId: StorageId): StorageId {
 		if (currentStorageId === 'lootBack') return 'backpack';
 		if (currentStorageId === 'backpack') return 'lootBack';
 		return 'backpack';
 	}
 
-	getFirstEmptySlotRef(storageId: string): SlotRef | null {
+	getFirstEmptySlotRef(storageId: StorageId): SlotRef | null {
 		const config = getStorageConfig(storageId);
 		if (!config) return null;
 		for (let i = 0; i < config.size; i++) {
@@ -74,7 +68,7 @@ export class InventoryManager {
 	}
 
 	setup(): void {
-		const initial: [SlotRef, ItemInstance][] = [
+		const initial: [SlotRef, InstanceItem][] = [
 			[{ storageId: 'backpack', index: 0 }, this.createItem('res_arc_circuitry', 10)],
 			// [{ storageId: 'backpack', index: 10 }, this.createItem('res_arc_circuitry', 5)],
 			// [{ storageId: 'backpack', index: 1 }, this.createItem('eqp_tactical_mk1')],

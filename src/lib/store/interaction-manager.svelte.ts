@@ -1,8 +1,8 @@
-import { type DropTarget, type SlotRef } from '$lib/config/items';
-import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 import { canDrop } from '$lib/store/inventory-validation';
 import { isEqual } from 'es-toolkit';
 import { isBaseSlot, isAttachment } from '$lib/utils';
+
+import type { DropTarget, SlotRef, StoredItem } from '$lib/types';
 
 export type { DropTarget } from '$lib/config/items';
 

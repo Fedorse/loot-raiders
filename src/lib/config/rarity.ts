@@ -1,11 +1,4 @@
-import type { ItemRarity } from './items';
-
-export interface RarityStyle {
-	border: string;
-	bg: string;
-	glow: string;
-	height: string;
-}
+import type { ItemRarity, RarityStyle } from '$lib/types';
 
 export const RARITY_STYLES: Record<ItemRarity, RarityStyle> = {
 	common: {
@@ -40,6 +33,6 @@ export const RARITY_STYLES: Record<ItemRarity, RarityStyle> = {
 	}
 };
 
-export function getRarityStyle(rarity: ItemRarity): RarityStyle {
-	return RARITY_STYLES[rarity] ?? RARITY_STYLES.common;
-}
+export const getRarityStyle = (rarity: ItemRarity): RarityStyle => {
+	return RARITY_STYLES[rarity];
+};

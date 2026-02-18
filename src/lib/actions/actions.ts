@@ -1,6 +1,5 @@
-import type { DropTarget } from '$lib/config/items';
-import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 import { getGameContext } from '$lib/store/game.svelte';
+import type { DropTarget, StoredItem } from '$lib/types';
 
 export function droppable(dropTarget: DropTarget) {
 	return (node: HTMLElement) => {

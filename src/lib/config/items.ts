@@ -38,27 +38,29 @@ export interface RecyclingResult {
 	name: string;
 }
 
-export interface ItemDefinition {
-	id: string;
-	name: string;
-	type: ItemType;
-	rarity: ItemRarity;
-	attachmentKind?: AttachmentType;
+// export interface ItemDefinition {
+// 	id: string;
+// 	name: string;
+// 	type: ItemType;
+// 	rarity: ItemRarity;
+// 	attachmentKind?: AttachmentType;
 
-	image: string;
-	categoryIcon: string;
+// 	image: string;
+// 	categoryIcon: string;
 
-	weight: number;
-	price: number;
-	maxStack?: number;
+// 	weight: number;
+// 	price: number;
+// 	maxStack?: number;
 
-	attachmentSlots?: {
-		type: AttachmentType;
-		placeholder: string;
-	}[];
+// 	attachmentSlots?: {
+// 		type: AttachmentType;
+// 		placeholder: string;
+// 	}[];
 
-	recycling?: RecyclingResult[];
-}
+// 	recycling?: RecyclingResult[];
+// }
+
+import type { ItemDefinition } from '$lib/types';
 
 export const ITEM_DB: Record<string, ItemDefinition> = {
 	wpn_kettle: {

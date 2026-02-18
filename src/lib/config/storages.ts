@@ -1,11 +1,4 @@
-import type { ItemType } from './items';
-
-export interface StorageConfig {
-	name: string;
-	size: number;
-	allowedTypes: ItemType[];
-	placeholder?: string;
-}
+import type { StorageConfig, ItemType, StorageId } from '$lib/types';
 
 export const STORAGE_CONFIGS: StorageConfig[] = [
 	{
@@ -38,11 +31,11 @@ export const STORAGE_CONFIGS: StorageConfig[] = [
 	}
 ];
 
-export function getStorageConfig(name: string): StorageConfig | undefined {
+export const getStorageConfig = (name: StorageId): StorageConfig | undefined => {
 	return STORAGE_CONFIGS.find((config) => config.name === name);
-}
+};
 
-export function getAllowedTypes(name: string): ItemType[] {
+export const getAllowedTypes = (name: StorageId): ItemType[] => {
 	const config = getStorageConfig(name);
 	return config?.allowedTypes ?? [];
-}
+};

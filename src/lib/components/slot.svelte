@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
-	import type { SlotRef } from '$lib/config/items';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
+	import type { SlotRef } from '$lib/types';
 
 	type Props = {
 		slotRef: SlotRef;

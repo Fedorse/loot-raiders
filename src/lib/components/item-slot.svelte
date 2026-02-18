@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { droppable, slotInteractions } from '$lib/actions/actions';
-	import type { StoredItem } from '$lib/store/inventory-manger.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import WeaponCard from './weapon-card.svelte';
 	import ItemCard from './item-card.svelte';
 	import AttachCard from './attach-weapon-card.svelte';
+
+	import type { StoredItem } from '$lib/types';
 
 	type Props = {
 		storedItem: StoredItem;

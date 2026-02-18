@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { getDef } from '$lib/config/items';
-	import type { ItemInstance } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
+	import type { InstanceItem } from '$lib/types';
 
 	type Props = {
-		item: ItemInstance;
+		item: InstanceItem;
 		className?: string;
 		selected: boolean;
 		hasAttachments?: boolean;

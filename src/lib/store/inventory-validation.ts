@@ -1,15 +1,13 @@
-import { getDef, type ItemInstance, type ItemType } from '$lib/config/items';
-import type { SlotRef } from '$lib/config/items';
-import type { StoredItem } from '$lib/store/inventory-manger.svelte';
-import type { DropTarget } from '$lib/config/items';
+import { getDef } from '$lib/config/items';
 import { getAllowedTypes } from '$lib/config/storages';
+import type { StoredItem, DropTarget, InstanceItem, ItemType } from '$lib/types';
 
-export const canPlace = (draggedItem: ItemInstance, allowedTypes: ItemType[]): boolean => {
+export const canPlace = (draggedItem: InstanceItem, allowedTypes: ItemType[]): boolean => {
 	const itemDef = getDef(draggedItem.defId);
 	return allowedTypes.includes(itemDef.type);
 };
 
-export const canAttach = (draggedItem: ItemInstance, targetItem: ItemInstance | null): boolean => {
+export const canAttach = (draggedItem: InstanceItem, targetItem: InstanceItem | null): boolean => {
 	if (!targetItem) return false;
 	const itemDef = getDef(draggedItem.defId);
 	const targetDef = getDef(targetItem.defId);
