@@ -1,6 +1,6 @@
 import { setContext, getContext } from 'svelte';
-import { Inventory } from './inventory.svelte.ts';
-import { Interaction } from './interaction.svelte.ts';
+import { Inventory } from './inventory.svelte';
+import { Interaction } from './interaction.svelte';
 
 export class Game {
 	inventory = new Inventory();

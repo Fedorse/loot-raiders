@@ -7,13 +7,13 @@
 		item: InstanceItem;
 		className?: string;
 		selected: boolean;
-		hasAttachments?: boolean;
 	};
 
-	let { item, className = 'h-20 w-20', selected, hasAttachments }: Props = $props();
+	let { item, className = 'h-20 w-20', selected }: Props = $props();
 
 	const def = $derived(getDef(item.defId));
 	const style = $derived(getRarityStyle(def.rarity));
+	const hasAttachments = $derived(item.attachments?.some((a) => a !== null) ?? false);
 </script>
 
 <div class="{className} group">

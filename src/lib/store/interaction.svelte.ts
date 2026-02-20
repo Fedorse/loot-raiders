@@ -1,9 +1,8 @@
 import { canDrop } from '$lib/store/inventory-validation';
 import { isEqual } from 'es-toolkit';
-import { isBaseSlot, isAttachment } from '$lib/utils';
 import type { Inventory } from './inventory.svelte';
 
-import type { DropTarget, SlotRef, StoredItem } from '$lib/types';
+import type { DropTarget, SlotRef, StoredItem, AttachmentRef, InstanceItem } from '$lib/types';
 
 const DRAG_THRESHOLD = 5;
 const DOUBLE_CLICK_DELAY = 300;
@@ -12,6 +11,7 @@ export class Interaction {
 	private inventory: Inventory;
 	isValidDrop = $state(false);
 	dragOrigin = $state<StoredItem | null>(null);
+	attachmentOrigin = $state<AttachmentRef | null>(null);
 	dropTarget = $state<DropTarget | null>(null);
 	pointer = $state({ x: 0, y: 0 });
 	offset = $state({ x: 0, y: 0 });
@@ -41,17 +41,33 @@ export class Interaction {
 		window.addEventListener('pointerup', this.handlePointerUp);
 	}
 
+	handleAttachmentPointerDown(
+		weaponSlotRef: SlotRef,
+		attachIndex: number,
+		attachment: InstanceItem,
+		e: PointerEvent,
+		node: HTMLElement
+	) {
+		if (e.button !== 0) return;
+		if (this.pending || this.dragOrigin) return;
+		e.stopPropagation();
+		e.preventDefault();
+
+		this.pending = {
+			storedItem: { storage: weaponSlotRef, item: attachment },
+			startX: e.clientX,
+			startY: e.clientY,
+			node
+		};
+		this.attachmentOrigin = { weaponSlotRef, attachIndex };
+
+		window.addEventListener('pointermove', this.handlePointerMove);
+		window.addEventListener('pointerup', this.handlePointerUp);
+	}
+
 	highlightHoverSlot(slotRef: SlotRef) {
 		if (!this.dropTarget) return false;
-		const target = this.dropTarget.storage;
-
-		if (isEqual(target, slotRef)) return true;
-
-		if (isBaseSlot(slotRef) && isAttachment(target)) {
-			return target.storageId === slotRef.storageId && target.index === slotRef.index;
-		}
-
-		return false;
+		return isEqual(this.dropTarget.storage, slotRef);
 	}
 
 	setDropTarget(dropTarget: DropTarget) {
@@ -61,6 +77,7 @@ export class Interaction {
 
 	canAccept(dropTarget: DropTarget): boolean {
 		if (!this.dragOrigin) return false;
+		if (this.attachmentOrigin) return true;
 		return canDrop(this.dragOrigin, dropTarget);
 	}
 
@@ -88,8 +105,11 @@ export class Interaction {
 
 	private handlePointerUp = (e: PointerEvent) => {
 		if (this.pending) {
-			this.resolveClick(this.pending.storedItem, e);
+			if (!this.attachmentOrigin) {
+				this.resolveClick(this.pending.storedItem, e);
+			}
 			this.pending = null;
+			this.attachmentOrigin = null;
 			this.removeWindowListeners();
 			return;
 		}
@@ -117,7 +137,6 @@ export class Interaction {
 		const uid = storedItem.item.uid;
 
 		if (e.altKey) {
-			// Future: split stack
 			return;
 		}
 
@@ -142,13 +161,22 @@ export class Interaction {
 
 	private endDrag() {
 		if (this.isValidDrop && this.dragOrigin != null && this.dropTarget != null) {
-			this.inventory.handleDrop(this.dragOrigin, this.dropTarget);
+			if (this.attachmentOrigin) {
+				this.inventory.handleAttachmentDrop(
+					this.attachmentOrigin.weaponSlotRef,
+					this.attachmentOrigin.attachIndex,
+					this.dropTarget
+				);
+			} else {
+				this.inventory.handleDrop(this.dragOrigin, this.dropTarget);
+			}
 		}
 		this.reset();
 	}
 
 	private reset() {
 		this.dragOrigin = null;
+		this.attachmentOrigin = null;
 		this.dropTarget = null;
 		this.isValidDrop = false;
 		this.pending = null;

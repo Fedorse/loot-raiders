@@ -50,7 +50,7 @@
 {/snippet}
 
 {#snippet invalidIcon()}
-	{#if dragOrigin && !validSlot && !('attachIndex' in slotRef)}
+	{#if dragOrigin && !validSlot}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>

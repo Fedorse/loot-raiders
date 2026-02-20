@@ -1,13 +1,5 @@
-// import type { AttachmentSlot, SlotRef, StorageSlot, ItemInstance } from './config/items';
-import type { AttachmentSlot, SlotRef, StorageSlot, InstanceItem } from '$lib/types';
+import type { InstanceItem } from '$lib/types';
 import { getDef } from './config/items';
-export function isAttachment(slot: SlotRef): slot is AttachmentSlot {
-	return 'attachIndex' in slot;
-}
-
-export function isBaseSlot(slot: SlotRef): slot is StorageSlot {
-	return !('attachIndex' in slot);
-}
 
 export function isWeapon(item: InstanceItem | null): boolean {
 	if (!item) return false;

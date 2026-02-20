@@ -1,19 +1,18 @@
 <script lang="ts">
 	import TierIcon from '$lib/components/tier-icon.svelte';
-	import Slot from '$lib/components/slot.svelte';
+	import AttachmentSlot from '$lib/components/attachment-slot.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
-	import type { InstanceItem } from '$lib/types';
+	import type { InstanceItem, SlotRef } from '$lib/types';
 
 	type Props = {
 		item: InstanceItem;
 		className?: string;
-		weaponStorage?: string;
-		weaponPosition?: number;
+		weaponSlotRef: SlotRef;
 		selected: boolean;
 	};
 
-	let { item, className = 'h-40', weaponStorage, weaponPosition, selected }: Props = $props();
+	let { item, className = 'h-40', weaponSlotRef, selected }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
 	const style = $derived(getRarityStyle(def.rarity));
@@ -36,14 +35,13 @@
 				/>
 			</div>
 			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
-				{#each def.attachmentSlots as _, index}
-					<Slot
-						slotRef={{
-							storageId: weaponStorage ?? '',
-							index: weaponPosition ?? 0,
-							attachIndex: index
-						}}
-						class="z-20 aspect-square size-8"
+				{#each def.attachmentSlots ?? [] as slotDef, index}
+					<AttachmentSlot
+						{weaponSlotRef}
+						attachIndex={index}
+						attachment={item.attachments?.[index] ?? null}
+						placeholder={slotDef.placeholder}
+						weaponItem={item}
 					/>
 				{/each}
 			</div>

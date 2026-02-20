@@ -1,5 +1,5 @@
 import { getGameContext } from '$lib/store/game.svelte';
-import type { DropTarget, StoredItem } from '$lib/types';
+import type { DropTarget, StoredItem, SlotRef, InstanceItem } from '$lib/types';
 
 export function droppable(dropTarget: DropTarget) {
 	return (node: HTMLElement) => {
@@ -24,6 +24,22 @@ export function slotInteractions(storedItem: StoredItem) {
 	return (node: HTMLElement) => {
 		const { interaction } = getGameContext();
 		const onDown = (e: PointerEvent) => interaction.handlePointerDown(storedItem, e, node);
+		node.addEventListener('pointerdown', onDown);
+		node.style.cursor = 'grab';
+		node.style.touchAction = 'none';
+		return () => node.removeEventListener('pointerdown', onDown);
+	};
+}
+
+export function attachmentInteractions(
+	weaponSlotRef: SlotRef,
+	attachIndex: number,
+	attachment: InstanceItem
+) {
+	return (node: HTMLElement) => {
+		const { interaction } = getGameContext();
+		const onDown = (e: PointerEvent) =>
+			interaction.handleAttachmentPointerDown(weaponSlotRef, attachIndex, attachment, e, node);
 		node.addEventListener('pointerdown', onDown);
 		node.style.cursor = 'grab';
 		node.style.touchAction = 'none';

@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { droppable, slotInteractions } from '$lib/actions/actions';
-	import { getGameContext } from '$lib/store/game.svelte';
+	import { getDef } from '$lib/config/items';
 	import WeaponCard from './weapon-card.svelte';
 	import ItemCard from './item-card.svelte';
-	import AttachCard from './attach-weapon-card.svelte';
 
 	import type { StoredItem } from '$lib/types';
 
@@ -15,23 +14,14 @@
 
 	let { storedItem, className = '', selectedItem }: Props = $props();
 
-	const { inventory } = getGameContext();
 	const { item, storage } = $derived(storedItem);
 	const dropTarget = $derived({
 		storage: storedItem.storage,
 		item: storedItem.item
 	});
 
-	const isWeapon = $derived(storage.storageId === 'weapon' && !('attachIndex' in storage));
-	const isAttachmentInWeapon = $derived('attachIndex' in storage);
-	const hasAttachments = $derived(
-		inventory.items.some(
-			(i) =>
-				'attachIndex' in i.storage &&
-				i.storage.storageId === storage.storageId &&
-				i.storage.index === storage.index
-		)
-	);
+	const def = $derived(getDef(item.defId));
+	const isWeapon = $derived(def.type === 'weapon');
 </script>
 
 <div
@@ -39,17 +29,9 @@
 	{@attach droppable(dropTarget)}
 	{@attach slotInteractions(storedItem)}
 >
-	{#if isWeapon}
-		<WeaponCard
-			{item}
-			className="h-full w-full"
-			weaponStorage={storage.storageId}
-			weaponPosition={storage.index}
-			selected={selectedItem}
-		/>
-	{:else if isAttachmentInWeapon}
-		<AttachCard {item} className="h-full w-full" />
+	{#if isWeapon && storedItem.storage.storageId === 'weapon'}
+		<WeaponCard {item} className="h-full w-full" weaponSlotRef={storage} selected={selectedItem} />
 	{:else}
-		<ItemCard {item} selected={selectedItem} {hasAttachments} className="h-full w-full" />
+		<ItemCard {item} selected={selectedItem} className="h-full w-full" />
 	{/if}
 </div>

@@ -23,8 +23,5 @@ export const canDrop = (dragOrigin: StoredItem, dropTarget: DropTarget): boolean
 	const targetItem = dropTarget.item;
 	const storageId = dropTarget.storage.storageId;
 	const allowedTypes = getAllowedTypes(storageId);
-	if ('attachIndex' in dropTarget.storage) {
-		return canAttach(draggedItem, targetItem);
-	}
 	return canPlace(draggedItem, allowedTypes) || canAttach(draggedItem, targetItem);
 };

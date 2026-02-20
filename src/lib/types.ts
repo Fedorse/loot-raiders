@@ -5,24 +5,23 @@ export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' 
 export type StorageId = 'backpack' | 'lootBack' | 'weapon' | 'augment' | 'shield';
 
 // ---- Slot position ----
-export interface StorageSlot {
+export interface SlotRef {
 	storageId: StorageId;
 	index: number;
 }
 
-export interface AttachmentSlot {
-	storageId: StorageId;
-	index: number;
+// ---- Attachment drag reference ----
+export interface AttachmentRef {
+	weaponSlotRef: SlotRef;
 	attachIndex: number;
 }
-
-export type SlotRef = StorageSlot | AttachmentSlot;
 
 // ---- Items ----
 export interface InstanceItem {
 	uid: string;
 	defId: string;
 	count: number;
+	attachments?: (InstanceItem | null)[];
 }
 export interface StoredItem {
 	storage: SlotRef;
