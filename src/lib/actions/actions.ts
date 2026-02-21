@@ -23,8 +23,8 @@ export function droppable(dropTarget: DropTarget) {
 export function slotInteractions(storedItem: StoredItem) {
 	return (node: HTMLElement) => {
 		const { interaction } = getGameContext();
-		const onDown = (e: PointerEvent) =>
-			interaction.startInteraction({ type: 'item', storedItem }, e, node);
+		const payload = { source: 'inventory_slot', storedItem } as const;
+		const onDown = (e: PointerEvent) => interaction.startInteraction(payload, e, node);
 
 		node.addEventListener('pointerdown', onDown);
 		node.style.cursor = 'grab';
@@ -40,7 +40,11 @@ export function attachmentInteractions(
 ) {
 	return (node: HTMLElement) => {
 		const { interaction } = getGameContext();
-		const payload = { type: 'attachment', weaponSlotRef, attachIndex, item: attachment } as const;
+		const payload = {
+			source: 'weapon_attachment',
+			attachmentRef: { weaponSlotRef, attachIndex },
+			item: attachment
+		} as const;
 
 		const onDown = (e: PointerEvent) => interaction.startInteraction(payload, e, node);
 

@@ -4,30 +4,35 @@ export const STORAGE_CONFIGS: Record<StorageId, StorageConfig> = {
 	lootBack: {
 		name: 'lootBack',
 		size: 20,
-		allowedTypes: ['loot', 'attachment', 'weapon', 'augment']
+		allowedTypes: ['loot', 'attachment', 'weapon', 'augment'],
+		quickMoveTarget: 'backpack'
 	},
 	augment: {
 		name: 'augment',
 		size: 1,
 		allowedTypes: ['augment'],
-		placeholder: '/assets/placeholder/augment_placeholder.png'
+		placeholder: '/assets/placeholder/augment_placeholder.png',
+		quickMoveTarget: 'backpack'
 	},
 	shield: {
 		name: 'shield',
 		size: 1,
 		allowedTypes: ['shield'],
-		placeholder: '/assets/placeholder/shield_placeholder.png'
+		placeholder: '/assets/placeholder/shield_placeholder.png',
+		quickMoveTarget: 'backpack'
 	},
 	weapon: {
 		name: 'weapon',
 		size: 2,
 		allowedTypes: ['weapon'],
-		placeholder: '/assets/placeholder/placeholder_weapon.png'
+		placeholder: '/assets/placeholder/placeholder_weapon.png',
+		quickMoveTarget: 'backpack'
 	},
 	backpack: {
 		name: 'backpack',
 		size: 14,
-		allowedTypes: ['loot', 'weapon', 'augment', 'shield', 'attachment']
+		allowedTypes: ['loot', 'weapon', 'augment', 'shield', 'attachment'],
+		quickMoveTarget: 'lootBack'
 	}
 };
 

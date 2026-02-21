@@ -4,7 +4,14 @@ import { SvelteSet } from 'svelte/reactivity';
 import { canDrop } from './inventory-validation';
 import { getDef } from '$lib/config/items';
 import { isWeapon } from '$lib/utils';
-import type { StoredItem, InstanceItem, SlotRef, StorageId, DropTarget } from '$lib/types';
+import type {
+	StoredItem,
+	InstanceItem,
+	SlotRef,
+	StorageId,
+	DropTarget,
+	DragPayload
+} from '$lib/types';
 
 export class Inventory {
 	items = $state<StoredItem[]>([]);
@@ -18,32 +25,96 @@ export class Inventory {
 		this.setup();
 	}
 
-	// ---- Drop handling ----
-
-	handleDrop(dragItem: StoredItem, targetDrop: DropTarget): void {
-		if (isEqual(dragItem.storage, targetDrop.storage)) return;
-
-		if (this.#tryAttach(dragItem, targetDrop)) return;
-
-		this.#moveOrSwap(dragItem, targetDrop);
+	// 	// =====================================================================
+	// 	// 2. ГЛАВНЫЙ КОНТРОЛЛЕР ДЕЙСТВИЙ (Единая точка входа)
+	// 	// =====================================================================
+	executeDrop(payload: DragPayload, dropTarget: DropTarget): void {
+		switch (payload.source) {
+			case 'inventory_slot':
+				this.#handleDraggedInventoryItem(payload.storedItem, dropTarget);
+				break;
+			case 'weapon_attachment':
+				this.#handleDraggedAttachment(payload, dropTarget);
+				break;
+		}
 	}
-
-	handleAttachmentDrop(
-		weaponSlotRef: SlotRef,
-		attachIndex: number,
-		targetDrop: DropTarget
-	): void {
+	#handleDraggedAttachment(
+		payload: Extract<DragPayload, { source: 'weapon_attachment' }>,
+		dropTarget: DropTarget
+	) {
+		const { weaponSlotRef, attachIndex } = payload.attachmentRef;
 		const attachment = this.detachFromWeapon(weaponSlotRef, attachIndex);
 		if (!attachment) return;
 
-		if (targetDrop.item) {
+		if (dropTarget.item) {
 			this.attachToWeapon(weaponSlotRef, attachIndex, attachment);
 		} else {
-			this.insertItem(targetDrop.storage, attachment);
+			this.insertItem(dropTarget.storage, attachment);
 		}
 	}
 
-	// ---- CRUD ----
+	#handleDraggedInventoryItem(dragItem: StoredItem, dropTarget: DropTarget) {
+		// 1. Надеваем прицел на пушку?
+		if (this.#isAttachingAction(dragItem, dropTarget)) {
+			this.#executeAttachToWeapon(dragItem, dropTarget);
+			return;
+		}
+
+		// 2. Слот занят? Меняем местами.
+		if (dropTarget.item) {
+			this.#executeSwap(dragItem, dropTarget);
+			return;
+		}
+
+		// 3. Слот пуст? Перемещаем.
+		this.#executeMove(dragItem.storage, dropTarget.storage);
+	}
+
+	// 	// =====================================================================
+	// 	// 3. ПРИВАТНЫЕ ИСПОЛНИТЕЛИ (Грузчики)
+	// 	// =====================================================================
+
+	#executeMove(fromSlot: SlotRef, toSlot: SlotRef): void {
+		const item = this.getItem(fromSlot)?.item;
+		if (!item) return;
+		this.removeItem(fromSlot);
+		this.insertItem(toSlot, item);
+	}
+
+	#executeSwap(dragItem: StoredItem, dropTarget: DropTarget): void {
+		if (!dropTarget.item) return;
+		// ВАЖНО: Никакой валидации (canDrop) здесь больше нет. Менеджер уже всё проверил.
+		this.removeItem(dragItem.storage);
+		this.removeItem(dropTarget.storage);
+
+		this.insertItem(dropTarget.storage, dragItem.item);
+		this.insertItem(dragItem.storage, dropTarget.item);
+	}
+
+	#executeAttachToWeapon(dragItem: StoredItem, dropTarget: DropTarget): void {
+		const dragDef = getDef(dragItem.item.defId);
+		const targetDef = getDef(dropTarget.item!.defId);
+		const slotIdx = targetDef.attachmentSlots!.findIndex((s) => s.type === dragDef.attachmentKind);
+
+		const existingAttachment = dropTarget.item!.attachments?.[slotIdx] ?? null;
+
+		this.removeItem(dragItem.storage);
+
+		if (existingAttachment) {
+			// Если на пушке уже был прицел, кладем его в слот инвентаря вместо нового
+			this.insertItem(dragItem.storage, existingAttachment);
+		}
+		this.attachToWeapon(dropTarget.storage, slotIdx, dragItem.item);
+	}
+
+	#isAttachingAction(dragItem: StoredItem, dropTarget: DropTarget): boolean {
+		if (!dropTarget.item || !isWeapon(dropTarget.item)) return false;
+		return getDef(dragItem.item.defId).type === 'attachment';
+	}
+
+	// =====================================================================
+	// 4. БАЗОВЫЕ ОПЕРАЦИИ CRUD
+	// =====================================================================
 
 	getItem(slotRef: SlotRef): StoredItem | null {
 		return this.items.find((i) => isEqual(i.storage, slotRef)) ?? null;
@@ -68,7 +139,9 @@ export class Inventory {
 		}
 	}
 
-	// ---- Selection ----
+	// 	// =====================================================================
+	// 	// 5. ВЫДЕЛЕНИЕ (Selection)
+	// 	// =====================================================================
 
 	isSelected(uid: string): boolean {
 		return this.selectedIds.has(uid);
@@ -91,7 +164,9 @@ export class Inventory {
 		this.selectedIds.clear();
 	}
 
-	// ---- Attachment operations ----
+	// 	// =====================================================================
+	// 	// 6. ОПЕРАЦИИ С АТТАЧМЕНТАМИ
+	// 	// =====================================================================
 
 	getAttachment(weaponSlotRef: SlotRef, attachIndex: number): InstanceItem | null {
 		const stored = this.getItem(weaponSlotRef);
@@ -116,12 +191,13 @@ export class Inventory {
 	// ---- Quick move ----
 
 	quickMove(storedItem: StoredItem): boolean {
-		const targetId = this.getQuickMoveTargetStorage(storedItem.storage.storageId);
-		const empty = this.getFirstEmptySlotRef(targetId);
-		if (!empty) return false;
-		const dropTarget: DropTarget = { storage: empty, item: null };
-		if (!canDrop(storedItem, dropTarget)) return false;
-		this.handleDrop(storedItem, dropTarget);
+		const config = getStorageConfig(storedItem.storage.storageId);
+		const targetId = config?.quickMoveTarget; // берем из конфига!
+		if (!targetId) return false;
+		const emptySlot = this.getFirstEmptySlotRef(targetId);
+		const dropTarget: DropTarget = { storage: emptySlot, item: null };
+		// if (!canDrop(storedItem, dropTarget)) return false;
+		this.#executeMove(storedItem.storage, dropTarget.storage);
 		return true;
 	}
 
@@ -154,66 +230,6 @@ export class Inventory {
 			if (!this.getItem(ref)) return ref;
 		}
 		return null;
-	}
-
-	// ---- Private ----
-
-	#moveOrSwap(dragItem: StoredItem, targetDrop: DropTarget): void {
-		if (targetDrop.item) {
-			this.#swapItems(dragItem, targetDrop);
-		} else {
-			this.#moveToEmptySlot(dragItem, targetDrop);
-		}
-	}
-
-	#moveToEmptySlot(dragItem: StoredItem, targetDrop: DropTarget): void {
-		this.removeItem(dragItem.storage);
-		this.insertItem(targetDrop.storage, dragItem.item);
-	}
-
-	#swapItems(dragItem: StoredItem, dropItem: DropTarget): void {
-		if (!dropItem.item) return;
-		const itemToTarget = dragItem.item;
-		const itemToBack = dropItem.item;
-
-		const canReturnBack = canDrop(
-			{ storage: dragItem.storage, item: itemToBack },
-			{ storage: dropItem.storage, item: itemToTarget }
-		);
-		if (!canReturnBack) {
-			console.warn('Cannot return back item to original slot');
-			return;
-		}
-
-		this.removeItem(dragItem.storage);
-		this.removeItem(dropItem.storage);
-
-		this.insertItem(dropItem.storage, itemToTarget);
-		this.insertItem(dragItem.storage, itemToBack);
-	}
-
-	#tryAttach(dragItem: StoredItem, dropTarget: DropTarget): boolean {
-		const dragDef = getDef(dragItem.item.defId);
-		if (dragDef.type !== 'attachment') return false;
-		if (!isWeapon(dropTarget.item)) return false;
-
-		const targetDef = getDef(dropTarget.item!.defId);
-		const slotIdx = targetDef.attachmentSlots?.findIndex(
-			(s) => s.type === dragDef.attachmentKind
-		);
-		if (slotIdx === undefined || slotIdx === -1) return false;
-
-		const existing = dropTarget.item!.attachments?.[slotIdx] ?? null;
-		if (existing) {
-			this.removeItem(dragItem.storage);
-			this.insertItem(dragItem.storage, existing);
-			this.attachToWeapon(dropTarget.storage, slotIdx, dragItem.item);
-		} else {
-			this.removeItem(dragItem.storage);
-			this.attachToWeapon(dropTarget.storage, slotIdx, dragItem.item);
-		}
-
-		return true;
 	}
 
 	// ---- Setup ----

@@ -2,21 +2,12 @@ import { canDrop } from '$lib/store/inventory-validation';
 import { isEqual } from 'es-toolkit';
 import type { Inventory } from './inventory.svelte';
 
-import type { DropTarget, SlotRef, StoredItem, AttachmentRef, InstanceItem } from '$lib/types';
+import type { DropTarget, SlotRef, InstanceItem, DragPayload } from '$lib/types';
 
 const DRAG_THRESHOLD = 5;
 const DOUBLE_CLICK_DELAY = 300;
 
 type InteractionStatus = 'idle' | 'pressing' | 'dragging';
-
-type DragPayload =
-	| { type: 'item'; storedItem: StoredItem }
-	| {
-			type: 'attachment';
-			weaponSlotRef: SlotRef;
-			attachIndex: number;
-			item: InstanceItem;
-	  };
 
 export class Interaction {
 	private inventory: Inventory;
@@ -82,16 +73,8 @@ export class Interaction {
 		this.pointer = { x: e.clientX, y: e.clientY };
 	}
 	private handleDropAction() {
-		if (!this.isValidDrop || !this.dropTarget || !this.dragPayload) return;
-
-		if (this.dragPayload.type === 'attachment') {
-			this.inventory.handleAttachmentDrop(
-				this.dragPayload.weaponSlotRef,
-				this.dragPayload.attachIndex,
-				this.dropTarget
-			);
-		} else {
-			this.inventory.handleDrop(this.dragPayload.storedItem, this.dropTarget);
+		if (this.isValidDrop && this.dropTarget && this.dragPayload) {
+			this.inventory.executeDrop(this.dragPayload, this.dropTarget);
 		}
 	}
 
@@ -111,7 +94,7 @@ export class Interaction {
 	}
 
 	private handleClick(e: PointerEvent) {
-		if (this.dragPayload?.type !== 'item') return;
+		if (this.dragPayload?.source !== 'inventory_slot') return;
 
 		const itemUid = this.dragPayload.storedItem.item.uid;
 
@@ -143,7 +126,7 @@ export class Interaction {
 			return;
 		}
 
-		if (this.dragPayload.type === 'attachment') {
+		if (this.dragPayload.source === 'weapon_attachment') {
 			this.isValidDrop = true;
 		} else {
 			this.isValidDrop = canDrop(this.dragPayload.storedItem, dropTarget);
@@ -152,7 +135,7 @@ export class Interaction {
 
 	get draggedItem(): InstanceItem | null {
 		if (this.status !== 'dragging' || !this.dragPayload) return null;
-		return this.dragPayload.type === 'item'
+		return this.dragPayload.source === 'inventory_slot'
 			? this.dragPayload.storedItem.item
 			: this.dragPayload.item;
 	}
@@ -166,7 +149,7 @@ export class Interaction {
 		if (this.status !== 'dragging' || !this.dragPayload) return true;
 
 		// Если тащим аттачмент — разрешаем (либо тут твоя логика для аттачментов)
-		if (this.dragPayload.type === 'attachment') return true;
+		if (this.dragPayload.source === 'weapon_attachment') return true;
 
 		// Проверяем через твою функцию валидации
 		return canDrop(this.dragPayload.storedItem, dropTarget);

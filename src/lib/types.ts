@@ -10,6 +10,14 @@ export interface SlotRef {
 	index: number;
 }
 
+export type DragPayload =
+	| { source: 'inventory_slot'; storedItem: StoredItem }
+	| {
+			source: 'weapon_attachment';
+			attachmentRef: AttachmentRef;
+			item: InstanceItem;
+	  };
+
 // ---- Attachment drag reference ----
 export interface AttachmentRef {
 	weaponSlotRef: SlotRef;
@@ -70,6 +78,7 @@ export interface StorageConfig {
 	size: number;
 	allowedTypes: ItemType[];
 	placeholder?: string;
+	quickMoveTarget?: StorageId;
 }
 // ---- Rarity visual style ----
 export interface RarityStyle {
