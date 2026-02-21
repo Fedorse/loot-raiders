@@ -3,6 +3,7 @@
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
 	import type { SlotRef } from '$lib/types';
+	import { canDrop } from '$lib/store/inventory-validation';
 
 	type Props = {
 		slotRef: SlotRef;
@@ -14,12 +15,16 @@
 
 	const game = getGameContext();
 	const { interaction, inventory } = game;
-	const { dragOrigin } = $derived(interaction);
+
 	const highlightHoverSlot = $derived(interaction.highlightHoverSlot(slotRef));
 
 	const storedItem = $derived(inventory.getItem(slotRef));
-	const dragOriginSlot = $derived(dragOrigin?.item === storedItem?.item);
+
 	const selectedItem = $derived(inventory.isSelected(storedItem?.item?.uid ?? ''));
+
+	const itemUid = $derived(storedItem?.item?.uid ?? '');
+
+	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
 
 	const validSlot = $derived(
 		interaction.canAccept({
@@ -27,12 +32,14 @@
 			item: storedItem?.item ?? null
 		})
 	);
+
+	// const validSlot = $derived(canDrop(interaction.dragPayload.storedItem, interaction.dropTarget));
 </script>
 
 <div class="{className}  relative rounded-lg">
 	{@render gradientBorder()}
 	<div class="relative z-20 h-full w-full p-[3.5px]">
-		{#if storedItem && !dragOriginSlot}
+		{#if storedItem && !isDraggingThisItem}
 			<ItemSlot {storedItem} {selectedItem} className="h-full w-full" />
 		{:else}
 			<EmptySlot {slotRef} {placeholder} className="h-full w-full" />
@@ -50,7 +57,7 @@
 {/snippet}
 
 {#snippet invalidIcon()}
-	{#if dragOrigin && !validSlot}
+	{#if !validSlot}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>

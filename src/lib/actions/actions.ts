@@ -3,19 +3,19 @@ import type { DropTarget, StoredItem, SlotRef, InstanceItem } from '$lib/types';
 
 export function droppable(dropTarget: DropTarget) {
 	return (node: HTMLElement) => {
-		const game = getGameContext();
+		const { interaction } = getGameContext();
 		const handleEnter = (e: PointerEvent) => {
 			e.stopPropagation();
 			e.preventDefault();
-			game.interaction.setDropTarget(dropTarget);
+			interaction.setDropTarget(dropTarget);
 		};
-		const handleLeave = () => game.interaction.clearDropTarget();
+		const handleLeave = () => interaction.clearDropTarget();
 		node.addEventListener('pointerover', handleEnter);
 		node.addEventListener('pointerleave', handleLeave);
 		return () => {
 			node.removeEventListener('pointerover', handleEnter);
 			node.removeEventListener('pointerleave', handleLeave);
-			game.interaction.clearDropTarget();
+			interaction.clearDropTarget();
 		};
 	};
 }
@@ -23,7 +23,9 @@ export function droppable(dropTarget: DropTarget) {
 export function slotInteractions(storedItem: StoredItem) {
 	return (node: HTMLElement) => {
 		const { interaction } = getGameContext();
-		const onDown = (e: PointerEvent) => interaction.handlePointerDown(storedItem, e, node);
+		const onDown = (e: PointerEvent) =>
+			interaction.startInteraction({ type: 'item', storedItem }, e, node);
+
 		node.addEventListener('pointerdown', onDown);
 		node.style.cursor = 'grab';
 		node.style.touchAction = 'none';
@@ -38,8 +40,10 @@ export function attachmentInteractions(
 ) {
 	return (node: HTMLElement) => {
 		const { interaction } = getGameContext();
-		const onDown = (e: PointerEvent) =>
-			interaction.handleAttachmentPointerDown(weaponSlotRef, attachIndex, attachment, e, node);
+		const payload = { type: 'attachment', weaponSlotRef, attachIndex, item: attachment } as const;
+
+		const onDown = (e: PointerEvent) => interaction.startInteraction(payload, e, node);
+
 		node.addEventListener('pointerdown', onDown);
 		node.style.cursor = 'grab';
 		node.style.touchAction = 'none';

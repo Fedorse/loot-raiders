@@ -7,21 +7,30 @@ import type { DropTarget, SlotRef, StoredItem, AttachmentRef, InstanceItem } fro
 const DRAG_THRESHOLD = 5;
 const DOUBLE_CLICK_DELAY = 300;
 
+type InteractionStatus = 'idle' | 'pressing' | 'dragging';
+
+type DragPayload =
+	| { type: 'item'; storedItem: StoredItem }
+	| {
+			type: 'attachment';
+			weaponSlotRef: SlotRef;
+			attachIndex: number;
+			item: InstanceItem;
+	  };
+
 export class Interaction {
 	private inventory: Inventory;
+
+	status = $state<InteractionStatus>('idle');
+	dragPayload = $state<DragPayload | null>(null);
+
 	isValidDrop = $state(false);
-	dragOrigin = $state<StoredItem | null>(null);
-	attachmentOrigin = $state<AttachmentRef | null>(null);
 	dropTarget = $state<DropTarget | null>(null);
 	pointer = $state({ x: 0, y: 0 });
 	offset = $state({ x: 0, y: 0 });
 
-	private pending: {
-		storedItem: StoredItem;
-		startX: number;
-		startY: number;
-		node: HTMLElement;
-	} | null = null;
+	private startPos = { x: 0, y: 0 };
+	private dragNode: HTMLElement | null = null;
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
@@ -29,56 +38,138 @@ export class Interaction {
 		this.inventory = inventory;
 	}
 
-	handlePointerDown(storedItem: StoredItem, e: PointerEvent, node: HTMLElement) {
+	startInteraction(payload: DragPayload, e: PointerEvent, node: HTMLElement) {
 		if (e.button !== 0) return;
-		if (this.pending || this.dragOrigin) return;
+		if (this.status !== 'idle') return;
 		e.stopPropagation();
 		e.preventDefault();
 
-		this.pending = { storedItem, startX: e.clientX, startY: e.clientY, node };
+		this.status = 'pressing';
+		this.dragPayload = payload;
+		this.startPos = { x: e.clientX, y: e.clientY };
+		this.dragNode = node;
 
 		window.addEventListener('pointermove', this.handlePointerMove);
 		window.addEventListener('pointerup', this.handlePointerUp);
 	}
 
-	handleAttachmentPointerDown(
-		weaponSlotRef: SlotRef,
-		attachIndex: number,
-		attachment: InstanceItem,
-		e: PointerEvent,
-		node: HTMLElement
-	) {
-		if (e.button !== 0) return;
-		if (this.pending || this.dragOrigin) return;
-		e.stopPropagation();
-		e.preventDefault();
+	private handlePointerMove = (e: PointerEvent) => {
+		if (this.status === 'pressing') {
+			this.checkDragThreshold(e);
+		} else if (this.status === 'dragging') {
+			this.updatePointerPosition(e);
+		}
+	};
+	private handlePointerUp = (e: PointerEvent) => {
+		if (this.status === 'pressing') {
+			this.handleClick(e);
+		} else if (this.status === 'dragging') {
+			this.handleDropAction();
+		}
+		this.reset();
+	};
 
-		this.pending = {
-			storedItem: { storage: weaponSlotRef, item: attachment },
-			startX: e.clientX,
-			startY: e.clientY,
-			node
-		};
-		this.attachmentOrigin = { weaponSlotRef, attachIndex };
+	private checkDragThreshold(e: PointerEvent) {
+		const dx = e.clientX - this.startPos.x;
+		const dy = e.clientY - this.startPos.y;
+		const distance = Math.sqrt(dx * dx + dy * dy);
 
-		window.addEventListener('pointermove', this.handlePointerMove);
-		window.addEventListener('pointerup', this.handlePointerUp);
+		if (distance > DRAG_THRESHOLD) {
+			this.beginDrag(e);
+		}
+	}
+	private updatePointerPosition(e: PointerEvent) {
+		this.pointer = { x: e.clientX, y: e.clientY };
+	}
+	private handleDropAction() {
+		if (!this.isValidDrop || !this.dropTarget || !this.dragPayload) return;
+
+		if (this.dragPayload.type === 'attachment') {
+			this.inventory.handleAttachmentDrop(
+				this.dragPayload.weaponSlotRef,
+				this.dragPayload.attachIndex,
+				this.dropTarget
+			);
+		} else {
+			this.inventory.handleDrop(this.dragPayload.storedItem, this.dropTarget);
+		}
 	}
 
 	highlightHoverSlot(slotRef: SlotRef) {
-		if (!this.dropTarget) return false;
-		return isEqual(this.dropTarget.storage, slotRef);
+		return this.dropTarget ? isEqual(this.dropTarget.storage, slotRef) : false;
 	}
 
+	private beginDrag(e: PointerEvent) {
+		this.status = 'dragging';
+		const rect = this.dragNode!.getBoundingClientRect();
+
+		this.pointer = { x: e.clientX, y: e.clientY };
+		this.offset = {
+			x: (e.clientX - rect.left) / rect.width,
+			y: (e.clientY - rect.top) / rect.height
+		};
+	}
+
+	private handleClick(e: PointerEvent) {
+		if (this.dragPayload?.type !== 'item') return;
+
+		const itemUid = this.dragPayload.storedItem.item.uid;
+
+		if (e.altKey) return;
+		if (e.shiftKey) {
+			this.inventory.toggleSelectionItem(itemUid);
+			return;
+		}
+
+		// Логика двойного клика
+		const now = Date.now();
+		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === itemUid;
+
+		if (isDouble) {
+			this.inventory.quickMove(this.dragPayload.storedItem);
+			this.lastClickTime = 0;
+			this.lastClickUid = '';
+		} else {
+			this.inventory.selectSingleItem(itemUid);
+			this.lastClickTime = now;
+			this.lastClickUid = itemUid;
+		}
+	}
 	setDropTarget(dropTarget: DropTarget) {
 		this.dropTarget = dropTarget;
-		this.isValidDrop = this.canAccept(dropTarget);
+
+		if (!this.dragPayload) {
+			this.isValidDrop = false;
+			return;
+		}
+
+		if (this.dragPayload.type === 'attachment') {
+			this.isValidDrop = true;
+		} else {
+			this.isValidDrop = canDrop(this.dragPayload.storedItem, dropTarget);
+		}
+	}
+
+	get draggedItem(): InstanceItem | null {
+		if (this.status !== 'dragging' || !this.dragPayload) return null;
+		return this.dragPayload.type === 'item'
+			? this.dragPayload.storedItem.item
+			: this.dragPayload.item;
+	}
+
+	isDraggingUid(uid: string): boolean {
+		return this.status === 'dragging' && this.draggedItem?.uid === uid;
 	}
 
 	canAccept(dropTarget: DropTarget): boolean {
-		if (!this.dragOrigin) return false;
-		if (this.attachmentOrigin) return true;
-		return canDrop(this.dragOrigin, dropTarget);
+		// Если мы прямо сейчас ничего не тащим, скрываем все крестики
+		if (this.status !== 'dragging' || !this.dragPayload) return true;
+
+		// Если тащим аттачмент — разрешаем (либо тут твоя логика для аттачментов)
+		if (this.dragPayload.type === 'attachment') return true;
+
+		// Проверяем через твою функцию валидации
+		return canDrop(this.dragPayload.storedItem, dropTarget);
 	}
 
 	clearDropTarget() {
@@ -86,104 +177,13 @@ export class Interaction {
 		this.isValidDrop = false;
 	}
 
-	private handlePointerMove = (e: PointerEvent) => {
-		if (this.pending) {
-			const dx = e.clientX - this.pending.startX;
-			const dy = e.clientY - this.pending.startY;
-			const distance = Math.sqrt(dx * dx + dy * dy);
-
-			if (distance > DRAG_THRESHOLD) {
-				this.beginDrag(e);
-			}
-			return;
-		}
-
-		if (this.dragOrigin) {
-			this.pointer = { x: e.clientX, y: e.clientY };
-		}
-	};
-
-	private handlePointerUp = (e: PointerEvent) => {
-		if (this.pending) {
-			if (!this.attachmentOrigin) {
-				this.resolveClick(this.pending.storedItem, e);
-			}
-			this.pending = null;
-			this.attachmentOrigin = null;
-			this.removeWindowListeners();
-			return;
-		}
-
-		if (this.dragOrigin) {
-			this.endDrag();
-		}
-	};
-
-	private beginDrag(e: PointerEvent) {
-		const { storedItem, node } = this.pending!;
-		const rect = node.getBoundingClientRect();
-
-		this.dragOrigin = storedItem;
-		this.pointer = { x: e.clientX, y: e.clientY };
-		this.offset = {
-			x: (e.clientX - rect.left) / rect.width,
-			y: (e.clientY - rect.top) / rect.height
-		};
-
-		this.pending = null;
-	}
-
-	private resolveClick(storedItem: StoredItem, e: PointerEvent) {
-		const uid = storedItem.item.uid;
-
-		if (e.altKey) {
-			return;
-		}
-
-		if (e.shiftKey) {
-			this.inventory.toggleSelectionItem(uid);
-			return;
-		}
-
-		const now = Date.now();
-		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === uid;
-
-		if (isDouble) {
-			this.inventory.quickMove(storedItem);
-			this.lastClickTime = 0;
-			this.lastClickUid = '';
-		} else {
-			this.inventory.selectSingleItem(uid);
-			this.lastClickTime = now;
-			this.lastClickUid = uid;
-		}
-	}
-
-	private endDrag() {
-		if (this.isValidDrop && this.dragOrigin != null && this.dropTarget != null) {
-			if (this.attachmentOrigin) {
-				this.inventory.handleAttachmentDrop(
-					this.attachmentOrigin.weaponSlotRef,
-					this.attachmentOrigin.attachIndex,
-					this.dropTarget
-				);
-			} else {
-				this.inventory.handleDrop(this.dragOrigin, this.dropTarget);
-			}
-		}
-		this.reset();
-	}
-
 	private reset() {
-		this.dragOrigin = null;
-		this.attachmentOrigin = null;
+		this.status = 'idle';
+		this.dragPayload = null;
+		this.dragNode = null;
 		this.dropTarget = null;
 		this.isValidDrop = false;
-		this.pending = null;
-		this.removeWindowListeners();
-	}
 
-	private removeWindowListeners() {
 		window.removeEventListener('pointermove', this.handlePointerMove);
 		window.removeEventListener('pointerup', this.handlePointerUp);
 	}

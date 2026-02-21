@@ -16,7 +16,8 @@
 	let { weaponSlotRef, attachIndex, attachment, placeholder, weaponItem }: Props = $props();
 
 	const { interaction } = getGameContext();
-	const isDragOrigin = $derived(interaction.dragOrigin?.item === attachment && attachment !== null);
+	const itemUid = $derived(attachment?.uid ?? '');
+	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
 
 	const dropTarget = $derived({
 		storage: weaponSlotRef,
@@ -27,7 +28,7 @@
 	const style = $derived(def ? getRarityStyle(def.rarity) : null);
 </script>
 
-{#if attachment && def && style && !isDragOrigin}
+{#if attachment && def && style && !isDraggingThisItem}
 	<div
 		class="z-20 aspect-square size-8"
 		{@attach droppable(dropTarget)}
@@ -37,8 +38,9 @@
 			class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 		>
 			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-[#0f111a]">
-				<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-60 blur-xl {style.glow}">
-				</div>
+				<div
+					class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-60 blur-xl {style.glow}"
+				></div>
 				<div class="relative min-h-0 flex-1 items-center justify-center">
 					<img
 						src={def.image}
