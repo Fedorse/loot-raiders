@@ -1,7 +1,8 @@
-import { canDrop, canDropAttachment, canDropSplit } from '$lib/store/inventory-validation';
+// import { canDrop, canDropAttachment, canDropSplit } from '$lib/store/inventory-validation';
 import { getDef } from '$lib/config/items';
 import { isEqual } from 'es-toolkit';
 import type { Inventory } from './inventory.svelte';
+import { validateDrop } from '$lib/store/inventory-validation';
 
 import type { DropTarget, SlotRef, InstanceItem, DragPayload } from '$lib/types';
 
@@ -142,18 +143,7 @@ export class Interaction {
 			return;
 		}
 
-		if (this.dragPayload.source === 'split_slot') {
-			// Создаем виртуальный предмет для валидации
-			const virtualSplitItem = {
-				...this.dragPayload.storedItem.item,
-				count: this.dragPayload.splitCount
-			};
-			this.isValidDrop = canDropSplit(virtualSplitItem, dropTarget);
-		} else if (this.dragPayload.source === 'weapon_attachment') {
-			this.isValidDrop = canDropAttachment(this.dragPayload.item, dropTarget);
-		} else {
-			this.isValidDrop = canDrop(this.dragPayload.storedItem, dropTarget);
-		}
+		this.isValidDrop = validateDrop(this.dragPayload, dropTarget);
 	}
 
 	get draggedItem(): InstanceItem | null {
@@ -165,34 +155,60 @@ export class Interaction {
 				...this.dragPayload.storedItem.item,
 				count: this.dragPayload.splitCount
 			};
+		} else if (this.dragPayload.source === 'weapon_attachment') {
+			return this.dragPayload.item;
+		} else {
+			return this.dragPayload.storedItem.item;
 		}
-
-		return this.dragPayload.source === 'inventory_slot'
-			? this.dragPayload.storedItem.item
-			: this.dragPayload.item;
 	}
 
 	isDraggingUid(uid: string): boolean {
 		if (this.status !== 'dragging' || !this.dragPayload) return false;
-		// Если мы сплитим, оригинальный слот НЕ ДОЛЖЕН пропадать из инвентаря
+
 		if (this.dragPayload.source === 'split_slot') return false;
 
 		return this.draggedItem?.uid === uid;
 	}
 
-	canAccept(dropTarget: DropTarget): boolean {
-		if (this.status !== 'dragging' || !this.dragPayload) return true;
-		if (this.dragPayload.source === 'weapon_attachment') return true;
+	shouldShowInvalidHint(dropTarget: DropTarget): boolean {
+		if (this.status !== 'dragging' || !this.dragPayload) return false;
+
+		// 2. Спрашиваем инвентарь: валиден ли слот?
+		const isValid = this.inventory.validateDrop(this.dragPayload, dropTarget);
+
+		// Если слот ВАЛИДЕН (можно бросить) — крестик точно НЕ нужен
+		if (isValid) return false;
 
 		if (this.dragPayload.source === 'split_slot') {
-			const virtualSplitItem = {
-				...this.dragPayload.storedItem.item,
-				count: this.dragPayload.splitCount
-			};
-			return canDropSplit(virtualSplitItem, dropTarget);
+			const targetStorageId = dropTarget.storage.storageId;
+			if (targetStorageId === 'lootBack' || targetStorageId === 'backpack') return false;
+			return true;
 		}
 
-		return canDrop(this.dragPayload.storedItem, dropTarget);
+		// UX-Правило 2: Если тащим оружие прямо из слота 'weapon' — скрываем крестики
+		if (this.dragPayload.source === 'inventory_slot') {
+			const sourceStorageId = this.dragPayload.storedItem.storage.storageId;
+
+			if (
+				(sourceStorageId === 'weapon' && dropTarget.storage.storageId === 'backpack') ||
+				dropTarget.storage.storageId === 'lootBack'
+			)
+				return false;
+
+			return true;
+		}
+
+		// UX-Правило 3: При снятии аттачмента крестики нужны ТОЛЬКО на слотах экипировки
+		if (this.dragPayload.source === 'weapon_attachment') {
+			const targetStorageId = dropTarget.storage.storageId;
+			// Скрываем крестики в рюкзаках
+			if (targetStorageId === 'backpack' || targetStorageId === 'lootBack') return false;
+			// На weapon, shield, augment — показываем
+			return true;
+		}
+
+		// Дефолт: для всех остальных невалидных случаев показываем крестик
+		return true;
 	}
 
 	getDisplayCount(item: InstanceItem): number {

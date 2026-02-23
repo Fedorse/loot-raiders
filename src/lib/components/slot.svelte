@@ -24,8 +24,8 @@
 
 	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
 
-	const validSlot = $derived(
-		interaction.canAccept({
+	const showInvalidHint = $derived(
+		interaction.shouldShowInvalidHint({
 			storage: slotRef,
 			item: storedItem?.item ?? null
 		})
@@ -53,7 +53,7 @@
 {/snippet}
 
 {#snippet invalidIcon()}
-	{#if !validSlot}
+	{#if showInvalidHint}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
 			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>
