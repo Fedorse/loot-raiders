@@ -3,7 +3,6 @@
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
 	import type { SlotRef } from '$lib/types';
-	import { canDrop } from '$lib/store/inventory-validation';
 
 	type Props = {
 		slotRef: SlotRef;
@@ -13,16 +12,15 @@
 
 	let { slotRef, class: className = '', placeholder }: Props = $props();
 
-	const game = getGameContext();
-	const { interaction, inventory } = game;
+	const { interaction, inventory } = getGameContext();
 
 	const highlightHoverSlot = $derived(interaction.highlightHoverSlot(slotRef));
 
 	const storedItem = $derived(inventory.getItem(slotRef));
 
-	const selectedItem = $derived(inventory.isSelected(storedItem?.item?.uid ?? ''));
-
 	const itemUid = $derived(storedItem?.item?.uid ?? '');
+
+	const selectedItem = $derived(inventory.isSelected(itemUid));
 
 	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
 
@@ -32,8 +30,6 @@
 			item: storedItem?.item ?? null
 		})
 	);
-
-	// const validSlot = $derived(canDrop(interaction.dragPayload.storedItem, interaction.dropTarget));
 </script>
 
 <div class="{className}  relative rounded-lg">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
+	import { getGameContext } from '$lib/store/game.svelte';
 	import type { InstanceItem } from '$lib/types';
 
 	type Props = {
@@ -11,9 +12,12 @@
 
 	let { item, className = 'h-20 w-20', selected }: Props = $props();
 
+	const { interaction } = getGameContext();
+
 	const def = $derived(getDef(item.defId));
 	const style = $derived(getRarityStyle(def.rarity));
 	const hasAttachments = $derived(item.attachments?.some((a) => a !== null) ?? false);
+	const displayCount = $derived(interaction.getDisplayCount(item));
 </script>
 
 <div class="{className} group">
@@ -69,13 +73,13 @@
 			<div class="text-white/70">
 				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
-			{#if item.count > 1}
+			{#if displayCount > 1}
 				<div
 					class="flex items-baseline items-center gap-0.5 text-xs leading-none font-medium text-white"
 				>
 					<span class="text-[9px]">x</span>
 					<span class="font-sans text-xs tracking-[-0.05em]">
-						{item.count}
+						{displayCount}
 					</span>
 				</div>
 			{/if}

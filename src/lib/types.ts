@@ -16,6 +16,11 @@ export type DragPayload =
 			source: 'weapon_attachment';
 			attachmentRef: AttachmentRef;
 			item: InstanceItem;
+	  }
+	| {
+			source: 'split_slot';
+			storedItem: StoredItem;
+			splitCount: number;
 	  };
 
 // ---- Attachment drag reference ----

@@ -12,7 +12,7 @@
 		selected: boolean;
 	};
 
-	let { item, className = 'h-40', weaponSlotRef, selected }: Props = $props();
+	let { item, className = 'h-40', weaponSlotRef }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
 	const style = $derived(getRarityStyle(def.rarity));

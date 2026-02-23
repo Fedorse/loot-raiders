@@ -16,15 +16,15 @@
 </script>
 
 <!-- debug -->
-{#if debugOpen}
-	{#if interaction.dragOrigin}
+<!-- {#if debugOpen}
+	{#if interaction.dragPayload}
 		<pre
 			class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
 {JSON.stringify(
 				{
-					dragOrigin: interaction.dragOrigin && {
-						storage: interaction.dragOrigin.storage,
-						item: interaction.dragOrigin.item.defId
+					dragOrigin: interaction.dragPayload && {
+						storage: interaction.dragPayload,
+						item: interaction.dragPayload
 					},
 					dropTarget: interaction.dropTarget && {
 						storage: interaction.dropTarget.storage,
@@ -38,12 +38,12 @@
 			)}
 	</pre>
 	{/if}
-{/if}
+{/if} -->
 
 <div class="flex h-full w-full flex-col items-center gap-6 px-5 py-16">
 	<div class="flex items-start justify-center gap-4">
 		<div
-			class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/80 px-4 pt-4 pb-12 backdrop-blur-xs"
+			class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/50 px-4 pt-4 pb-12 backdrop-blur-xs"
 		>
 			<div class="flex items-center gap-4">
 				<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
@@ -57,7 +57,7 @@
 			</div>
 		</div>
 		<div
-			class="z-10 flex flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/80 px-4 py-4 backdrop-blur-xs"
+			class="z-10 flex flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/50 px-4 py-4 backdrop-blur-xs"
 		>
 			<div class="flex items-center">
 				<h2 class="text-base font-bold uppercase">loadout</h2>
