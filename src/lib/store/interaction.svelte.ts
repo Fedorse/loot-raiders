@@ -1,4 +1,3 @@
-// import { canDrop, canDropAttachment, canDropSplit } from '$lib/store/inventory-validation';
 import { getDef } from '$lib/config/items';
 import { isEqual } from 'es-toolkit';
 import type { Inventory } from './inventory.svelte';
@@ -17,10 +16,12 @@ export class Interaction {
 	status = $state<InteractionStatus>('idle');
 	dragPayload = $state<DragPayload | null>(null);
 
-	isValidDrop = $state(false);
 	dropTarget = $state<DropTarget | null>(null);
 	pointer = $state({ x: 0, y: 0 });
 	offset = $state({ x: 0, y: 0 });
+	isValidDrop = $derived(
+		this.dragPayload && this.dropTarget ? validateDrop(this.dragPayload, this.dropTarget) : false
+	);
 
 	private startPos = { x: 0, y: 0 };
 	private dragNode: HTMLElement | null = null;
@@ -137,13 +138,6 @@ export class Interaction {
 	}
 	setDropTarget(dropTarget: DropTarget) {
 		this.dropTarget = dropTarget;
-
-		if (!this.dragPayload) {
-			this.isValidDrop = false;
-			return;
-		}
-
-		this.isValidDrop = validateDrop(this.dragPayload, dropTarget);
 	}
 
 	get draggedItem(): InstanceItem | null {
@@ -190,8 +184,8 @@ export class Interaction {
 			const sourceStorageId = this.dragPayload.storedItem.storage.storageId;
 
 			if (
-				(sourceStorageId === 'weapon' && dropTarget.storage.storageId === 'backpack') ||
-				dropTarget.storage.storageId === 'lootBack'
+				sourceStorageId === 'weapon' &&
+				(dropTarget.storage.storageId === 'backpack' || dropTarget.storage.storageId === 'lootBack')
 			)
 				return false;
 
@@ -228,12 +222,10 @@ export class Interaction {
 	}
 
 	private reset() {
-		// Никакого сложного rollback'а! Все чисто.
 		this.status = 'idle';
 		this.dragPayload = null;
 		this.dragNode = null;
 		this.dropTarget = null;
-		this.isValidDrop = false;
 
 		window.removeEventListener('pointermove', this.handlePointerMove);
 		window.removeEventListener('pointerup', this.handlePointerUp);

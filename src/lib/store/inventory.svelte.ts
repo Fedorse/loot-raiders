@@ -1,4 +1,3 @@
-// lib/store/inventory.svelte.ts
 import { isEqual } from 'es-toolkit';
 import { getStorageConfig } from '$lib/config/storages';
 import { SvelteSet } from 'svelte/reactivity';
@@ -46,7 +45,7 @@ export class Inventory {
 
 	#handleDraggedInventoryItem(dragItem: StoredItem, dropTarget: DropTarget) {
 		const action = getDropActionType(dragItem.item, dropTarget);
-
+		if (isEqual(dragItem.storage, dropTarget.storage)) return;
 		switch (action) {
 			case 'stack':
 				this.#executeStack(dragItem, dropTarget);
@@ -196,12 +195,6 @@ export class Inventory {
 
 	insertItem(slotRef: SlotRef, item: InstanceItem): void {
 		this.items.push({ storage: slotRef, item });
-	}
-
-	updateItem(slotRef: SlotRef, newItem: InstanceItem): void {
-		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
-		if (idx === -1) return;
-		this.items[idx].item = newItem;
 	}
 
 	removeItem(slotRef: SlotRef): void {
