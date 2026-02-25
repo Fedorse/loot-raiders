@@ -74,7 +74,7 @@
 				class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
 			>
 				{#if placeholder}
-					<span class="text-[8px] text-white/30">{placeholder}</span>
+					<img src={placeholder} alt="mod slot" class="h-[90%] w-[90%] object-contain opacity-20" />
 				{/if}
 			</div>
 		</div>

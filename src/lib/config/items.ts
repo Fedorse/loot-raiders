@@ -9,15 +9,16 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 5,
 		price: 100,
 		image: '/assets/weapons/kettle.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/ammo_type_assets/light_ammo.png',
+		gradeIcon: '/assets/ui/two.png',
 		recycling: [
 			{ itemId: 'res_arc_core', amount: 1, name: 'ARC Core' },
 			{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }
 		],
 		attachmentSlots: [
-			{ type: 'muzzle', placeholder: 'MZ' },
-			{ type: 'underbarrel', placeholder: 'UB' },
-			{ type: 'magazine', placeholder: 'MAG' }
+			{ type: 'muzzle', placeholder: '/assets/mod_slot_assets/muzzle.png' },
+			{ type: 'underbarrel', placeholder: '/assets/mod_slot_assets/underbarrel.png' },
+			{ type: 'magazine', placeholder: '/assets/mod_slot_assets/light_magazine.png' }
 		]
 	},
 	wpn_bobcat: {
@@ -28,14 +29,15 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 10,
 		price: 200,
 		image: '/assets/weapons/bobcat.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/ammo_type_assets/medium_ammo.png',
+		gradeIcon: '/assets/ui/four.png',
 		recycling: [
 			{ itemId: 'res_ind_charger', amount: 4, name: 'Industrial Charger' },
 			{ itemId: 'res_toaster', amount: 1, name: 'Toaster' }
 		],
 		attachmentSlots: [
-			{ type: 'stock', placeholder: 'OPT' },
-			{ type: 'muzzle', placeholder: 'MAG' }
+			{ type: 'stock', placeholder: '/assets/mod_slot_assets/stock.png' },
+			{ type: 'muzzle', placeholder: '/assets/mod_slot_assets/muzzle.png' }
 		]
 	},
 
@@ -45,7 +47,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		type: 'loot',
 		rarity: 'common',
 		image: '/assets/loot/arcCircuitry.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/category_assets/recyclable.png',
 		price: 300,
 		weight: 1,
 		maxStack: 12,
@@ -57,7 +59,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		type: 'loot',
 		rarity: 'rare',
 		image: '/assets/loot/toaster.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/category_assets/recyclable.png',
 		price: 50,
 		weight: 2,
 		maxStack: 3,
@@ -69,7 +71,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		type: 'loot',
 		rarity: 'epic',
 		image: '/assets/loot/bastionCell.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/category_assets/refined_material.png',
 		price: 500,
 		weight: 0.5,
 		maxStack: 15
@@ -80,7 +82,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		type: 'loot',
 		rarity: 'uncommon',
 		image: '/assets/loot/catBed.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/category_assets/misc.png',
 		price: 150,
 		weight: 1,
 		maxStack: 5
@@ -94,7 +96,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 2,
 		price: 300,
 		image: '/assets/equip/Tactical_Mk_1.png',
-		categoryIcon: '/assets/cattegory/test.png'
+		categoryIcon: '/assets/category_assets/augment.png'
 	},
 	eqp_light_shield: {
 		id: 'eqp_light_shield',
@@ -102,7 +104,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		type: 'shield',
 		rarity: 'uncommon',
 		image: '/assets/equip/shield-1.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/category_assets/shield.png',
 		weight: 5,
 		price: 400,
 		recycling: [{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }]
@@ -115,7 +117,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentKind: 'muzzle',
 		rarity: 'uncommon',
 		image: '/assets/weapons/Compensator_I.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/mod_slot_assets/muzzle.png',
 		weight: 0.5,
 		price: 150,
 		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
@@ -127,7 +129,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentKind: 'stock',
 		rarity: 'common',
 		image: '/assets/weapons/Stable_Stock_I.png',
-		categoryIcon: '/assets/cattegory/test.png',
+		categoryIcon: '/assets/mod_slot_assets/stock.png',
 		weight: 1,
 		price: 150,
 		recycling: [{ itemId: 'res_metal_parts', amount: 3, name: 'Metal Parts' }]

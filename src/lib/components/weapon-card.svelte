@@ -1,5 +1,4 @@
 <script lang="ts">
-	import TierIcon from '$lib/components/tier-icon.svelte';
 	import AttachmentSlot from '$lib/components/attachment-slot.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
@@ -75,9 +74,9 @@
 				<p class="tabular-nums">{30}</p>
 			</div>
 		</div>
-		<div class="text-white/70">
-			<TierIcon tier={(def as { tier?: number }).tier ?? 3} className="size-7" />
-		</div>
+		{#if def.gradeIcon}
+			<img src={def.gradeIcon} alt="grade" class="size-7 object-contain" />
+		{/if}
 	</div>
 {/snippet}
 

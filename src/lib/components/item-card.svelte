@@ -61,13 +61,16 @@
 {#snippet footer()}
 	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5">
 		{#if def.type === 'weapon'}
-			<div class="text-white/70">
-				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
-			</div>
+			<img src={def.categoryIcon} alt="ammo type" class="size-4 object-contain" />
 			{#if hasAttachments}
-				<div>
-					<img src={def.categoryIcon} alt="category" class="size-4 object-contain opacity-50" />
-				</div>
+				<img
+					src="/assets/mod_slot_assets/weapon-mod.png"
+					alt="modded"
+					class="size-4 object-contain opacity-50"
+				/>
+			{/if}
+			{#if def.gradeIcon}
+				<img src={def.gradeIcon} alt="grade" class="size-4 object-contain" />
 			{/if}
 		{:else}
 			<div class="text-white/70">
