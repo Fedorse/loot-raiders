@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Slot from '$lib/components/slot.svelte';
 	import DragLayer from '$lib/components/drag-layer.svelte';
+	import ContextMenu from '$lib/components/context-menu.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
@@ -92,6 +93,7 @@
 </div>
 
 <DragLayer />
+<ContextMenu />
 
 <style>
 	@reference "tailwindcss";

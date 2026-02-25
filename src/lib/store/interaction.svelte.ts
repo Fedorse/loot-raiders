@@ -1,6 +1,7 @@
 import { getDef } from '$lib/config/items';
 import { isEqual } from 'es-toolkit';
 import type { Inventory } from './inventory.svelte';
+import type { Overlay } from './overlay.svelte';
 import { validateDrop } from '$lib/store/inventory-validation';
 
 import type { DropTarget, SlotRef, InstanceItem, DragPayload } from '$lib/types';
@@ -12,6 +13,7 @@ type InteractionStatus = 'idle' | 'pressing' | 'dragging';
 
 export class Interaction {
 	private inventory: Inventory;
+	private overlay: Overlay;
 
 	status = $state<InteractionStatus>('idle');
 	dragPayload = $state<DragPayload | null>(null);
@@ -29,8 +31,9 @@ export class Interaction {
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	constructor(inventory: Inventory) {
+	constructor(inventory: Inventory, overlay: Overlay) {
 		this.inventory = inventory;
+		this.overlay = overlay;
 	}
 
 	startInteraction(payload: DragPayload, e: PointerEvent, node: HTMLElement) {
@@ -87,6 +90,7 @@ export class Interaction {
 	}
 
 	private beginDrag(e: PointerEvent) {
+		this.overlay.closeAll();
 		this.status = 'dragging';
 		const rect = this.dragNode!.getBoundingClientRect();
 

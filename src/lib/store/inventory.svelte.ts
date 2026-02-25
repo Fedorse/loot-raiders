@@ -247,6 +247,25 @@ export class Inventory {
 		return attachment;
 	}
 
+	splitStack(storedItem: StoredItem): boolean {
+		const def = getDef(storedItem.item.defId);
+		if (!def.maxStack || storedItem.item.count <= 1) return false;
+
+		const emptySlot = this.getFirstEmptySlotRef(storedItem.storage.storageId);
+		if (!emptySlot) return false;
+
+		const splitCount = Math.floor(storedItem.item.count / 2);
+		storedItem.item.count -= splitCount;
+
+		this.insertItem(emptySlot, {
+			uid: crypto.randomUUID(),
+			defId: storedItem.item.defId,
+			count: splitCount
+		});
+
+		return true;
+	}
+
 	quickMove(storedItem: StoredItem): boolean {
 		const config = getStorageConfig(storedItem.storage.storageId);
 		const targetId = config?.quickMoveTarget;
