@@ -7,8 +7,6 @@
 
 	import type { StoredItem } from '$lib/types';
 
-	const { overlay } = getGameContext();
-
 	type Props = {
 		storedItem: StoredItem;
 		className?: string;
@@ -32,10 +30,6 @@
 	class="{className} h-full w-full"
 	{@attach droppable(dropTarget)}
 	{@attach slotInteractions(storedItem)}
-	oncontextmenu={(e) => {
-		e.preventDefault();
-		overlay.openContextMenu(e.clientX, e.clientY, storedItem);
-	}}
 >
 	{#if isWeapon && storedItem.storage.storageId === 'weapon'}
 		<WeaponCard {item} className="h-full w-full" weaponSlotRef={storage} selected={selectedItem} />

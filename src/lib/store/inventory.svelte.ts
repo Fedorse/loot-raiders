@@ -291,6 +291,55 @@ export class Inventory {
 		return item;
 	}
 
+	recycleItem(storedItem: StoredItem): boolean {
+		const def = getDef(storedItem.item.defId);
+		if (!def.recycling) return false;
+
+		const sourceStorageId = storedItem.storage.storageId;
+		const config = getStorageConfig(sourceStorageId);
+		const targetStorageId = config?.quickMoveTarget ?? sourceStorageId;
+
+		const attachments: InstanceItem[] =
+			storedItem.item.attachments?.filter((a): a is InstanceItem => a !== null) ?? [];
+
+		const slotsNeeded = def.recycling.length + attachments.length;
+		const emptySlots = this.#countEmptySlots(targetStorageId);
+		const availableSlots = emptySlots + 1;
+
+		if (slotsNeeded > availableSlots) return false;
+
+		this.removeItem(storedItem.storage);
+
+		for (const att of attachments) {
+			const slot = this.getFirstEmptySlotRef(targetStorageId);
+			if (slot) {
+				this.insertItem(slot, att);
+			}
+		}
+
+		for (const result of def.recycling) {
+			const slot = this.getFirstEmptySlotRef(targetStorageId);
+			if (slot) {
+				this.insertItem(slot, {
+					uid: crypto.randomUUID(),
+					defId: result.itemId,
+					count: result.amount
+				});
+			}
+		}
+		return true;
+	}
+
+	#countEmptySlots(storageId: StorageId): number {
+		const config = getStorageConfig(storageId);
+		if (!config) return 0;
+		let count = 0;
+		for (let i = 0; i < config.size; i++) {
+			if (!this.getItem({ storageId, index: i })) count++;
+		}
+		return count;
+	}
+
 	getFirstEmptySlotRef(storageId: StorageId): SlotRef | null {
 		const config = getStorageConfig(storageId);
 		if (!config) return null;

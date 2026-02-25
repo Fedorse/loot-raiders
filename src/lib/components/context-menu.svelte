@@ -73,12 +73,12 @@
 			Remove
 		</button>
 
-		<!-- TODO: recycle item -->
 		{#if def.recycling?.length}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#e69a00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
+					inventory.recycleItem(menu.storedItem);
 					close();
 				}}
 			>

@@ -12,7 +12,7 @@
 
 	let { slotRef, class: className = '', placeholder }: Props = $props();
 
-	const { interaction, inventory } = getGameContext();
+	const { interaction, inventory, overlay } = getGameContext();
 
 	const highlightHoverSlot = $derived(interaction.highlightHoverSlot(slotRef));
 
@@ -34,7 +34,13 @@
 
 <div class="{className}  relative rounded-lg">
 	{@render gradientBorder()}
-	<div class="relative z-20 h-full w-full p-[3.5px]">
+	<div
+		class="relative z-20 h-full w-full p-[3.5px]"
+		oncontextmenu={(e) => {
+			e.preventDefault();
+			overlay.openContextMenu(e.clientX, e.clientY, storedItem);
+		}}
+	>
 		{#if storedItem && !isDraggingThisItem}
 			<ItemSlot {storedItem} {selectedItem} className="h-full w-full" />
 		{:else}

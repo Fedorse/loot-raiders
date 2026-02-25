@@ -51,7 +51,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 300,
 		weight: 1,
 		maxStack: 12,
-		recycling: [{ itemId: 'res_metal_parts', amount: 1, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 10, name: 'Metal Parts' }]
 	},
 	res_toaster: {
 		id: 'res_toaster',
@@ -86,6 +86,18 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		weight: 1,
 		maxStack: 5
+	},
+
+	res_metal_parts: {
+		id: 'res_metal_parts',
+		name: 'Metal Parts',
+		type: 'loot',
+		rarity: 'common',
+		image: '/assets/loot_assets/metal-parts.png',
+		categoryIcon: '/assets/category_assets/basic_material.png',
+		price: 50,
+		weight: 0.5,
+		maxStack: 50
 	},
 
 	eqp_tactical_mk1: {
