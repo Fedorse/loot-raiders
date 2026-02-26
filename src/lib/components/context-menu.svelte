@@ -2,8 +2,9 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getStorageConfig } from '$lib/config/storages';
+	import { formatLocation } from '$lib/store/debug.svelte';
 
-	const { overlay, inventory } = getGameContext();
+	const { overlay, inventory, debug } = getGameContext();
 	const menu = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
@@ -16,13 +17,14 @@
 />
 
 {#if menu}
-	{@const def = getDef(menu.storedItem.item.defId)}
-	{@const moveTargetId = getStorageConfig(menu.storedItem.storage.storageId)?.quickMoveTarget}
+	{@const def = getDef(menu.slot.item.defId)}
+	{@const moveTargetId =
+		menu.slot.location.type === 'container'
+			? getStorageConfig(menu.slot.location.storageId)?.quickMoveTarget
+			: undefined}
 
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<!-- <div class="fixed inset-0 z-[9998]" oncontextmenu={(e) => e.preventDefault()}></div> -->
 
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="fixed z-[9999] flex w-48 flex-col rounded-sm border border-[#d2ccbc] bg-[#F3EFE0] py-1.5 shadow-xl"
 		style="top: {menu.y}px; left: {menu.x}px;"
@@ -39,7 +41,16 @@
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					inventory.quickMove(menu.storedItem);
+					const from = formatLocation(menu.slot.location);
+					const success = inventory.quickMove(menu.slot.location);
+					if (success) {
+						debug.logAction({
+							action: 'quickMove',
+							itemName: def.name,
+							from,
+							to: moveTargetId ?? 'auto'
+						});
+					}
 					close();
 				}}
 			>
@@ -47,12 +58,22 @@
 			</button>
 		{/if}
 
-		{#if def.maxStack && menu.storedItem.item.count > 1}
+		{#if def.maxStack && menu.slot.item.count > 1}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					inventory.splitStack(menu.storedItem);
+					const from = formatLocation(menu.slot.location);
+					const success = inventory.splitStack(menu.slot.location);
+					if (success) {
+						debug.logAction({
+							action: 'split',
+							itemName: def.name,
+							from,
+							to: from,
+							detail: `half of ${menu.slot.item.count}`
+						});
+					}
 					close();
 				}}
 			>
@@ -66,7 +87,14 @@
 			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 			onpointerdown={(e) => {
 				e.stopPropagation();
-				inventory.removeItem(menu.storedItem.storage);
+				const from = formatLocation(menu.slot.location);
+				debug.logAction({
+					action: 'remove',
+					itemName: def.name,
+					from,
+					to: 'deleted'
+				});
+				inventory.removeItem(menu.slot.location);
 				close();
 			}}
 		>
@@ -78,7 +106,17 @@
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#e69a00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					inventory.recycleItem(menu.storedItem);
+					const from = formatLocation(menu.slot.location);
+					const success = inventory.recycleItem(menu.slot.location);
+					if (success) {
+						debug.logAction({
+							action: 'recycle',
+							itemName: def.name,
+							from,
+							to: from,
+							detail: `${def.recycling!.length} parts`
+						});
+					}
 					close();
 				}}
 			>

@@ -1,209 +1,279 @@
-import { isEqual } from 'es-toolkit';
 import { getStorageConfig } from '$lib/config/storages';
 import { SvelteSet } from 'svelte/reactivity';
 import { getDef } from '$lib/config/items';
-import { getDropActionType, getAttachmentSlotIndex, validateDrop } from './inventory-validation';
+import { getAttachmentSlotIndex } from './inventory-validation';
+import { isEqualLocation } from '$lib/utils';
 
-import type {
-	StoredItem,
-	InstanceItem,
-	SlotRef,
-	StorageId,
-	DropTarget,
-	DragPayload
-} from '$lib/types';
+import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } from '$lib/types';
 
 export class Inventory {
-	items = $state<StoredItem[]>([]);
+	items = $state<OccupiedSlot[]>([]);
 	selectedIds = new SvelteSet<string>();
 
-	backpack = $derived(this.items.filter((i) => i.storage.storageId === 'backpack'));
-	lootBack = $derived(this.items.filter((i) => i.storage.storageId === 'lootBack'));
-	weapon = $derived(this.items.filter((i) => i.storage.storageId === 'weapon'));
+	backpack = $derived(
+		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'backpack')
+	);
+	lootBack = $derived(
+		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'lootBack')
+	);
+	weapon = $derived(
+		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'weapon')
+	);
 
 	constructor() {
 		this.setup();
 	}
 
-	validateDrop(payload: DragPayload, dropTarget: DropTarget): boolean {
-		return validateDrop(payload, dropTarget);
+	// ---- Universal accessors ----
+
+	getItem(loc: ItemLocation): InstanceItem | null {
+		if (loc.type === 'container') {
+			const slot = this.items.find((i) => isEqualLocation(i.location, loc));
+			return slot?.item ?? null;
+		}
+		// attachment: resolve parent, then index into attachments
+		const parent = this.getItem(loc.parentLocation);
+		if (!parent?.attachments) return null;
+		return parent.attachments[loc.attachIndex] ?? null;
 	}
 
-	executeDrop(payload: DragPayload, dropTarget: DropTarget): void {
-		switch (payload.source) {
-			case 'inventory_slot':
-				this.#handleDraggedInventoryItem(payload.storedItem, dropTarget);
-				break;
-			case 'weapon_attachment':
-				this.#handleDraggedAttachment(payload, dropTarget);
-				break;
-			case 'split_slot':
-				this.#handleSplitDrop(payload, dropTarget);
-				break;
+	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
+		if (loc.type === 'container') {
+			if (item === null) {
+				const idx = this.items.findIndex((i) => isEqualLocation(i.location, loc));
+				if (idx !== -1) this.items.splice(idx, 1);
+			} else {
+				const existing = this.items.find((i) => isEqualLocation(i.location, loc));
+				if (existing) {
+					existing.item = item;
+				} else {
+					this.items.push({ location: loc, item });
+				}
+			}
+			return;
+		}
+		// attachment: set on parent's attachments array
+		const parent = this.getItem(loc.parentLocation);
+		if (!parent?.attachments) return;
+		parent.attachments[loc.attachIndex] = item;
+	}
+
+	removeItem(loc: ItemLocation): void {
+		const item = this.getItem(loc);
+		if (item) this.selectedIds.delete(item.uid);
+		this.setItem(loc, null);
+	}
+
+	// ---- Drop operations (called by Interaction) ----
+
+	move(drag: DragState, targetLoc: ItemLocation): void {
+		if (isEqualLocation(drag.sourceLocation, targetLoc)) return;
+
+		if (drag.isSplit) {
+			// Create clone with split count, decrement original
+			const original = this.getItem(drag.sourceLocation);
+			if (!original) return;
+
+			const splitItem: InstanceItem = {
+				uid: crypto.randomUUID(),
+				defId: original.defId,
+				count: drag.item.count
+			};
+			original.count -= drag.item.count;
+			this.setItem(targetLoc, splitItem);
+		} else {
+			const item = this.getItem(drag.sourceLocation);
+			if (!item) return;
+			this.removeItem(drag.sourceLocation);
+			this.setItem(targetLoc, item);
 		}
 	}
 
-	#handleDraggedInventoryItem(dragItem: StoredItem, dropTarget: DropTarget) {
-		const action = getDropActionType(dragItem.item, dropTarget);
-		if (isEqual(dragItem.storage, dropTarget.storage)) return;
-		switch (action) {
-			case 'stack':
-				this.#executeStack(dragItem, dropTarget);
-				break;
-			case 'attach':
-				this.#executeAttachToWeapon(dragItem.storage, dragItem.item, dropTarget);
-				break;
-			case 'swap':
-				this.#executeSwap(dragItem, dropTarget);
-				break;
-			case 'move':
-				this.#executeMove(dragItem.storage, dropTarget.storage);
-				break;
-		}
-	}
+	stack(drag: DragState, targetLoc: ItemLocation): void {
+		const targetItem = this.getItem(targetLoc);
+		if (!targetItem) return;
 
-	#handleSplitDrop(
-		payload: Extract<DragPayload, { source: 'split_slot' }>,
-		dropTarget: DropTarget
-	): void {
-		// Защита от дропа в самого себя
-		if (isEqual(payload.storedItem.storage, dropTarget.storage)) return;
+		const def = getDef(drag.item.defId);
+		const maxStack = def.maxStack!;
+		const total = drag.item.count + targetItem.count;
 
-		const originalStoredItem = this.getItem(payload.storedItem.storage);
-		if (!originalStoredItem) return;
-
-		// Создаем реальный сплит-предмет
-		const splitItem: InstanceItem = {
-			uid: crypto.randomUUID(),
-			defId: originalStoredItem.item.defId,
-			count: payload.splitCount
-		};
-
-		const action = getDropActionType(splitItem, dropTarget);
-
-		if (action === 'stack' && dropTarget.item) {
-			const targetStored = this.getItem(dropTarget.storage);
-			if (!targetStored) return;
-
-			const def = getDef(splitItem.defId);
-			const maxStack = def.maxStack!;
-			const total = splitItem.count + targetStored.item.count;
+		if (drag.isSplit) {
+			const original = this.getItem(drag.sourceLocation);
+			if (!original) return;
 
 			if (total <= maxStack) {
-				targetStored.item.count = total;
-				originalStoredItem.item.count -= payload.splitCount;
+				targetItem.count = total;
+				original.count -= drag.item.count;
 			} else {
-				const diffToMax = maxStack - targetStored.item.count;
-				targetStored.item.count = maxStack;
-				originalStoredItem.item.count -= diffToMax;
+				const diffToMax = maxStack - targetItem.count;
+				targetItem.count = maxStack;
+				original.count -= diffToMax;
 			}
-		} else if (action === 'move') {
-			this.insertItem(dropTarget.storage, splitItem);
-			originalStoredItem.item.count -= payload.splitCount;
-		}
-	}
-
-	#handleDraggedAttachment(
-		payload: Extract<DragPayload, { source: 'weapon_attachment' }>,
-		dropTarget: DropTarget
-	) {
-		const { weaponSlotRef, attachIndex } = payload.attachmentRef;
-
-		const attachment = this.detachFromWeapon(weaponSlotRef, attachIndex);
-		if (!attachment) return;
-
-		const action = getDropActionType(attachment, dropTarget);
-
-		if (action === 'attach' && dropTarget.item) {
-			// Перенос аттачмента с одной пушки на другую
-			this.#executeAttachToWeapon(weaponSlotRef, attachment, dropTarget, attachIndex);
-		} else if (action === 'move') {
-			// Снятие аттачмента в рюкзак
-			this.insertItem(dropTarget.storage, attachment);
 		} else {
-			// Откат, если что-то пошло не так
-			this.attachToWeapon(weaponSlotRef, attachIndex, attachment);
+			if (total <= maxStack) {
+				targetItem.count = total;
+				this.removeItem(drag.sourceLocation);
+			} else {
+				targetItem.count = maxStack;
+				const sourceItem = this.getItem(drag.sourceLocation);
+				if (sourceItem) sourceItem.count = total - maxStack;
+			}
 		}
 	}
 
-	#executeMove(fromSlot: SlotRef, toSlot: SlotRef): void {
-		const item = this.getItem(fromSlot)?.item;
-		if (!item) return;
-		this.removeItem(fromSlot);
-		this.insertItem(toSlot, item);
+	swap(drag: DragState, targetLoc: ItemLocation): void {
+		if (isEqualLocation(drag.sourceLocation, targetLoc)) return;
+		const sourceItem = this.getItem(drag.sourceLocation);
+		const targetItem = this.getItem(targetLoc);
+		if (!sourceItem || !targetItem) return;
+
+		this.removeItem(drag.sourceLocation);
+		this.removeItem(targetLoc);
+		this.setItem(targetLoc, sourceItem);
+		this.setItem(drag.sourceLocation, targetItem);
 	}
 
-	#executeStack(dragItem: StoredItem, dropTarget: DropTarget): void {
-		const targetStored = this.getItem(dropTarget.storage);
-		if (!targetStored) return;
+	attach(drag: DragState, weaponLoc: ItemLocation): void {
+		const weapon = this.getItem(weaponLoc);
+		if (!weapon) return;
 
-		const def = getDef(dragItem.item.defId);
-		const maxStack = def.maxStack!;
-		const total = dragItem.item.count + targetStored.item.count;
-
-		if (total <= maxStack) {
-			targetStored.item.count = total;
-			this.removeItem(dragItem.storage);
-		} else {
-			targetStored.item.count = maxStack;
-			dragItem.item.count = total - maxStack;
-		}
-	}
-
-	#executeSwap(dragItem: StoredItem, dropTarget: DropTarget): void {
-		if (!dropTarget.item) return;
-		this.removeItem(dragItem.storage);
-		this.removeItem(dropTarget.storage);
-
-		this.insertItem(dropTarget.storage, dragItem.item);
-		this.insertItem(dragItem.storage, dropTarget.item);
-	}
-
-	#executeAttachToWeapon(
-		sourceStorageRef: SlotRef,
-		attachmentItem: InstanceItem,
-		dropTarget: DropTarget,
-		originalAttachIndex?: number
-	): void {
-		const targetWeapon = dropTarget.item!;
-		const targetSlotIdx = getAttachmentSlotIndex(attachmentItem, targetWeapon);
+		const targetSlotIdx = getAttachmentSlotIndex(drag.item, weapon);
 		if (targetSlotIdx === -1) return;
 
-		const existingAttachment = targetWeapon.attachments?.[targetSlotIdx] ?? null;
+		const existingAttachment = weapon.attachments?.[targetSlotIdx] ?? null;
 
-		// Если предмет из инвентаря, удаляем его из старого слота
-		if (originalAttachIndex === undefined) {
-			this.removeItem(sourceStorageRef);
+		if (drag.isSplit) return; // Can't attach a split
+
+		// Remove attachment from source
+		const sourceItem = this.getItem(drag.sourceLocation);
+		if (!sourceItem) return;
+
+		// Determine if source was also an attachment (cross-weapon swap)
+		const isSourceAttachment = drag.sourceLocation.type === 'attachment';
+
+		this.removeItem(drag.sourceLocation);
+
+		// Attach new item
+		if (weapon.attachments) {
+			weapon.attachments[targetSlotIdx] = sourceItem;
 		}
 
-		// Надеваем новый
-		this.attachToWeapon(dropTarget.storage, targetSlotIdx, attachmentItem);
-
-		// Возвращаем старый (если был) на освободившееся место
+		// Return existing attachment to source location
 		if (existingAttachment) {
-			if (originalAttachIndex !== undefined) {
-				this.attachToWeapon(sourceStorageRef, originalAttachIndex, existingAttachment);
+			if (isSourceAttachment) {
+				// Swap between weapons: put old attachment back in source attachment slot
+				this.setItem(drag.sourceLocation, existingAttachment);
 			} else {
-				this.insertItem(sourceStorageRef, existingAttachment);
+				// From inventory: return to source container slot
+				this.setItem(drag.sourceLocation, existingAttachment);
 			}
 		}
 	}
 
-	getItem(slotRef: SlotRef): StoredItem | null {
-		return this.items.find((i) => isEqual(i.storage, slotRef)) ?? null;
+	// ---- Context menu operations ----
+
+	quickMove(loc: ItemLocation): boolean {
+		if (loc.type !== 'container') return false;
+		const config = getStorageConfig(loc.storageId);
+		const targetId = config?.quickMoveTarget;
+		if (!targetId) return false;
+		const emptySlot = this.getFirstEmptySlot(targetId);
+		if (!emptySlot) return false;
+
+		const item = this.getItem(loc);
+		if (!item) return false;
+		this.removeItem(loc);
+		this.setItem(emptySlot, item);
+		return true;
 	}
 
-	insertItem(slotRef: SlotRef, item: InstanceItem): void {
-		this.items.push({ storage: slotRef, item });
+	splitStack(loc: ItemLocation): boolean {
+		if (loc.type !== 'container') return false;
+		const item = this.getItem(loc);
+		if (!item) return false;
+
+		const def = getDef(item.defId);
+		if (!def.maxStack || item.count <= 1) return false;
+
+		const emptySlot = this.getFirstEmptySlot(loc.storageId);
+		if (!emptySlot) return false;
+
+		const splitCount = Math.floor(item.count / 2);
+		item.count -= splitCount;
+
+		this.setItem(emptySlot, {
+			uid: crypto.randomUUID(),
+			defId: item.defId,
+			count: splitCount
+		});
+
+		return true;
 	}
 
-	removeItem(slotRef: SlotRef): void {
-		const idx = this.items.findIndex((i) => isEqual(i.storage, slotRef));
-		if (idx !== -1) {
-			const uid = this.items[idx].item.uid;
-			this.selectedIds.delete(uid);
-			this.items.splice(idx, 1);
+	recycleItem(loc: ItemLocation): boolean {
+		if (loc.type !== 'container') return false;
+		const item = this.getItem(loc);
+		if (!item) return false;
+
+		const def = getDef(item.defId);
+		if (!def.recycling) return false;
+
+		const sourceStorageId = loc.storageId;
+		const config = getStorageConfig(sourceStorageId);
+		const targetStorageId = config?.quickMoveTarget ?? sourceStorageId;
+
+		const attachments: InstanceItem[] =
+			item.attachments?.filter((a): a is InstanceItem => a !== null) ?? [];
+
+		const slotsNeeded = def.recycling.length + attachments.length;
+		const emptySlots = this.#countEmptySlots(targetStorageId);
+		const availableSlots = emptySlots + 1;
+
+		if (slotsNeeded > availableSlots) return false;
+
+		this.removeItem(loc);
+
+		for (const att of attachments) {
+			const slot = this.getFirstEmptySlot(targetStorageId);
+			if (slot) this.setItem(slot, att);
 		}
+
+		for (const result of def.recycling) {
+			const slot = this.getFirstEmptySlot(targetStorageId);
+			if (slot) {
+				this.setItem(slot, {
+					uid: crypto.randomUUID(),
+					defId: result.itemId,
+					count: result.amount
+				});
+			}
+		}
+		return true;
+	}
+
+	// ---- Utilities ----
+
+	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
+		const config = getStorageConfig(storageId);
+		if (!config) return null;
+		for (let i = 0; i < config.size; i++) {
+			const loc: ItemLocation = { type: 'container', storageId, index: i };
+			if (!this.getItem(loc)) return loc;
+		}
+		return null;
+	}
+
+	createItem(defId: string, count = 1): InstanceItem {
+		const def = getDef(defId);
+		const item: InstanceItem = {
+			uid: crypto.randomUUID(),
+			defId,
+			count
+		};
+		if (def.attachmentSlots) {
+			item.attachments = def.attachmentSlots.map(() => null);
+		}
+		return item;
 	}
 
 	isSelected(uid: string): boolean {
@@ -227,141 +297,39 @@ export class Inventory {
 		this.selectedIds.clear();
 	}
 
-	getAttachment(weaponSlotRef: SlotRef, attachIndex: number): InstanceItem | null {
-		const stored = this.getItem(weaponSlotRef);
-		if (!stored?.item.attachments) return null;
-		return stored.item.attachments[attachIndex] ?? null;
-	}
-
-	attachToWeapon(weaponSlotRef: SlotRef, attachIndex: number, attachment: InstanceItem): void {
-		const stored = this.getItem(weaponSlotRef);
-		if (!stored?.item.attachments) return;
-		stored.item.attachments[attachIndex] = attachment;
-	}
-
-	detachFromWeapon(weaponSlotRef: SlotRef, attachIndex: number): InstanceItem | null {
-		const stored = this.getItem(weaponSlotRef);
-		if (!stored?.item.attachments) return null;
-		const attachment = stored.item.attachments[attachIndex];
-		stored.item.attachments[attachIndex] = null;
-		return attachment;
-	}
-
-	splitStack(storedItem: StoredItem): boolean {
-		const def = getDef(storedItem.item.defId);
-		if (!def.maxStack || storedItem.item.count <= 1) return false;
-
-		const emptySlot = this.getFirstEmptySlotRef(storedItem.storage.storageId);
-		if (!emptySlot) return false;
-
-		const splitCount = Math.floor(storedItem.item.count / 2);
-		storedItem.item.count -= splitCount;
-
-		this.insertItem(emptySlot, {
-			uid: crypto.randomUUID(),
-			defId: storedItem.item.defId,
-			count: splitCount
-		});
-
-		return true;
-	}
-
-	quickMove(storedItem: StoredItem): boolean {
-		const config = getStorageConfig(storedItem.storage.storageId);
-		const targetId = config?.quickMoveTarget;
-		if (!targetId) return false;
-		const emptySlot = this.getFirstEmptySlotRef(targetId);
-		if (!emptySlot) return false;
-
-		const dropTarget: DropTarget = { storage: emptySlot, item: null };
-		this.#executeMove(storedItem.storage, dropTarget.storage);
-		return true;
-	}
-
-	createItem(defId: string, count = 1): InstanceItem {
-		const def = getDef(defId);
-		const item: InstanceItem = {
-			uid: crypto.randomUUID(),
-			defId,
-			count
-		};
-		if (def.attachmentSlots) {
-			item.attachments = def.attachmentSlots.map(() => null);
-		}
-		return item;
-	}
-
-	recycleItem(storedItem: StoredItem): boolean {
-		const def = getDef(storedItem.item.defId);
-		if (!def.recycling) return false;
-
-		const sourceStorageId = storedItem.storage.storageId;
-		const config = getStorageConfig(sourceStorageId);
-		const targetStorageId = config?.quickMoveTarget ?? sourceStorageId;
-
-		const attachments: InstanceItem[] =
-			storedItem.item.attachments?.filter((a): a is InstanceItem => a !== null) ?? [];
-
-		const slotsNeeded = def.recycling.length + attachments.length;
-		const emptySlots = this.#countEmptySlots(targetStorageId);
-		const availableSlots = emptySlots + 1;
-
-		if (slotsNeeded > availableSlots) return false;
-
-		this.removeItem(storedItem.storage);
-
-		for (const att of attachments) {
-			const slot = this.getFirstEmptySlotRef(targetStorageId);
-			if (slot) {
-				this.insertItem(slot, att);
-			}
-		}
-
-		for (const result of def.recycling) {
-			const slot = this.getFirstEmptySlotRef(targetStorageId);
-			if (slot) {
-				this.insertItem(slot, {
-					uid: crypto.randomUUID(),
-					defId: result.itemId,
-					count: result.amount
-				});
-			}
-		}
-		return true;
-	}
-
 	#countEmptySlots(storageId: StorageId): number {
 		const config = getStorageConfig(storageId);
 		if (!config) return 0;
 		let count = 0;
 		for (let i = 0; i < config.size; i++) {
-			if (!this.getItem({ storageId, index: i })) count++;
+			if (!this.getItem({ type: 'container', storageId, index: i })) count++;
 		}
 		return count;
 	}
 
-	getFirstEmptySlotRef(storageId: StorageId): SlotRef | null {
-		const config = getStorageConfig(storageId);
-		if (!config) return null;
-		for (let i = 0; i < config.size; i++) {
-			const ref: SlotRef = { storageId, index: i };
-			if (!this.getItem(ref)) return ref;
-		}
-		return null;
-	}
-
 	setup(): void {
-		const initial: [SlotRef, InstanceItem][] = [
-			[{ storageId: 'backpack', index: 0 }, this.createItem('res_arc_circuitry', 10)],
-			[{ storageId: 'backpack', index: 10 }, this.createItem('res_arc_circuitry', 10)],
-
-			[{ storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
-			[{ storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
-			[{ storageId: 'lootBack', index: 0 }, this.createItem('att_compensator_1')],
-			[{ storageId: 'lootBack', index: 1 }, this.createItem('att_stable_stock_1')]
+		const initial: [ItemLocation, InstanceItem][] = [
+			[
+				{ type: 'container', storageId: 'backpack', index: 0 },
+				this.createItem('res_arc_circuitry', 10)
+			],
+			[
+				{ type: 'container', storageId: 'backpack', index: 10 },
+				this.createItem('res_arc_circuitry', 10)
+			],
+			[{ type: 'container', storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
+			[{ type: 'container', storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
+			[
+				{ type: 'container', storageId: 'lootBack', index: 0 },
+				this.createItem('att_compensator_1')
+			],
+			[
+				{ type: 'container', storageId: 'lootBack', index: 1 },
+				this.createItem('att_stable_stock_1')
+			]
 		];
-		for (const [slotRef, item] of initial) {
-			this.items.push({ storage: slotRef, item });
+		for (const [loc, item] of initial) {
+			this.items.push({ location: loc, item });
 		}
 	}
 }

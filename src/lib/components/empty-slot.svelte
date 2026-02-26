@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { droppable } from '$lib/actions/actions';
-	import type { SlotRef } from '$lib/types';
+	import type { SlotState } from '$lib/types';
 
 	type Props = {
-		slotRef: SlotRef;
+		slotState: SlotState;
 		className: string;
 		placeholder?: string;
 	};
 
-	let { slotRef, className = '', placeholder }: Props = $props();
+	let { slotState, className = '', placeholder }: Props = $props();
 </script>
 
-<div class={className} {@attach droppable({ storage: slotRef, item: null })}>
+<div class={className} {@attach droppable(slotState)}>
 	<div
 		class="flex h-full w-full cursor-default items-center justify-center rounded-lg border border-white/20"
 	>

@@ -1,10 +1,12 @@
 import { getDef } from '$lib/config/items';
-import { isEqual } from 'es-toolkit';
+import { isEqualLocation } from '$lib/utils';
 import type { Inventory } from './inventory.svelte';
 import type { Overlay } from './overlay.svelte';
-import { validateDrop } from '$lib/store/inventory-validation';
+import type { DebugStore } from './debug.svelte';
+import { formatLocation } from './debug.svelte';
+import { validateDrop, getDropActionType } from '$lib/store/inventory-validation';
 
-import type { DropTarget, SlotRef, InstanceItem, DragPayload } from '$lib/types';
+import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
 
 const DRAG_THRESHOLD = 1;
 const DOUBLE_CLICK_DELAY = 300;
@@ -12,38 +14,44 @@ const DOUBLE_CLICK_DELAY = 300;
 type InteractionStatus = 'idle' | 'pressing' | 'dragging';
 
 export class Interaction {
-	private inventory: Inventory;
-	private overlay: Overlay;
+	private inventory!: Inventory;
+	private overlay!: Overlay;
+	private debug!: DebugStore;
 
 	status = $state<InteractionStatus>('idle');
-	dragPayload = $state<DragPayload | null>(null);
+	dragState = $state<DragState | null>(null);
 
-	dropTarget = $state<DropTarget | null>(null);
+	hoveredSlot = $state<SlotState | null>(null);
 	pointer = $state({ x: 0, y: 0 });
 	offset = $state({ x: 0, y: 0 });
 	isValidDrop = $derived(
-		this.dragPayload && this.dropTarget ? validateDrop(this.dragPayload, this.dropTarget) : false
+		this.dragState && this.hoveredSlot
+			? validateDrop(this.dragState, this.hoveredSlot, this.inventory.getItem.bind(this.inventory))
+			: false
 	);
 
 	private startPos = { x: 0, y: 0 };
 	private dragNode: HTMLElement | null = null;
+	private initialSlot: SlotState | null = null;
 
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	constructor(inventory: Inventory, overlay: Overlay) {
+	constructor(inventory: Inventory, overlay: Overlay, debug: DebugStore) {
 		this.inventory = inventory;
 		this.overlay = overlay;
+		this.debug = debug;
 	}
 
-	startInteraction(payload: DragPayload, e: PointerEvent, node: HTMLElement) {
+	startInteraction(slot: SlotState, e: PointerEvent, node: HTMLElement) {
 		if (e.button !== 0) return;
 		if (this.status !== 'idle') return;
+		if (!slot.item) return;
 		e.stopPropagation();
 		e.preventDefault();
 
 		this.status = 'pressing';
-		this.dragPayload = payload;
+		this.initialSlot = slot;
 		this.startPos = { x: e.clientX, y: e.clientY };
 		this.dragNode = node;
 
@@ -80,16 +88,41 @@ export class Interaction {
 		this.pointer = { x: e.clientX, y: e.clientY };
 	}
 	private handleDropAction() {
-		if (this.isValidDrop && this.dropTarget && this.dragPayload) {
-			this.inventory.executeDrop(this.dragPayload, this.dropTarget);
+		if (this.isValidDrop && this.hoveredSlot && this.dragState) {
+			const action = getDropActionType(this.dragState, this.hoveredSlot);
+			const itemDef = getDef(this.dragState.item.defId);
+			const from = formatLocation(this.dragState.sourceLocation);
+			const to = formatLocation(this.hoveredSlot.location);
+
+			let detail: string | undefined;
+
+			switch (action) {
+				case 'move':
+					this.inventory.move(this.dragState, this.hoveredSlot.location);
+					if (this.dragState.isSplit) detail = `split: ${this.dragState.item.count}`;
+					break;
+				case 'stack': {
+					const targetItem = this.inventory.getItem(this.hoveredSlot.location);
+					const before = targetItem?.count ?? 0;
+					this.inventory.stack(this.dragState, this.hoveredSlot.location);
+					const after = this.inventory.getItem(this.hoveredSlot.location)?.count ?? 0;
+					detail = `${before}+${this.dragState.item.count}=${after}`;
+					break;
+				}
+				case 'swap':
+					this.inventory.swap(this.dragState, this.hoveredSlot.location);
+					break;
+				case 'attach':
+					this.inventory.attach(this.dragState, this.hoveredSlot.location);
+					break;
+			}
+
+			this.debug.logAction({ action, itemName: itemDef.name, from, to, detail });
 		}
 	}
 
-	highlightHoverSlot(slotRef: SlotRef) {
-		return this.dropTarget ? isEqual(this.dropTarget.storage, slotRef) : false;
-	}
-
 	private beginDrag(e: PointerEvent) {
+		if (!this.initialSlot?.item) return;
 		this.overlay.closeAll();
 		this.status = 'dragging';
 		const rect = this.dragNode!.getBoundingClientRect();
@@ -100,30 +133,45 @@ export class Interaction {
 			y: (this.startPos.y - rect.top) / rect.height
 		};
 
-		if ((e.metaKey || e.altKey) && this.dragPayload?.source === 'inventory_slot') {
-			const storedItem = this.dragPayload.storedItem;
-			const def = getDef(storedItem.item.defId);
+		let isSplit = false;
+		let dragItem = this.initialSlot.item;
 
-			if (def.maxStack && storedItem.item.count > 1) {
-				const splitCount = Math.floor(storedItem.item.count / 2);
-
-				this.dragPayload = {
-					source: 'split_slot',
-					storedItem,
-					splitCount
-				};
+		if ((e.metaKey || e.altKey) && this.initialSlot.location.type === 'container') {
+			const def = getDef(dragItem.defId);
+			if (def.maxStack && dragItem.count > 1) {
+				const splitCount = Math.floor(dragItem.count / 2);
+				isSplit = true;
+				dragItem = { ...dragItem, count: splitCount };
 			}
+		}
+
+		this.dragState = {
+			item: dragItem,
+			sourceLocation: this.initialSlot.location,
+			isSplit
+		};
+
+		// Add body CSS class for weapon/attachment pointer-event control
+		const def = getDef(dragItem.defId);
+		if (def.type === 'weapon') {
+			document.body.classList.add('dragging-weapon');
+		} else if (def.type === 'attachment') {
+			document.body.classList.add('dragging-attachment');
 		}
 	}
 
 	private handleClick(e: PointerEvent) {
-		if (this.dragPayload?.source !== 'inventory_slot') return;
+		if (!this.initialSlot?.item) return;
 
-		const itemUid = this.dragPayload.storedItem.item.uid;
+		const itemUid = this.initialSlot.item.uid;
 
 		if (e.altKey || e.metaKey) return;
-		if (e.shiftKey) {
+		if (e.ctrlKey) {
 			this.inventory.toggleSelectionItem(itemUid);
+			return;
+		}
+		if (e.shiftKey) {
+			this.inventory.quickMove(this.initialSlot.location);
 			return;
 		}
 
@@ -131,7 +179,17 @@ export class Interaction {
 		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === itemUid;
 
 		if (isDouble) {
-			this.inventory.quickMove(this.dragPayload.storedItem);
+			const def = getDef(this.initialSlot.item.defId);
+			const from = formatLocation(this.initialSlot.location);
+			const success = this.inventory.quickMove(this.initialSlot.location);
+			if (success) {
+				this.debug.logAction({
+					action: 'quickMove',
+					itemName: def.name,
+					from,
+					to: 'auto'
+				});
+			}
 			this.lastClickTime = 0;
 			this.lastClickUid = '';
 		} else {
@@ -140,96 +198,93 @@ export class Interaction {
 			this.lastClickUid = itemUid;
 		}
 	}
-	setDropTarget(dropTarget: DropTarget) {
-		this.dropTarget = dropTarget;
+
+	setHoveredSlot(slot: SlotState) {
+		this.hoveredSlot = slot;
+	}
+
+	isSource(loc: ItemLocation): boolean {
+		if (this.status !== 'dragging' || !this.dragState) return false;
+		if (this.dragState.isSplit) return false;
+		return isEqualLocation(this.dragState.sourceLocation, loc);
+	}
+
+	isHovered(loc: ItemLocation): boolean {
+		if (!this.hoveredSlot) return false;
+		const hl = this.hoveredSlot.location;
+		if (isEqualLocation(hl, loc)) return true;
+		return hl.type === 'attachment' && isEqualLocation(hl.parentLocation, loc);
 	}
 
 	get draggedItem(): InstanceItem | null {
-		if (this.status !== 'dragging' || !this.dragPayload) return null;
-
-		if (this.dragPayload.source === 'split_slot') {
-			// Возвращаем виртуальный предмет с нужным количеством, чтобы DragLayer нарисовал правильную цифру
-			return {
-				...this.dragPayload.storedItem.item,
-				count: this.dragPayload.splitCount
-			};
-		} else if (this.dragPayload.source === 'weapon_attachment') {
-			return this.dragPayload.item;
-		} else {
-			return this.dragPayload.storedItem.item;
-		}
+		if (this.status !== 'dragging' || !this.dragState) return null;
+		return this.dragState.item;
 	}
 
-	isDraggingUid(uid: string): boolean {
-		if (this.status !== 'dragging' || !this.dragPayload) return false;
-
-		if (this.dragPayload.source === 'split_slot') return false;
-
-		return this.draggedItem?.uid === uid;
-	}
-
-	shouldShowInvalidHint(dropTarget: DropTarget): boolean {
-		if (this.status !== 'dragging' || !this.dragPayload) return false;
-
-		// 2. Спрашиваем инвентарь: валиден ли слот?
-		const isValid = this.inventory.validateDrop(this.dragPayload, dropTarget);
-
-		// Если слот ВАЛИДЕН (можно бросить) — крестик точно НЕ нужен
-		if (isValid) return false;
-
-		if (this.dragPayload.source === 'split_slot') {
-			const targetStorageId = dropTarget.storage.storageId;
-			if (targetStorageId === 'lootBack' || targetStorageId === 'backpack') return false;
-			return true;
-		}
-
-		// UX-Правило 2: Если тащим оружие прямо из слота 'weapon' — скрываем крестики
-		if (this.dragPayload.source === 'inventory_slot') {
-			const sourceStorageId = this.dragPayload.storedItem.storage.storageId;
-
-			if (
-				sourceStorageId === 'weapon' &&
-				(dropTarget.storage.storageId === 'backpack' || dropTarget.storage.storageId === 'lootBack')
-			)
-				return false;
-
-			return true;
-		}
-
-		// UX-Правило 3: При снятии аттачмента крестики нужны ТОЛЬКО на слотах экипировки
-		if (this.dragPayload.source === 'weapon_attachment') {
-			const targetStorageId = dropTarget.storage.storageId;
-			// Скрываем крестики в рюкзаках
-			if (targetStorageId === 'backpack' || targetStorageId === 'lootBack') return false;
-			// На weapon, shield, augment — показываем
-			return true;
-		}
-
-		// Дефолт: для всех остальных невалидных случаев показываем крестик
-		return true;
-	}
-
-	getDisplayCount(item: InstanceItem): number {
+	getDisplayCount(item: InstanceItem, loc: ItemLocation): number {
 		if (
 			this.status === 'dragging' &&
-			this.dragPayload?.source === 'split_slot' &&
-			this.dragPayload.storedItem.item.uid === item.uid
+			this.dragState?.isSplit &&
+			isEqualLocation(this.dragState.sourceLocation, loc)
 		) {
-			return item.count - this.dragPayload.splitCount;
+			return item.count - this.dragState.item.count;
 		}
 		return item.count;
 	}
 
-	clearDropTarget() {
-		this.dropTarget = null;
-		this.isValidDrop = false;
+	shouldShowInvalidHint(slot: SlotState): boolean {
+		if (this.status !== 'dragging' || !this.dragState) return false;
+
+		const resolver = this.inventory.getItem.bind(this.inventory);
+		const isValid = validateDrop(this.dragState, slot, resolver);
+
+		if (isValid) return false;
+
+		if (this.dragState.isSplit) {
+			if (slot.location.type !== 'container') return true;
+			const targetStorageId = slot.location.storageId;
+			if (targetStorageId === 'lootBack' || targetStorageId === 'backpack') return false;
+			return true;
+		}
+
+		// If source is an attachment location
+		if (this.dragState.sourceLocation.type === 'attachment') {
+			if (slot.location.type !== 'container') return true;
+			const targetStorageId = slot.location.storageId;
+			if (targetStorageId === 'backpack' || targetStorageId === 'lootBack') return false;
+			return true;
+		}
+
+		// Source is a container location
+		if (this.dragState.sourceLocation.type === 'container') {
+			const sourceStorageId = this.dragState.sourceLocation.storageId;
+
+			if (slot.location.type === 'container') {
+				if (
+					sourceStorageId === 'weapon' &&
+					(slot.location.storageId === 'backpack' || slot.location.storageId === 'lootBack')
+				)
+					return false;
+			}
+
+			return true;
+		}
+
+		return true;
+	}
+
+	clearHoveredSlot() {
+		this.hoveredSlot = null;
 	}
 
 	private reset() {
 		this.status = 'idle';
-		this.dragPayload = null;
+		this.dragState = null;
 		this.dragNode = null;
-		this.dropTarget = null;
+		this.hoveredSlot = null;
+		this.initialSlot = null;
+
+		document.body.classList.remove('dragging-weapon', 'dragging-attachment');
 
 		window.removeEventListener('pointermove', this.handlePointerMove);
 		window.removeEventListener('pointerup', this.handlePointerUp);

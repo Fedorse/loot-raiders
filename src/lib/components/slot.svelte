@@ -2,56 +2,55 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
-	import type { SlotRef } from '$lib/types';
+	import type { ItemLocation } from '$lib/types';
 
 	type Props = {
-		slotRef: SlotRef;
+		location: ItemLocation;
 		class: string;
 		placeholder?: string;
 	};
 
-	let { slotRef, class: className = '', placeholder }: Props = $props();
+	let { location, class: className = '', placeholder }: Props = $props();
 
 	const { interaction, inventory, overlay } = getGameContext();
 
-	const highlightHoverSlot = $derived(interaction.highlightHoverSlot(slotRef));
+	const isHovered = $derived(interaction.isHovered(location));
 
-	const storedItem = $derived(inventory.getItem(slotRef));
+	const item = $derived(inventory.getItem(location));
 
-	const itemUid = $derived(storedItem?.item?.uid ?? '');
+	const itemUid = $derived(item?.uid ?? '');
 
 	const selectedItem = $derived(inventory.isSelected(itemUid));
 
-	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
+	const isDraggingThisItem = $derived(interaction.isSource(location));
 
-	const showInvalidHint = $derived(
-		interaction.shouldShowInvalidHint({
-			storage: slotRef,
-			item: storedItem?.item ?? null
-		})
-	);
+	const slotState = $derived({ location, item });
+
+	const showInvalidHint = $derived(interaction.shouldShowInvalidHint(slotState));
 </script>
 
 <div class="{className}  relative rounded-lg">
 	{@render gradientBorder()}
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="relative z-20 h-full w-full p-[3.5px]"
 		oncontextmenu={(e) => {
 			e.preventDefault();
-			overlay.openContextMenu(e.clientX, e.clientY, storedItem);
+			if (e.ctrlKey) return;
+			if (item) overlay.openContextMenu(e.clientX, e.clientY, { location, item });
 		}}
 	>
-		{#if storedItem && !isDraggingThisItem}
-			<ItemSlot {storedItem} {selectedItem} className="h-full w-full" />
+		{#if item && !isDraggingThisItem}
+			<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
 		{:else}
-			<EmptySlot {slotRef} {placeholder} className="h-full w-full" />
+			<EmptySlot {slotState} {placeholder} className="h-full w-full" />
 		{/if}
 	</div>
 	{@render invalidIcon()}
 </div>
 
 {#snippet gradientBorder()}
-	{#if highlightHoverSlot}
+	{#if isHovered}
 		<div class="glow-ring-mask absolute inset-0 z-0 transition-opacity duration-300">
 			<div class="glow-animation absolute inset-[-100%]"></div>
 		</div>

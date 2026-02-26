@@ -1,47 +1,30 @@
 <script lang="ts">
-	import Slot from '$lib/components/slot.svelte';
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import ContextMenu from '$lib/components/context-menu.svelte';
+	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
 	const game = initGame();
-	const { inventory, interaction } = game;
+	const { inventory, debug } = game;
 
 	const lootBackConfig = getStorageConfig('lootBack');
 	const backpackConfig = getStorageConfig('backpack');
-
-	let debugOpen = $state(false);
 </script>
 
-<!-- debug -->
-<!-- {#if debugOpen}
-	{#if interaction.dragPayload}
-		<pre
-			class="fixed bottom-4 left-4 z-[9999] w-[420px] rounded-md bg-black/80 p-3 text-xs text-white">
-{JSON.stringify(
-				{
-					dragOrigin: interaction.dragPayload && {
-						storage: interaction.dragPayload,
-						item: interaction.dragPayload
-					},
-					dropTarget: interaction.dropTarget && {
-						storage: interaction.dropTarget.storage,
-						item: interaction.dropTarget.item?.defId ?? null
-					},
-					validDrop: interaction.isValidDrop,
-					pointer: interaction.pointer
-				},
-				null,
-				2
-			)}
-	</pre>
-	{/if}
-{/if} -->
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === 'd' || e.key === 'D') {
+			const tag = (e.target as HTMLElement)?.tagName;
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+			debug.toggle();
+		}
+	}}
+/>
 
-<div class="flex h-full w-full flex-col items-center gap-6 px-5 py-16">
+<div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
 	<div class="flex items-start justify-center gap-4">
 		<div
 			class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/50 px-4 pt-4 pb-12 backdrop-blur-xs"
@@ -94,6 +77,7 @@
 
 <DragLayer />
 <ContextMenu />
+<DebugPanel />
 
 <style>
 	@reference "tailwindcss";

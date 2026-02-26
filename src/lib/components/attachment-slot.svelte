@@ -1,28 +1,25 @@
 <script lang="ts">
-	import { droppable, attachmentInteractions } from '$lib/actions/actions';
+	import { droppable, draggable } from '$lib/actions/actions';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
-	import type { InstanceItem, SlotRef } from '$lib/types';
+	import type { InstanceItem, ItemLocation, SlotState } from '$lib/types';
 
 	type Props = {
-		weaponSlotRef: SlotRef;
+		parentLocation: ItemLocation;
 		attachIndex: number;
 		attachment: InstanceItem | null;
 		placeholder?: string;
-		weaponItem: InstanceItem;
 	};
 
-	let { weaponSlotRef, attachIndex, attachment, placeholder, weaponItem }: Props = $props();
+	let { parentLocation, attachIndex, attachment, placeholder }: Props = $props();
 
 	const { interaction } = getGameContext();
-	const itemUid = $derived(attachment?.uid ?? '');
-	const isDraggingThisItem = $derived(interaction.isDraggingUid(itemUid));
 
-	const dropTarget = $derived({
-		storage: weaponSlotRef,
-		item: weaponItem
-	});
+	const location: ItemLocation = $derived({ type: 'attachment', parentLocation, attachIndex });
+	const slotState: SlotState = $derived({ location, item: attachment });
+
+	const isDraggingThisItem = $derived(interaction.isSource(location));
 
 	const def = $derived(attachment ? getDef(attachment.defId) : null);
 	const style = $derived(def ? getRarityStyle(def.rarity) : null);
@@ -32,11 +29,11 @@
 </script>
 
 {#if attachment && def && style && !isDraggingThisItem}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="relative z-20 aspect-square size-8 rounded-lg"
-		{@attach droppable(dropTarget)}
-		{@attach attachmentInteractions(weaponSlotRef, attachIndex, attachment)}
+		data-slot-type="attachment"
+		{@attach droppable(slotState)}
+		{@attach draggable(slotState)}
 		onpointerenter={() => (isHovered = true)}
 		onpointerleave={() => (isHovered = false)}
 	>
@@ -61,10 +58,10 @@
 		</div>
 	</div>
 {:else}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		class="relative z-20 aspect-square size-8 rounded-lg"
-		{@attach droppable(dropTarget)}
+		data-slot-type="attachment"
+		{@attach droppable(slotState)}
 		onpointerenter={() => (isHovered = true)}
 		onpointerleave={() => (isHovered = false)}
 	>

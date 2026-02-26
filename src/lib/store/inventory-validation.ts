@@ -1,13 +1,29 @@
 import { getDef } from '$lib/config/items';
 import { getAllowedTypes } from '$lib/config/storages';
-import type { InstanceItem, StorageId, DragPayload, DropTarget } from '$lib/types';
+import type { InstanceItem, ItemLocation, DragState, SlotState } from '$lib/types';
 
 export type DropActionType = 'move' | 'stack' | 'attach' | 'swap' | 'invalid';
+export type ItemResolver = (loc: ItemLocation) => InstanceItem | null;
 
-export const isTypeAllowed = (item: InstanceItem, storageId: StorageId): boolean => {
+export const isAllowedInLocation = (
+	item: InstanceItem,
+	loc: ItemLocation,
+	resolve: ItemResolver
+): boolean => {
+	if (loc.type === 'container') {
+		const itemDef = getDef(item.defId);
+		const allowedTypes = getAllowedTypes(loc.storageId);
+		return allowedTypes.includes(itemDef.type);
+	}
+	// attachment location: check weapon's slot definition
+	const parent = resolve(loc.parentLocation);
+	if (!parent) return false;
+	const parentDef = getDef(parent.defId);
+	if (parentDef.type !== 'weapon' || !parentDef.attachmentSlots) return false;
+	const slotDef = parentDef.attachmentSlots[loc.attachIndex];
+	if (!slotDef) return false;
 	const itemDef = getDef(item.defId);
-	const allowedTypes = getAllowedTypes(storageId);
-	return allowedTypes.includes(itemDef.type);
+	return itemDef.type === 'attachment' && itemDef.attachmentKind === slotDef.type;
 };
 
 export const canStackItems = (sourceItem: InstanceItem, targetItem: InstanceItem): boolean => {
@@ -29,16 +45,6 @@ export const canAttachToWeapon = (sourceItem: InstanceItem, targetItem: Instance
 	return targetDef.attachmentSlots?.some((slot) => slot.type === sourceDef.attachmentKind) ?? false;
 };
 
-export const getDropActionType = (
-	draggedItem: InstanceItem,
-	dropTarget: DropTarget
-): DropActionType => {
-	if (!dropTarget.item) return 'move';
-	if (canStackItems(draggedItem, dropTarget.item)) return 'stack';
-	if (canAttachToWeapon(draggedItem, dropTarget.item)) return 'attach';
-	return 'swap';
-};
-
 export const getAttachmentSlotIndex = (
 	attachmentItem: InstanceItem,
 	weaponItem: InstanceItem
@@ -49,41 +55,35 @@ export const getAttachmentSlotIndex = (
 	return weaponDef.attachmentSlots.findIndex((s) => s.type === attachDef.attachmentKind);
 };
 
-export const validateDrop = (payload: DragPayload, dropTarget: DropTarget): boolean => {
-	// 1. Формируем "виртуальный" предмет на основе намерения пользователя
-	let draggedItem: InstanceItem;
+export const getDropActionType = (drag: DragState, target: SlotState): DropActionType => {
+	if (!target.item) return 'move';
+	if (canStackItems(drag.item, target.item)) return 'stack';
+	if (target.location.type === 'container' && canAttachToWeapon(drag.item, target.item))
+		return 'attach';
+	if (drag.isSplit) return 'invalid';
+	return 'swap';
+};
 
-	if (payload.source === 'split_slot') {
-		draggedItem = { ...payload.storedItem.item, count: payload.splitCount };
-	} else if (payload.source === 'weapon_attachment') {
-		draggedItem = payload.item;
-	} else {
-		draggedItem = payload.storedItem.item;
+export const validateDrop = (
+	drag: DragState,
+	target: SlotState,
+	resolve: ItemResolver
+): boolean => {
+	const action = getDropActionType(drag, target);
+	if (action === 'invalid') return false;
+
+	if (action === 'move' || action === 'stack') {
+		return isAllowedInLocation(drag.item, target.location, resolve);
 	}
 
-	const targetItem = dropTarget.item;
-	const targetStorageId = dropTarget.storage.storageId;
-
-	if (!targetItem) {
-		return isTypeAllowed(draggedItem, targetStorageId);
+	if (action === 'attach') {
+		return canAttachToWeapon(drag.item, target.item!);
 	}
 
-	// Сценарий Б: В целевом слоте УЖЕ ЕСТЬ предмет
-	if (canStackItems(draggedItem, targetItem)) return true;
-	if (canAttachToWeapon(draggedItem, targetItem)) return true;
+	// swap: check both directions
+	if (!isAllowedInLocation(drag.item, target.location, resolve)) return false;
 
-	// Сценарий В: СВАП (Смена мест)
-	// Предмет в руке должен подходить целевому слоту
-	if (!isTypeAllowed(draggedItem, targetStorageId)) return false;
-
-	// Свап запрещен, если мы тащим предмет с оружия или это сплит-предмет
-	if (payload.source === 'weapon_attachment' || payload.source === 'split_slot') return false;
-
-	// Предмет из целевого слота должен подходить тому месту, откуда мы взяли предмет в руке
-	if (payload.source === 'inventory_slot') {
-		const originalStorageId = payload.storedItem.storage.storageId;
-		return isTypeAllowed(targetItem, originalStorageId);
-	}
-
-	return false;
+	// source item from target must fit in the drag's source location
+	if (drag.sourceLocation.type === 'attachment') return false;
+	return isAllowedInLocation(target.item!, drag.sourceLocation, resolve);
 };

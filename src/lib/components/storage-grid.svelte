@@ -13,7 +13,7 @@
 
 {#each Array(config.size) as _, index (index)}
 	<Slot
-		slotRef={{ storageId: config.name, index }}
+		location={{ type: 'container', storageId: config.name, index }}
 		placeholder={config.placeholder}
 		class={className}
 	/>

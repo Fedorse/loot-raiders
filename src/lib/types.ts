@@ -4,29 +4,27 @@ export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' | 'underbarrel';
 export type StorageId = 'backpack' | 'lootBack' | 'weapon' | 'augment' | 'shield';
 
-// ---- Slot position ----
-export interface SlotRef {
-	storageId: StorageId;
-	index: number;
+// ---- Universal location ----
+export type ItemLocation =
+	| { type: 'container'; storageId: StorageId; index: number }
+	| { type: 'attachment'; parentLocation: ItemLocation; attachIndex: number };
+
+// ---- Slot states ----
+export interface OccupiedSlot {
+	location: ItemLocation;
+	item: InstanceItem;
 }
 
-export type DragPayload =
-	| { source: 'inventory_slot'; storedItem: StoredItem }
-	| {
-			source: 'weapon_attachment';
-			attachmentRef: AttachmentRef;
-			item: InstanceItem;
-	  }
-	| {
-			source: 'split_slot';
-			storedItem: StoredItem;
-			splitCount: number;
-	  };
+export interface SlotState {
+	location: ItemLocation;
+	item: InstanceItem | null;
+}
 
-// ---- Attachment drag reference ----
-export interface AttachmentRef {
-	weaponSlotRef: SlotRef;
-	attachIndex: number;
+// ---- Drag state ----
+export interface DragState {
+	item: InstanceItem;
+	sourceLocation: ItemLocation;
+	isSplit: boolean;
 }
 
 // ---- Items ----
@@ -36,15 +34,7 @@ export interface InstanceItem {
 	count: number;
 	attachments?: (InstanceItem | null)[];
 }
-export interface StoredItem {
-	storage: SlotRef;
-	item: InstanceItem;
-}
 
-export interface DropTarget {
-	storage: SlotRef;
-	item: InstanceItem | null;
-}
 //---- Item definition----
 export interface AttachmentSlotDef {
 	type: AttachmentType;

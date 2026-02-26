@@ -1,9 +1,9 @@
-import type { InstanceItem, StoredItem } from '$lib/types';
+import type { InstanceItem, OccupiedSlot } from '$lib/types';
 
 interface MenuState {
 	x: number;
 	y: number;
-	storedItem: StoredItem;
+	slot: OccupiedSlot;
 }
 
 interface TooltipState {
@@ -16,9 +16,9 @@ export class Overlay {
 	contextMenu = $state<MenuState | null>(null);
 	tooltip = $state<TooltipState | null>(null);
 
-	openContextMenu(x: number, y: number, storedItem: StoredItem) {
+	openContextMenu(x: number, y: number, slot: OccupiedSlot) {
 		this.hideTooltip();
-		this.contextMenu = { x, y, storedItem };
+		this.contextMenu = { x, y, slot };
 	}
 
 	closeContextMenu() {

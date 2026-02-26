@@ -2,16 +2,16 @@
 	import AttachmentSlot from '$lib/components/attachment-slot.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
-	import type { InstanceItem, SlotRef } from '$lib/types';
+	import type { InstanceItem, ItemLocation } from '$lib/types';
 
 	type Props = {
 		item: InstanceItem;
 		className?: string;
-		weaponSlotRef: SlotRef;
+		location: ItemLocation;
 		selected: boolean;
 	};
 
-	let { item, className = 'h-40', weaponSlotRef }: Props = $props();
+	let { item, className = 'h-40', location }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
 	const style = $derived(getRarityStyle(def.rarity));
@@ -36,11 +36,10 @@
 			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
 				{#each def.attachmentSlots ?? [] as slotDef, index}
 					<AttachmentSlot
-						{weaponSlotRef}
+						parentLocation={location}
 						attachIndex={index}
 						attachment={item.attachments?.[index] ?? null}
 						placeholder={slotDef.placeholder}
-						weaponItem={item}
 					/>
 				{/each}
 			</div>
