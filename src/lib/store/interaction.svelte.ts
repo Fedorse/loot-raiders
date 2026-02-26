@@ -2,8 +2,6 @@ import { getDef } from '$lib/config/items';
 import { isEqualLocation } from '$lib/utils';
 import type { Inventory } from './inventory.svelte';
 import type { Overlay } from './overlay.svelte';
-import type { DebugStore } from './debug.svelte';
-import { formatLocation } from './debug.svelte';
 import { validateDrop, getDropActionType } from '$lib/store/inventory-validation';
 
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
@@ -16,7 +14,6 @@ type InteractionStatus = 'idle' | 'pressing' | 'dragging';
 export class Interaction {
 	private inventory!: Inventory;
 	private overlay!: Overlay;
-	private debug!: DebugStore;
 
 	status = $state<InteractionStatus>('idle');
 	dragState = $state<DragState | null>(null);
@@ -37,10 +34,9 @@ export class Interaction {
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	constructor(inventory: Inventory, overlay: Overlay, debug: DebugStore) {
+	constructor(inventory: Inventory, overlay: Overlay) {
 		this.inventory = inventory;
 		this.overlay = overlay;
-		this.debug = debug;
 	}
 
 	startInteraction(slot: SlotState, e: PointerEvent, node: HTMLElement) {
@@ -90,25 +86,14 @@ export class Interaction {
 	private handleDropAction() {
 		if (this.isValidDrop && this.hoveredSlot && this.dragState) {
 			const action = getDropActionType(this.dragState, this.hoveredSlot);
-			const itemDef = getDef(this.dragState.item.defId);
-			const from = formatLocation(this.dragState.sourceLocation);
-			const to = formatLocation(this.hoveredSlot.location);
-
-			let detail: string | undefined;
 
 			switch (action) {
 				case 'move':
 					this.inventory.move(this.dragState, this.hoveredSlot.location);
-					if (this.dragState.isSplit) detail = `split: ${this.dragState.item.count}`;
 					break;
-				case 'stack': {
-					const targetItem = this.inventory.getItem(this.hoveredSlot.location);
-					const before = targetItem?.count ?? 0;
+				case 'stack':
 					this.inventory.stack(this.dragState, this.hoveredSlot.location);
-					const after = this.inventory.getItem(this.hoveredSlot.location)?.count ?? 0;
-					detail = `${before}+${this.dragState.item.count}=${after}`;
 					break;
-				}
 				case 'swap':
 					this.inventory.swap(this.dragState, this.hoveredSlot.location);
 					break;
@@ -116,8 +101,6 @@ export class Interaction {
 					this.inventory.attach(this.dragState, this.hoveredSlot.location);
 					break;
 			}
-
-			this.debug.logAction({ action, itemName: itemDef.name, from, to, detail });
 		}
 	}
 
@@ -179,17 +162,7 @@ export class Interaction {
 		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === itemUid;
 
 		if (isDouble) {
-			const def = getDef(this.initialSlot.item.defId);
-			const from = formatLocation(this.initialSlot.location);
-			const success = this.inventory.quickMove(this.initialSlot.location);
-			if (success) {
-				this.debug.logAction({
-					action: 'quickMove',
-					itemName: def.name,
-					from,
-					to: 'auto'
-				});
-			}
+			this.inventory.quickMove(this.initialSlot.location);
 			this.lastClickTime = 0;
 			this.lastClickUid = '';
 		} else {

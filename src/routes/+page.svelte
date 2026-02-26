@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import ContextMenu from '$lib/components/context-menu.svelte';
+	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { initGame } from '$lib/store/game.svelte';
@@ -8,7 +9,7 @@
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
 	const game = initGame();
-	const { inventory, debug } = game;
+	const { inventory, overlay, debug } = game;
 
 	const lootBackConfig = getStorageConfig('lootBack');
 	const backpackConfig = getStorageConfig('backpack');
@@ -77,6 +78,19 @@
 
 <DragLayer />
 <ContextMenu />
+
+{#if overlay.recycleModal}
+	{@const { item, location } = overlay.recycleModal}
+	<RecycleModal
+		{item}
+		onClose={() => overlay.closeRecycleModal()}
+		onConfirm={() => {
+			inventory.recycleItem(location);
+			overlay.closeRecycleModal();
+		}}
+	/>
+{/if}
+
 <DebugPanel />
 
 <style>

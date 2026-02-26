@@ -1,8 +1,8 @@
 <!-- ===== lib/components/recycle-modal.svelte ===== -->
 <script lang="ts">
 	import { getDef } from '$lib/config/items';
-	import { getRarityStyle } from '$lib/config/rarity';
-	import type { InstanceItem, RecyclingResult } from '$lib/types';
+	import ItemCard from '$lib/components/item-card.svelte';
+	import type { InstanceItem, ItemLocation } from '$lib/types';
 	import { fade, scale } from 'svelte/transition';
 
 	type Props = {
@@ -13,10 +13,14 @@
 
 	let { item, onClose, onConfirm }: Props = $props();
 
-	// Получаем дефиницию предмета, который разбираем
 	const def = $derived(getDef(item.defId));
-	// Получаем список того, что выпадет при разборке
 	const resources = $derived(def.recycling ?? []);
+	const attachments = $derived(
+		item.attachments?.filter((a): a is InstanceItem => a !== null) ?? []
+	);
+
+	// Фиктивный location — ItemCard использует его только для displayCount при drag
+	const dummyLocation: ItemLocation = { type: 'container', storageId: 'backpack', index: -1 };
 </script>
 
 <!-- Бекграунд затемнения -->
@@ -44,13 +48,27 @@
 				you will get back:
 			</p>
 
-			<!-- Контейнер для ресурсов -->
+			<!-- Контейнер для ресурсов и снятых атачментов -->
 			<div class="flex min-h-[110px] flex-wrap gap-2.5 rounded bg-[#E3DEC7] p-3">
-				{#each resources as res}
-					{@render resourceCard(res)}
+				{#each resources as res (res.itemId)}
+					<ItemCard
+						item={{ uid: res.itemId, defId: res.itemId, count: res.amount * item.count }}
+						location={dummyLocation}
+						selected={false}
+						className="h-[90px] w-[90px]"
+					/>
 				{/each}
 
-				{#if resources.length === 0}
+				{#each attachments as att (att.uid)}
+					<ItemCard
+						item={att}
+						location={dummyLocation}
+						selected={false}
+						className="h-[90px] w-[90px]"
+					/>
+				{/each}
+
+				{#if resources.length === 0 && attachments.length === 0}
 					<div class="flex w-full items-center justify-center text-sm font-bold text-black/30">
 						No resources can be salvaged.
 					</div>
@@ -76,41 +94,3 @@
 		</div>
 	</div>
 </div>
-
-<!-- Сниппет для отрисовки мини-карточки ресурса (как на скриншоте) -->
-{#snippet resourceCard(res: RecyclingResult)}
-	{@const resDef = getDef(res.itemId)}
-	{@const style = getRarityStyle(resDef.rarity)}
-
-	<div
-		class="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[4px] p-[1.5px] {style.border}"
-	>
-		<div class="relative flex h-full w-full flex-col bg-[#0F111A]">
-			<!-- Свечение на фоне карточки -->
-			<div
-				class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
-			></div>
-
-			<!-- Изображение ресурса -->
-			<div class="relative z-10 flex min-h-0 flex-1 items-center justify-center p-1.5">
-				<img
-					src={resDef.image}
-					alt={resDef.name}
-					class="h-full w-full object-contain drop-shadow-md"
-				/>
-			</div>
-
-			<!-- Футер карточки (иконка + количество) -->
-			<div class="z-10 flex h-[18px] w-full shrink-0 items-center justify-between bg-black px-1">
-				<img src={resDef.categoryIcon} alt="cat" class="size-[10px] object-contain opacity-80" />
-				<div class="flex items-baseline gap-[1px] text-white">
-					<span class="text-[8px]">×</span>
-					<span class="font-sans text-[10px] leading-none font-medium tracking-tight">
-						<!-- Умножаем базовое кол-во на размер стака, который мы разбираем -->
-						{res.amount * item.count}
-					</span>
-				</div>
-			</div>
-		</div>
-	</div>
-{/snippet}

@@ -2,9 +2,8 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getStorageConfig } from '$lib/config/storages';
-	import { formatLocation } from '$lib/store/debug.svelte';
 
-	const { overlay, inventory, debug } = getGameContext();
+	const { overlay, inventory } = getGameContext();
 	const menu = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
@@ -41,16 +40,7 @@
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					const from = formatLocation(menu.slot.location);
-					const success = inventory.quickMove(menu.slot.location);
-					if (success) {
-						debug.logAction({
-							action: 'quickMove',
-							itemName: def.name,
-							from,
-							to: moveTargetId ?? 'auto'
-						});
-					}
+					inventory.quickMove(menu.slot.location);
 					close();
 				}}
 			>
@@ -63,17 +53,7 @@
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					const from = formatLocation(menu.slot.location);
-					const success = inventory.splitStack(menu.slot.location);
-					if (success) {
-						debug.logAction({
-							action: 'split',
-							itemName: def.name,
-							from,
-							to: from,
-							detail: `half of ${menu.slot.item.count}`
-						});
-					}
+					inventory.splitStack(menu.slot.location);
 					close();
 				}}
 			>
@@ -87,13 +67,6 @@
 			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
 			onpointerdown={(e) => {
 				e.stopPropagation();
-				const from = formatLocation(menu.slot.location);
-				debug.logAction({
-					action: 'remove',
-					itemName: def.name,
-					from,
-					to: 'deleted'
-				});
 				inventory.removeItem(menu.slot.location);
 				close();
 			}}
@@ -106,17 +79,7 @@
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#e69a00]"
 				onpointerdown={(e) => {
 					e.stopPropagation();
-					const from = formatLocation(menu.slot.location);
-					const success = inventory.recycleItem(menu.slot.location);
-					if (success) {
-						debug.logAction({
-							action: 'recycle',
-							itemName: def.name,
-							from,
-							to: from,
-							detail: `${def.recycling!.length} parts`
-						});
-					}
+					overlay.openRecycleModal(menu.slot.item, menu.slot.location);
 					close();
 				}}
 			>

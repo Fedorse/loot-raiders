@@ -13,7 +13,11 @@ export function isEqualLocation(a: ItemLocation, b: ItemLocation): boolean {
 		return a.storageId === b.storageId && a.index === b.index;
 	}
 	if (a.type === 'attachment' && b.type === 'attachment') {
-		return a.attachIndex === b.attachIndex && isEqualLocation(a.parentLocation, b.parentLocation);
+		if (a.attachIndex !== b.attachIndex) return false;
+		const pa = a.parentLocation;
+		const pb = b.parentLocation;
+		return pa.type === 'container' && pb.type === 'container'
+			&& pa.storageId === pb.storageId && pa.index === pb.index;
 	}
 	return false;
 }

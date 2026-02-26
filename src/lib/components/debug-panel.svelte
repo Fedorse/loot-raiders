@@ -12,8 +12,7 @@
 		interaction: true,
 		drag: true,
 		hover: true,
-		stats: false,
-		log: true
+		stats: false
 	});
 
 	const statusColors: Record<string, string> = {
@@ -32,11 +31,6 @@
 		remove: 'bg-red-600',
 		recycle: 'bg-amber-600'
 	};
-
-	function formatTime(ts: number): string {
-		const d = new Date(ts);
-		return d.toLocaleTimeString('en-GB', { hour12: false });
-	}
 
 	function shortUid(uid: string): string {
 		return uid.slice(0, 8);
@@ -192,42 +186,6 @@
 							selected: [{[...inventory.selectedIds].map(shortUid).join(', ')}]
 						</span>
 					</div>
-				</div>
-			{/if}
-
-			<!-- Action Log -->
-			{@render sectionHeader('Action Log', 'log')}
-			{#if openSections.log}
-				<div class="flex flex-col">
-					<div class="flex justify-end px-3 py-1">
-						<button
-							class="text-[10px] text-white/40 hover:text-white/70"
-							onclick={() => debug.clearLog()}
-						>
-							Clear
-						</button>
-					</div>
-					{#if debug.log.length === 0}
-						<div class="px-3 py-2 text-[10px] text-white/30 italic">No actions yet</div>
-					{:else}
-						<div class="max-h-[300px] overflow-y-auto">
-							{#each debug.log as entry (entry.id)}
-								<div class="border-b border-white/5 px-3 py-1.5 font-mono text-[10px]">
-									<div class="flex items-center gap-2">
-										<span class="text-white/30">{formatTime(entry.timestamp)}</span>
-										{@render badge(entry.action, actionColors[entry.action] ?? 'bg-gray-600')}
-										<span class="truncate text-white/80">{entry.itemName}</span>
-									</div>
-									<div class="mt-0.5 text-white/40">
-										{entry.from} → {entry.to}
-										{#if entry.detail}
-											<span class="ml-1 text-white/50">({entry.detail})</span>
-										{/if}
-									</div>
-								</div>
-							{/each}
-						</div>
-					{/if}
 				</div>
 			{/if}
 		</div>

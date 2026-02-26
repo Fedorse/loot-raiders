@@ -31,10 +31,10 @@ export class Inventory {
 			const slot = this.items.find((i) => isEqualLocation(i.location, loc));
 			return slot?.item ?? null;
 		}
-		// attachment: resolve parent, then index into attachments
-		const parent = this.getItem(loc.parentLocation);
-		if (!parent?.attachments) return null;
-		return parent.attachments[loc.attachIndex] ?? null;
+		// attachment: find parent in items, then index into attachments
+		const parentSlot = this.items.find((i) => isEqualLocation(i.location, loc.parentLocation));
+		if (!parentSlot?.item?.attachments) return null;
+		return parentSlot.item.attachments[loc.attachIndex] ?? null;
 	}
 
 	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
@@ -52,10 +52,10 @@ export class Inventory {
 			}
 			return;
 		}
-		// attachment: set on parent's attachments array
-		const parent = this.getItem(loc.parentLocation);
-		if (!parent?.attachments) return;
-		parent.attachments[loc.attachIndex] = item;
+		// attachment: find parent in items, then set on attachments array
+		const parentSlot = this.items.find((i) => isEqualLocation(i.location, loc.parentLocation));
+		if (!parentSlot?.item?.attachments) return;
+		parentSlot.item.attachments[loc.attachIndex] = item;
 	}
 
 	removeItem(loc: ItemLocation): void {

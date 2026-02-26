@@ -8,7 +8,7 @@ export class Game {
 	inventory = new Inventory();
 	overlay = new Overlay();
 	debug = new DebugStore();
-	interaction = new Interaction(this.inventory, this.overlay, this.debug);
+	interaction = new Interaction(this.inventory, this.overlay);
 }
 
 const GAME_KEY = Symbol('GAME');
