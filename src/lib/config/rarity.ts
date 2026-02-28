@@ -8,27 +8,27 @@ export const RARITY_STYLES: Record<ItemRarity, RarityStyle> = {
 		height: 'h-[40%]'
 	},
 	uncommon: {
-		border: 'from-green-500 via-green-500 via-5% to-slate-700 to-80%',
-		bg: 'bg-green-500',
-		glow: 'bg-green-400',
+		border: 'from-rarity-uncommon via-rarity-uncommon via-5% to-rarity-gradient-end to-80%',
+		bg: 'bg-rarity-uncommon',
+		glow: 'bg-rarity-uncommon-glow',
 		height: 'h-[50%]'
 	},
 	rare: {
-		border: 'from-blue-500 via-blue-400 via-5% to-slate-700 to-80%',
-		bg: 'bg-blue-500',
-		glow: 'bg-blue-400',
+		border: 'from-rarity-rare via-rarity-rare-glow via-5% to-rarity-gradient-end to-80%',
+		bg: 'bg-rarity-rare',
+		glow: 'bg-rarity-rare-glow',
 		height: 'h-[60%]'
 	},
 	epic: {
-		border: 'from-purple-500 via-purple-500 via-5% to-slate-700 to-80%',
-		bg: 'bg-purple-500',
-		glow: 'bg-purple-400',
+		border: 'from-rarity-epic via-rarity-epic via-5% to-rarity-gradient-end to-80%',
+		bg: 'bg-rarity-epic',
+		glow: 'bg-rarity-epic-glow',
 		height: 'h-[70%]'
 	},
 	legendary: {
-		border: 'from-yellow-400 via-yellow-500 via-5% to-slate-700 to-80%',
-		bg: 'bg-yellow-400',
-		glow: 'bg-yellow-300',
+		border: 'from-rarity-legendary via-rarity-legendary-alt via-5% to-rarity-gradient-end to-80%',
+		bg: 'bg-rarity-legendary',
+		glow: 'bg-rarity-legendary-glow',
 		height: 'h-[80%]'
 	}
 };

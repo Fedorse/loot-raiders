@@ -25,19 +25,19 @@
 	<!-- <div class="fixed inset-0 z-[9998]" oncontextmenu={(e) => e.preventDefault()}></div> -->
 
 	<div
-		class="fixed z-[9999] flex w-48 flex-col rounded-sm border border-[#d2ccbc] bg-[#F3EFE0] py-1.5 shadow-xl"
+		class="fixed z-[9999] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
 		style="top: {menu.y}px; left: {menu.x}px;"
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div
-			class="border-b border-[#d2ccbc] px-3 pb-1 text-xs font-bold tracking-wider text-[#8c8c8c] uppercase"
+			class="border-b border-modal-border px-3 pb-1 text-xs font-bold tracking-wider text-muted uppercase"
 		>
 			{def.name}
 		</div>
 
 		{#if moveTargetId}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
+				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 				onpointerdown={(e) => {
 					e.stopPropagation();
 					inventory.quickMove(menu.slot.location);
@@ -50,7 +50,7 @@
 
 		{#if def.maxStack && menu.slot.item.count > 1}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
+				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 				onpointerdown={(e) => {
 					e.stopPropagation();
 					inventory.splitStack(menu.slot.location);
@@ -61,10 +61,10 @@
 			</button>
 		{/if}
 
-		<div class="my-0.5 border-t border-[#d2ccbc]"></div>
+		<div class="my-0.5 border-t border-modal-border"></div>
 
 		<button
-			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#ffab00]"
+			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 			onpointerdown={(e) => {
 				e.stopPropagation();
 				inventory.removeItem(menu.slot.location);
@@ -76,7 +76,7 @@
 
 		{#if def.recycling?.length}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-[#1a1a1a] hover:bg-[#e69a00]"
+				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent-alt"
 				onpointerdown={(e) => {
 					e.stopPropagation();
 					overlay.openRecycleModal(menu.slot.item, menu.slot.location);

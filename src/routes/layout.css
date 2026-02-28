@@ -1,5 +1,118 @@
 @import 'tailwindcss';
 
+:root {
+	/* Surface */
+	--background: #0b0c15;
+	--foreground: #ffffff;
+	--surface: #0f111a;
+	--surface-foreground: #ffffff;
+
+	/* Modal / Panel (light surfaces) */
+	--modal: #F4EFE1;
+	--modal-foreground: #111418;
+	--modal-secondary: #E3DEC7;
+	--modal-secondary-foreground: #333;
+	--modal-border: #d2ccbc;
+
+	/* Interactive */
+	--primary: #FFB800;
+	--primary-hover: #ffc733;
+	--primary-foreground: #111418;
+	--secondary: #626262;
+	--secondary-hover: #7a7a7a;
+	--accent: #ffab00;
+	--accent-alt: #e69a00;
+
+	/* Muted */
+	--muted: #8c8c8c;
+	--muted-dim: #777;
+
+	/* Drag states */
+	--drag-valid: oklch(0.29 0.07 230 / 0.6);
+	--drag-invalid: oklch(0.18 0.04 20 / 0.9);
+
+	/* Badge */
+	--badge: #1BA15C;
+
+	/* Keyboard shortcut buttons */
+	--kbd-from: #c4beb2;
+	--kbd-via: #b5ae9e;
+	--kbd-to: #a69f8f;
+	--kbd-text: #4c4c4c;
+
+	/* Glow animation */
+	--glow-magenta: #ff00ff;
+	--glow-cyan: #00ffff;
+	--glow-blue: #6080e0;
+
+	/* Rarity (base colors) */
+	--rarity-common: #9ca3af;
+	--rarity-uncommon: #22c55e;
+	--rarity-uncommon-glow: #4ade80;
+	--rarity-rare: #3b82f6;
+	--rarity-rare-glow: #60a5fa;
+	--rarity-epic: #a855f7;
+	--rarity-epic-glow: #c084fc;
+	--rarity-legendary: #facc15;
+	--rarity-legendary-alt: #eab308;
+	--rarity-legendary-glow: #fde047;
+	--rarity-gradient-end: #334155;
+}
+
+@theme inline {
+	/* Surface */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-surface: var(--surface);
+	--color-surface-foreground: var(--surface-foreground);
+
+	/* Modal / Panel */
+	--color-modal: var(--modal);
+	--color-modal-foreground: var(--modal-foreground);
+	--color-modal-secondary: var(--modal-secondary);
+	--color-modal-secondary-foreground: var(--modal-secondary-foreground);
+	--color-modal-border: var(--modal-border);
+
+	/* Interactive */
+	--color-primary: var(--primary);
+	--color-primary-hover: var(--primary-hover);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-hover: var(--secondary-hover);
+	--color-accent: var(--accent);
+	--color-accent-alt: var(--accent-alt);
+
+	/* Muted */
+	--color-muted: var(--muted);
+	--color-muted-dim: var(--muted-dim);
+
+	/* Drag states */
+	--color-drag-valid: var(--drag-valid);
+	--color-drag-invalid: var(--drag-invalid);
+
+	/* Badge */
+	--color-badge: var(--badge);
+
+	/* Keyboard shortcuts */
+	--color-kbd-from: var(--kbd-from);
+	--color-kbd-via: var(--kbd-via);
+	--color-kbd-to: var(--kbd-to);
+	--color-kbd-text: var(--kbd-text);
+
+	/* Rarity */
+	--color-rarity-common: var(--rarity-common);
+	--color-rarity-uncommon: var(--rarity-uncommon);
+	--color-rarity-uncommon-glow: var(--rarity-uncommon-glow);
+	--color-rarity-rare: var(--rarity-rare);
+	--color-rarity-rare-glow: var(--rarity-rare-glow);
+	--color-rarity-epic: var(--rarity-epic);
+	--color-rarity-epic-glow: var(--rarity-epic-glow);
+	--color-rarity-legendary: var(--rarity-legendary);
+	--color-rarity-legendary-alt: var(--rarity-legendary-alt);
+	--color-rarity-legendary-glow: var(--rarity-legendary-glow);
+	--color-rarity-gradient-end: var(--rarity-gradient-end);
+}
+
 body.dragging-weapon [data-slot-type='attachment'] {
 	pointer-events: none !important;
 }

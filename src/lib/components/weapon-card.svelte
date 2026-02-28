@@ -22,7 +22,7 @@
 		class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 	>
 		<div
-			class="weapon-card__body relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-[#0f111a] transition-shadow duration-300"
+			class="weapon-card__body relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-surface transition-shadow duration-300"
 		>
 			{@render absoluteGlowShadow()}
 			{@render absoluteBlob()}
@@ -67,15 +67,7 @@
 	>
 		<div class="flex h-full items-center justify-center gap-0.5">
 			<img src={def.categoryIcon} alt="ammo" class="size-9 object-contain" />
-			<div class="flex font-mono text-xs text-white/90">
-				<p class="tabular-nums">{0}</p>
-				<span class="text-white">/</span>
-				<p class="tabular-nums">{30}</p>
-			</div>
 		</div>
-		{#if def.gradeIcon}
-			<img src={def.gradeIcon} alt="grade" class="size-7 object-contain" />
-		{/if}
 	</div>
 {/snippet}
 

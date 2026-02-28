@@ -38,18 +38,18 @@
 		onclick={(e) => e.stopPropagation()}
 	>
 		<!-- Верхняя часть (Светлая) -->
-		<div class="bg-[#F4EFE1] px-7 py-6 text-[#111418]">
+		<div class="bg-modal px-7 py-6 text-modal-foreground">
 			<h1 class="mb-3 text-[28px] leading-none font-black tracking-tight uppercase">
 				Recycle {def.name}
 			</h1>
 
-			<p class="mb-5 text-[15px] leading-snug font-medium text-[#333]">
+			<p class="mb-5 text-[15px] leading-snug font-medium text-modal-secondary-foreground">
 				You have selected {item.count} item{item.count > 1 ? 's' : ''} to recycle. These are the resources
 				you will get back:
 			</p>
 
 			<!-- Контейнер для ресурсов и снятых атачментов -->
-			<div class="flex min-h-[110px] flex-wrap gap-2.5 rounded bg-[#E3DEC7] p-3">
+			<div class="flex min-h-[110px] flex-wrap gap-2.5 rounded bg-modal-secondary p-3">
 				{#each resources as res (res.itemId)}
 					<ItemCard
 						item={{ uid: res.itemId, defId: res.itemId, count: res.amount * item.count }}
@@ -77,15 +77,15 @@
 		</div>
 
 		<!-- Нижняя часть (Темная) -->
-		<div class="flex gap-4 bg-[#0F111A] px-7 py-6">
+		<div class="flex gap-4 bg-surface px-7 py-6">
 			<button
-				class="flex h-11 flex-1 items-center justify-center rounded-full bg-[#626262] text-[13px] font-bold tracking-widest text-white transition-colors hover:bg-[#7a7a7a] active:scale-[0.98]"
+				class="flex h-11 flex-1 items-center justify-center rounded-full bg-secondary text-[13px] font-bold tracking-widest text-white transition-colors hover:bg-secondary-hover active:scale-[0.98]"
 				onclick={onClose}
 			>
 				CANCEL
 			</button>
 			<button
-				class="flex h-11 flex-1 items-center justify-center rounded-full bg-[#FFB800] text-[13px] font-bold tracking-widest text-[#111418] transition-colors hover:bg-[#ffc733] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+				class="flex h-11 flex-1 items-center justify-center rounded-full bg-primary text-[13px] font-bold tracking-widest text-primary-foreground transition-colors hover:bg-primary-hover active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
 				disabled={resources.length === 0}
 				onclick={onConfirm}
 			>

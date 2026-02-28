@@ -18,8 +18,8 @@
 	<div
 		class="pointer-events-none fixed top-0 left-0 z-50 flex h-20 w-20 items-center justify-center rounded-lg
                 will-change-transform {interaction.isValidDrop
-			? ' bg-sky-900/60'
-			: ' bg-[#251212]/90'}"
+			? ' bg-drag-valid'
+			: ' bg-drag-invalid'}"
 		style="
 			transform: translate3d({x}px, {y}px, 0) 
 		"

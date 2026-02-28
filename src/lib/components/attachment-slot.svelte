@@ -42,7 +42,7 @@
 			<div
 				class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 			>
-				<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-[#0f111a]">
+				<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-surface">
 					<div
 						class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-60 blur-xl {style.glow}"
 					></div>
@@ -103,15 +103,15 @@
 	.glow-animation {
 		background: conic-gradient(
 			from 0deg,
-			#ff00ff 0deg,
-			#00ffff 45deg,
+			var(--glow-magenta) 0deg,
+			var(--glow-cyan) 45deg,
 			transparent 90deg,
-			#6080e0 135deg,
-			#ff00ff 180deg,
-			#00ffff 240deg,
+			var(--glow-blue) 135deg,
+			var(--glow-magenta) 180deg,
+			var(--glow-cyan) 240deg,
 			transparent 270deg,
-			#ff00ff 330deg,
-			#ff00ff 360deg
+			var(--glow-magenta) 330deg,
+			var(--glow-magenta) 360deg
 		);
 		animation: rotate 4s linear infinite;
 		filter: blur(1px);

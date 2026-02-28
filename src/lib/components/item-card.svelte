@@ -28,7 +28,7 @@
 		<div
 			class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] {selected
 				? 'bg-white'
-				: 'bg-[#0f111a]'}"
+				: 'bg-surface'}"
 		>
 			<div class="relative min-h-0 flex-1 items-center justify-center">
 				{@render absoluteGlowShadow()}
@@ -69,9 +69,6 @@
 					alt="modded"
 					class="size-4 object-contain opacity-50"
 				/>
-			{/if}
-			{#if def.gradeIcon}
-				<img src={def.gradeIcon} alt="grade" class="size-4 object-contain" />
 			{/if}
 		{:else}
 			<div class="text-white/70">

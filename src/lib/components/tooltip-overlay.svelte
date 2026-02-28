@@ -50,7 +50,7 @@
 	>
 		<!-- Вкладка ACTIONS (корешок сверху) -->
 		<div
-			class="absolute -top-8 left-0 flex h-8 items-center gap-2 rounded-t-[6px] bg-[#E3DEC7] px-4 font-bold text-[#111418]"
+			class="absolute -top-8 left-0 flex h-8 items-center gap-2 rounded-t-[6px] bg-modal-secondary px-4 font-bold text-modal-foreground"
 		>
 			<svg class="size-4 opacity-70" viewBox="0 0 24 24" fill="currentColor">
 				<path
@@ -62,18 +62,18 @@
 
 		<!-- Главное тело тултипа (Светлое) -->
 		<div
-			class="flex flex-col rounded-tr-[6px] rounded-b-[6px] bg-[#F4EFE1] text-[#111418] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
+			class="flex flex-col rounded-tr-[6px] rounded-b-[6px] bg-modal text-modal-foreground shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]"
 		>
 			<!-- Паддинг-контейнер для контента -->
 			<div class="flex flex-col px-5 py-5">
 				<!-- Подзаголовок (Бейджи) -->
 				<div class="mb-2 flex gap-1 text-[11px] font-bold tracking-wider text-white uppercase">
-					<div class="flex items-center gap-1 bg-[#1BA15C] px-1.5 py-0.5">
+					<div class="flex items-center gap-1 bg-badge px-1.5 py-0.5">
 						<span class="font-black">!!</span>
 						<!-- Иконка шотгана -->
 						<span>Shotgun</span>
 					</div>
-					<div class="bg-[#1BA15C] px-1.5 py-0.5">
+					<div class="bg-badge px-1.5 py-0.5">
 						{def.rarity}
 					</div>
 				</div>
@@ -84,7 +84,7 @@
 				</h1>
 
 				<!-- Описание -->
-				<p class="mb-4 text-[15px] leading-snug font-medium text-[#333]">
+				<p class="mb-4 text-[15px] leading-snug font-medium text-modal-secondary-foreground">
 					{def.description ||
 						mockData.description ||
 						'Has a large bullet spread, sharp falloff, and high damage output.'}
@@ -98,38 +98,38 @@
 				</div>
 
 				<!-- Характеристики (Grid/List) -->
-				<div class="mb-4 flex flex-col text-[14px] font-medium text-[#111418]">
-					<div class="flex items-center justify-between border-b border-[#111418]/10 py-2">
-						<span class="text-[#333]">Durability</span>
+				<div class="mb-4 flex flex-col text-[14px] font-medium text-modal-foreground">
+					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
+						<span class="text-modal-secondary-foreground">Durability</span>
 						<span class="font-bold">{mockData.durability}</span>
 					</div>
-					<div class="flex items-center justify-between border-b border-[#111418]/10 py-2">
-						<span class="text-[#333]">Ammo Type</span>
+					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
+						<span class="text-modal-secondary-foreground">Ammo Type</span>
 						<span class="flex items-center gap-1.5 font-bold">
 							<span class="font-black opacity-60">!!</span>
 							{mockData.ammoType}
 						</span>
 					</div>
-					<div class="flex items-center justify-between border-b border-[#111418]/10 py-2">
-						<span class="text-[#333]">Magazine Size</span>
+					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
+						<span class="text-modal-secondary-foreground">Magazine Size</span>
 						<span class="font-bold">{mockData.magazineSize}</span>
 					</div>
-					<div class="flex items-center justify-between border-b border-[#111418]/10 py-2">
-						<span class="text-[#333]">Firing Mode</span>
+					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
+						<span class="text-modal-secondary-foreground">Firing Mode</span>
 						<span class="font-bold">{mockData.firingMode}</span>
 					</div>
-					<div class="flex items-center justify-between border-b border-[#111418]/10 py-2">
-						<span class="text-[#333]">ARC Armor Penetration</span>
+					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
+						<span class="text-modal-secondary-foreground">ARC Armor Penetration</span>
 						<span class="font-bold">{mockData.armorPenetration}</span>
 					</div>
 				</div>
 
 				<!-- Upgrade Modifiers -->
 				<div class="mb-4 flex flex-col">
-					<span class="mb-1 text-[12px] font-bold tracking-widest text-[#777] uppercase">
+					<span class="mb-1 text-[12px] font-bold tracking-widest text-muted-dim uppercase">
 						Upgrade Modifiers
 					</span>
-					<div class="border-b border-[#111418]/10 pb-2 text-[14px] font-bold text-[#111418]">
+					<div class="border-b border-modal-foreground/10 pb-2 text-[14px] font-bold text-modal-foreground">
 						{#each mockData.upgradeModifiers as mod}
 							<div>{mod}</div>
 						{/each}
@@ -138,7 +138,7 @@
 
 				<!-- Recycles Into -->
 				<div class="flex flex-col">
-					<span class="mb-2 text-[12px] font-bold tracking-widest text-[#111418] uppercase">
+					<span class="mb-2 text-[12px] font-bold tracking-widest text-modal-foreground uppercase">
 						Recycles Into
 					</span>
 					<div class="flex gap-1.5">
@@ -152,7 +152,7 @@
 
 			<!-- Подвал (Вес и Цена) -->
 			<div
-				class="flex h-[42px] w-full items-center rounded-b-[6px] bg-[#E3DEC7] text-[15px] font-bold text-[#111418]"
+				class="flex h-[42px] w-full items-center rounded-b-[6px] bg-modal-secondary text-[15px] font-bold text-modal-foreground"
 			>
 				<div class="flex flex-1 items-center justify-center gap-2 border-r border-white/50">
 					<!-- Иконка гири (Вес) -->
@@ -175,7 +175,7 @@
 <!-- Сниппет для отрисовки квадратных мини-иконок (аттачменты и ресурсы) -->
 {#snippet miniItem(rarityStr: string)}
 	{@const style = getRarityStyle(rarityStr as any) || getRarityStyle('common')}
-	<div class="relative h-[42px] w-[42px] shrink-0 overflow-hidden rounded-[4px] bg-[#0F111A]">
+	<div class="relative h-[42px] w-[42px] shrink-0 overflow-hidden rounded-[4px] bg-surface">
 		<!-- Маска уголка редкости -->
 		<div
 			class="absolute -bottom-1 -left-1 z-0 aspect-square h-[60%] {style.bg}"

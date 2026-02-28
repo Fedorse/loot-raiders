@@ -29,7 +29,7 @@
 <div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
 	<div class="flex items-start justify-center gap-4">
 		<div
-			class="z-10 flex flex-col gap-4 rounded-lg bg-[#0b0c15]/50 px-4 pt-4 pb-12 backdrop-blur-xs"
+			class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs"
 		>
 			<div class="flex items-center gap-4">
 				<h2 class="text-base font-bold uppercase">Loot raiders cashes</h2>
@@ -43,7 +43,7 @@
 			</div>
 		</div>
 		<div
-			class="z-10 flex flex-col items-start gap-4 rounded-lg bg-[#0b0c15]/50 px-4 py-4 backdrop-blur-xs"
+			class="z-10 flex flex-col items-start gap-4 rounded-lg bg-background/50 px-4 py-4 backdrop-blur-xs"
 		>
 			<div class="flex items-center">
 				<h2 class="text-base font-bold uppercase">loadout</h2>
