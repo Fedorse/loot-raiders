@@ -6,19 +6,22 @@
 
 	type Props = {
 		item: InstanceItem;
-		location: ItemLocation;
+		location?: ItemLocation;
 		className?: string;
 		selected: boolean;
+		readonly?: boolean;
 	};
 
-	let { item, location, className = 'h-20 w-20', selected }: Props = $props();
+	let { item, location, className = 'h-20 w-20', selected, readonly }: Props = $props();
 
 	const { interaction } = getGameContext();
 
 	const def = $derived(getDef(item.defId));
 	const style = $derived(getRarityStyle(def.rarity));
 	const hasAttachments = $derived(item.attachments?.some((a) => a !== null) ?? false);
-	const displayCount = $derived(interaction.getDisplayCount(item, location));
+	const displayCount = $derived(
+		location ? interaction.getDisplayCount(item, location) : item.count
+	);
 </script>
 
 <div class="{className} group">
@@ -36,7 +39,9 @@
 				<img
 					src={def.image}
 					alt="Loot"
-					class="relative z-10 h-full w-full object-contain transition-transform group-hover:scale-110"
+					class="relative z-10 h-full w-full object-contain transition-transform {readonly
+						? ''
+						: 'group-hover:scale-105'} "
 				/>
 			</div>
 

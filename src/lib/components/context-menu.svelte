@@ -7,11 +7,13 @@
 	const menu = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
+
+	let menuRef: HTMLElement;
 </script>
 
 <svelte:window
 	onpointerdown={(e) => {
-		if (menu && e.button === 0) close();
+		if (menu && e.button === 0 && menuRef && !menuRef.contains(e.target as Node)) close();
 	}}
 />
 
@@ -22,10 +24,9 @@
 			? getStorageConfig(menu.slot.location.storageId)?.quickMoveTarget
 			: undefined}
 
-	<!-- <div class="fixed inset-0 z-[9998]" oncontextmenu={(e) => e.preventDefault()}></div> -->
-
 	<div
-		class="fixed z-[9999] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
+		bind:this={menuRef}
+		class="fixed z-[9998] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
 		style="top: {menu.y}px; left: {menu.x}px;"
 		oncontextmenu={(e) => e.preventDefault()}
 	>
@@ -38,8 +39,7 @@
 		{#if moveTargetId}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
-				onpointerdown={(e) => {
-					e.stopPropagation();
+				onclick={() => {
 					inventory.quickMove(menu.slot.location);
 					close();
 				}}
@@ -51,8 +51,7 @@
 		{#if def.maxStack && menu.slot.item.count > 1}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
-				onpointerdown={(e) => {
-					e.stopPropagation();
+				onclick={() => {
 					inventory.splitStack(menu.slot.location);
 					close();
 				}}
@@ -65,8 +64,7 @@
 
 		<button
 			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
-			onpointerdown={(e) => {
-				e.stopPropagation();
+			onclick={() => {
 				inventory.removeItem(menu.slot.location);
 				close();
 			}}
@@ -77,8 +75,7 @@
 		{#if def.recycling?.length}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent-alt"
-				onpointerdown={(e) => {
-					e.stopPropagation();
+				onclick={() => {
 					overlay.openRecycleModal(menu.slot.item, menu.slot.location);
 					close();
 				}}

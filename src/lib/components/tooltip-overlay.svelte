@@ -27,7 +27,7 @@
 		}
 	});
 
-	// --- МОК ДАННЫХ ДЛЯ СКРИНШОТА ---
+	// TODO: Replace mockData with real item properties from ItemDefinition
 	const mockData = {
 		durability: '37/130',
 		ammoType: 'Shotgun Ammo',
@@ -35,7 +35,6 @@
 		firingMode: 'Pump-Action',
 		armorPenetration: 'Weak',
 		upgradeModifiers: ['50% Increased Fire Rate'],
-		// Мокаем картинки для аттачментов и ресурсов (используем плейсхолдеры)
 		mockAttachments: [1, 2, 3, 4],
 		mockRecycles: [1, 2]
 	};
@@ -69,7 +68,8 @@
 				<!-- Подзаголовок (Бейджи) -->
 				<div class="mb-2 flex gap-1 text-[11px] font-bold tracking-wider text-white uppercase">
 					<div class="flex items-center gap-1 bg-badge px-1.5 py-0.5">
-						<span class="font-black">!!</span>
+						<!-- todo icon category shoud be here -->
+						<!-- <span class="font-black">!!</span> -->
 						<!-- Иконка шотгана -->
 						<span>Shotgun</span>
 					</div>
@@ -100,13 +100,10 @@
 				<!-- Характеристики (Grid/List) -->
 				<div class="mb-4 flex flex-col text-[14px] font-medium text-modal-foreground">
 					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
-						<span class="text-modal-secondary-foreground">Durability</span>
-						<span class="font-bold">{mockData.durability}</span>
-					</div>
-					<div class="flex items-center justify-between border-b border-modal-foreground/10 py-2">
 						<span class="text-modal-secondary-foreground">Ammo Type</span>
 						<span class="flex items-center gap-1.5 font-bold">
-							<span class="font-black opacity-60">!!</span>
+							<!-- todo icon category shoud be here -->
+							<!-- <span class="font-black opacity-60">!!</span> -->
 							{mockData.ammoType}
 						</span>
 					</div>
@@ -125,16 +122,18 @@
 				</div>
 
 				<!-- Upgrade Modifiers -->
-				<div class="mb-4 flex flex-col">
+				<!-- <div class="mb-4 flex flex-col">
 					<span class="mb-1 text-[12px] font-bold tracking-widest text-muted-dim uppercase">
 						Upgrade Modifiers
 					</span>
-					<div class="border-b border-modal-foreground/10 pb-2 text-[14px] font-bold text-modal-foreground">
+					<div
+						class="border-b border-modal-foreground/10 pb-2 text-[14px] font-bold text-modal-foreground"
+					>
 						{#each mockData.upgradeModifiers as mod}
 							<div>{mod}</div>
 						{/each}
 					</div>
-				</div>
+				</div> -->
 
 				<!-- Recycles Into -->
 				<div class="flex flex-col">
@@ -146,26 +145,6 @@
 							{@render miniItem('common')}
 						{/each}
 					</div>
-				</div>
-			</div>
-			<!-- Конец паддинг-контейнера -->
-
-			<!-- Подвал (Вес и Цена) -->
-			<div
-				class="flex h-[42px] w-full items-center rounded-b-[6px] bg-modal-secondary text-[15px] font-bold text-modal-foreground"
-			>
-				<div class="flex flex-1 items-center justify-center gap-2 border-r border-white/50">
-					<!-- Иконка гири (Вес) -->
-					<svg class="size-4 opacity-70" viewBox="0 0 24 24" fill="currentColor">
-						<path
-							d="M12 2c-1.1 0-2 .9-2 2v2H6c-1.1 0-2 .9-2 2v10c0 2.2 1.8 4 4 4h8c2.2 0 4-1.8 4-4V8c0-1.1-.9-2-2-2h-4V4c0-1.1-.9-2-2-2zm0 2c.55 0 1 .45 1 1v1h-2V5c0-.55.45-1 1-1z"
-						/>
-					</svg>
-					{def.weight.toFixed(1)}
-				</div>
-				<div class="flex flex-1 items-center justify-center gap-1.5">
-					<span class="text-[16px] font-medium opacity-70">Ф</span>
-					{def.price.toLocaleString()}
 				</div>
 			</div>
 		</div>

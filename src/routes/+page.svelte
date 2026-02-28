@@ -1,30 +1,14 @@
 <script lang="ts">
-	import DragLayer from '$lib/components/drag-layer.svelte';
-	import ContextMenu from '$lib/components/context-menu.svelte';
-	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
-	import RecycleModal from '$lib/components/recycle-modal.svelte';
-	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
-	import { initGame } from '$lib/store/game.svelte';
+	import { getGameContext } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
-	const game = initGame();
-	const { inventory, overlay, debug } = game;
+	const { inventory } = getGameContext();
 
 	const lootBackConfig = getStorageConfig('lootBack');
 	const backpackConfig = getStorageConfig('backpack');
 </script>
-
-<svelte:window
-	onkeydown={(e) => {
-		if (e.key === 'd' || e.key === 'D') {
-			const tag = (e.target as HTMLElement)?.tagName;
-			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-			debug.toggle();
-		}
-	}}
-/>
 
 <div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
 	<div class="flex items-start justify-center gap-4">
@@ -76,24 +60,6 @@
 
 	<Shortcuts />
 </div>
-
-<DragLayer />
-<ContextMenu />
-<TooltipOverlay />
-
-{#if overlay.recycleModal}
-	{@const { item, location } = overlay.recycleModal}
-	<RecycleModal
-		{item}
-		onClose={() => overlay.closeRecycleModal()}
-		onConfirm={() => {
-			inventory.recycleItem(location);
-			overlay.closeRecycleModal();
-		}}
-	/>
-{/if}
-
-<DebugPanel />
 
 <style>
 	@reference "tailwindcss";

@@ -24,7 +24,12 @@ export class Overlay {
 
 	openContextMenu(x: number, y: number, slot: OccupiedSlot) {
 		this.hideTooltip();
-		this.contextMenu = { x, y, slot };
+		const W = 192, H = 200;
+		this.contextMenu = {
+			x: Math.min(x, window.innerWidth - W - 8),
+			y: Math.min(y, window.innerHeight - H - 8),
+			slot
+		};
 	}
 
 	closeContextMenu() {
@@ -41,8 +46,16 @@ export class Overlay {
 	}
 
 	showTooltip(x: number, y: number, item: InstanceItem) {
-		if (this.contextMenu) return;
+		if (this.contextMenu || this.recycleModal) return;
 		this.tooltip = { x, y, item };
+	}
+
+	handleEscape() {
+		if (this.recycleModal) {
+			this.closeRecycleModal();
+		} else if (this.contextMenu) {
+			this.closeContextMenu();
+		}
 	}
 
 	hideTooltip() {
