@@ -1,6 +1,7 @@
 <script lang="ts">
 	import DragLayer from '$lib/components/drag-layer.svelte';
 	import ContextMenu from '$lib/components/context-menu.svelte';
+	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import Shortcuts from '$lib/components/shortcuts.svelte';
@@ -78,6 +79,7 @@
 
 <DragLayer />
 <ContextMenu />
+<TooltipOverlay />
 
 {#if overlay.recycleModal}
 	{@const { item, location } = overlay.recycleModal}

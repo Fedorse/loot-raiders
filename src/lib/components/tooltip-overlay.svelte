@@ -1,4 +1,3 @@
-<!-- ===== lib/components/tooltip-overlay.svelte ===== -->
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
@@ -21,9 +20,10 @@
 			const vw = window.innerWidth;
 			const vh = window.innerHeight;
 
-			// Учитываем высоту вкладки "ACTIONS" (около 32px)
+			const TAB_HEIGHT = 32; // высота вкладки "ACTIONS" (-top-8)
 			adjustedX = tooltip.x + rect.width > vw ? tooltip.x - rect.width - 20 : tooltip.x + 15;
-			adjustedY = tooltip.y + rect.height > vh ? tooltip.y - rect.height - 20 : tooltip.y + 15;
+			const rawY = tooltip.y + rect.height > vh ? tooltip.y - rect.height - 20 : tooltip.y + 15;
+			adjustedY = Math.max(TAB_HEIGHT + 4, rawY);
 		}
 	});
 

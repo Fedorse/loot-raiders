@@ -39,6 +39,14 @@
 			if (e.ctrlKey) return;
 			if (item) overlay.openContextMenu(e.clientX, e.clientY, { location, item });
 		}}
+		onpointerenter={(e) => {
+			if (item && interaction.status === 'idle') {
+				overlay.showTooltip(e.clientX, e.clientY, item);
+			}
+		}}
+		onpointerleave={() => {
+			overlay.hideTooltip();
+		}}
 	>
 		{#if item && !isDraggingThisItem}
 			<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
