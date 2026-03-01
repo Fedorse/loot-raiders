@@ -68,7 +68,7 @@
 {#snippet invalidIcon()}
 	{#if showInvalidHint}
 		<div class="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-			<img src="/assets/invalid.png" alt="!!" class="size-10 opacity-50" />
+			<img src="/assets/ui/invalid.png" alt="!!" class="size-10 opacity-50" />
 		</div>
 	{/if}
 {/snippet}

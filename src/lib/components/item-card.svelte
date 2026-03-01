@@ -70,7 +70,7 @@
 			<img src={def.categoryIcon} alt="ammo type" class="size-4 object-contain" />
 			{#if hasAttachments}
 				<img
-					src="/assets/mod_slot_assets/weapon-mod.png"
+					src="/assets/ui/mod_slot_assets/weapon-mod.png"
 					alt="modded"
 					class="size-4 object-contain opacity-50"
 				/>

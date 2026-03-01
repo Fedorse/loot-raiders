@@ -11,21 +11,21 @@ export const STORAGE_CONFIGS: Record<StorageId, StorageConfig> = {
 		name: 'augment',
 		size: 1,
 		allowedTypes: ['augment'],
-		placeholder: '/assets/placeholder/augment_placeholder.png',
+		placeholder: '/assets/ui/placeholder/augment_placeholder.png',
 		quickMoveTarget: 'backpack'
 	},
 	shield: {
 		name: 'shield',
 		size: 1,
 		allowedTypes: ['shield'],
-		placeholder: '/assets/placeholder/shield_placeholder.png',
+		placeholder: '/assets/ui/placeholder/shield_placeholder.png',
 		quickMoveTarget: 'backpack'
 	},
 	weapon: {
 		name: 'weapon',
 		size: 2,
 		allowedTypes: ['weapon'],
-		placeholder: '/assets/placeholder/placeholder_weapon.png',
+		placeholder: '/assets/ui/placeholder/placeholder_weapon.png',
 		quickMoveTarget: 'backpack'
 	},
 	backpack: {

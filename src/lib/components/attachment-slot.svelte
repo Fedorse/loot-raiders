@@ -38,7 +38,7 @@
 		onpointerleave={() => (isHovered = false)}
 	>
 		{@render glowRing()}
-		<div class="relative z-10 h-full w-full p-[2px]">
+		<div class="relative z-10 size-8 h-full w-full p-[2px]">
 			<div
 				class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 			>
@@ -50,7 +50,7 @@
 						<img
 							src={def.image}
 							alt={def.name}
-							class="relative z-10 h-full w-full scale-105 object-contain"
+							class="relative z-10 h-full w-full scale-125 object-contain"
 						/>
 					</div>
 				</div>

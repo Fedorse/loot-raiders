@@ -65,6 +65,17 @@ export interface ItemDefinition {
 	attachmentSlots?: AttachmentSlotDef[];
 
 	recycling?: RecyclingResult[];
+
+	// Weapon-specific
+	description?: string;
+	weaponClass?: string;
+	ammoType?: string;
+	magazineSize?: number;
+	firingMode?: string;
+	armorPenetration?: string;
+
+	// Attachment-specific
+	statBonuses?: string[];
 }
 
 // ----Storage config----
