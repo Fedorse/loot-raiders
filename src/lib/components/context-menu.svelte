@@ -2,36 +2,30 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getStorageConfig } from '$lib/config/storages';
+	import { clickOutside } from '$lib/actions/actions';
 
 	const { overlay, inventory } = getGameContext();
-	const menu = $derived(overlay.contextMenu);
+	const menuData = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
-
-	let menuRef: HTMLElement;
+	const def = $derived(menuData ? getDef(menuData.slot.item.defId) : null);
 </script>
 
-<svelte:window
-	onpointerdown={(e) => {
-		if (menu && e.button === 0 && menuRef && !menuRef.contains(e.target as Node)) close();
-	}}
-/>
-
-{#if menu}
-	{@const def = getDef(menu.slot.item.defId)}
+{#if menuData && def}
 	{@const moveTargetId =
-		menu.slot.location.type === 'container'
-			? getStorageConfig(menu.slot.location.storageId)?.quickMoveTarget
+		menuData.slot.location.type === 'container'
+			? getStorageConfig(menuData.slot.location.storageId)?.quickMoveTarget
 			: undefined}
 
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		bind:this={menuRef}
-		class="fixed z-[9998] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
-		style="top: {menu.y}px; left: {menu.x}px;"
+		{@attach clickOutside(close)}
+		class="fixed z-[100] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
+		style="top: {menuData.y}px; left: {menuData.x}px;"
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div
-			class="border-b border-modal-border px-3 pb-1 text-xs font-bold tracking-wider text-muted uppercase"
+			class="border-b border-modal-border px-3 pt-1 pb-2 text-xs font-bold tracking-wider text-muted uppercase"
 		>
 			{def.name}
 		</div>
@@ -40,7 +34,7 @@
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 				onclick={() => {
-					inventory.quickMove(menu.slot.location);
+					inventory.quickMove(menuData.slot.location);
 					close();
 				}}
 			>
@@ -48,11 +42,11 @@
 			</button>
 		{/if}
 
-		{#if def.maxStack && menu.slot.item.count > 1}
+		{#if def.maxStack && menuData.slot.item.count > 1}
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 				onclick={() => {
-					inventory.splitStack(menu.slot.location);
+					inventory.splitStack(menuData.slot.location);
 					close();
 				}}
 			>
@@ -65,7 +59,7 @@
 		<button
 			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
 			onclick={() => {
-				inventory.removeItem(menu.slot.location);
+				inventory.removeItem(menuData.slot.location);
 				close();
 			}}
 		>
@@ -76,7 +70,7 @@
 			<button
 				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent-alt"
 				onclick={() => {
-					overlay.openRecycleModal(menu.slot.item, menu.slot.location);
+					overlay.openRecycleModal(menuData.slot.item, menuData.slot.location);
 					close();
 				}}
 			>

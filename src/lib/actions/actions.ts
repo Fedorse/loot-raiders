@@ -31,3 +31,15 @@ export function draggable(slot: SlotState) {
 		return () => node.removeEventListener('pointerdown', onDown);
 	};
 }
+
+export function clickOutside(callback: () => void) {
+	return (node: HTMLElement) => {
+		const handle = (e: PointerEvent) => {
+			if (e.button === 0 && !node.contains(e.target as Node)) {
+				callback();
+			}
+		};
+		window.addEventListener('pointerdown', handle);
+		return () => window.removeEventListener('pointerdown', handle);
+	};
+}

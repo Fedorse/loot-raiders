@@ -51,7 +51,7 @@
 </div>
 
 {#snippet absoluteGlowShadow()}
-	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {style.glow} "></div>
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow} "></div>
 {/snippet}
 
 {#snippet absoluteBlob()}

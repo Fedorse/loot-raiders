@@ -1,4 +1,4 @@
-import type { InstanceItem, ItemLocation, OccupiedSlot } from '$lib/types';
+import type { InstanceItem, ItemLocation, OccupiedSlot, SlotState } from '$lib/types';
 
 interface MenuState {
 	x: number;
@@ -16,19 +16,21 @@ interface RecycleModalState {
 	item: InstanceItem;
 	location: ItemLocation;
 }
+const CONTEXT_MENU_WIDTH = 192;
+const CONTEXT_MENU_HEIGHT = 200;
 
 export class Overlay {
 	contextMenu = $state<MenuState | null>(null);
 	tooltip = $state<TooltipState | null>(null);
 	recycleModal = $state<RecycleModalState | null>(null);
 
-	openContextMenu(x: number, y: number, slot: OccupiedSlot) {
+	openContextMenu(x: number, y: number, slot: SlotState) {
+		if (!slot.item) return;
 		this.hideTooltip();
-		const W = 192, H = 200;
 		this.contextMenu = {
-			x: Math.min(x, window.innerWidth - W - 8),
-			y: Math.min(y, window.innerHeight - H - 8),
-			slot
+			x: Math.min(x, window.innerWidth - CONTEXT_MENU_WIDTH - 8),
+			y: Math.min(y, window.innerHeight - CONTEXT_MENU_HEIGHT - 8),
+			slot: { location: slot.location, item: slot.item }
 		};
 	}
 

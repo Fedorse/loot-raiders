@@ -33,6 +33,38 @@ export const RARITY_STYLES: Record<ItemRarity, RarityStyle> = {
 	}
 };
 
+const TOOLTIP_OVERRIDES: Partial<Record<ItemRarity, Partial<RarityStyle>>> = {
+	common: {
+		border: 'bg-gray-600',
+		bg: 'bg-gray-600/60',
+		glow: 'bg-gray-600'
+	},
+	uncommon: {
+		border: 'from-rarity-uncommon via-rarity-uncommon via-5% to-rarity-gradient-end to-100%',
+		bg: 'bg-rarity-uncommon',
+		glow: 'bg-rarity-uncommon-glow'
+	},
+	rare: {
+		border: 'from-rarity-rare via-rarity-rare-glow via-5% to-rarity-gradient-end to-100%',
+		bg: 'bg-rarity-rare',
+		glow: 'bg-rarity-rare-glow'
+	},
+	epic: {
+		border: 'from-rarity-epic via-rarity-epic via-5% to-rarity-gradient-end to-100%',
+		bg: 'bg-rarity-epic',
+		glow: 'bg-rarity-epic-glow'
+	},
+	legendary: {
+		border: 'from-rarity-legendary via-rarity-legendary-alt via-5% to-rarity-gradient-end to-100%',
+		bg: 'bg-rarity-legendary',
+		glow: 'bg-rarity-legendary-glow'
+	}
+};
+
 export const getRarityStyle = (rarity: ItemRarity): RarityStyle => {
 	return RARITY_STYLES[rarity];
+};
+
+export const getRarityStyleTooltip = (rarity: ItemRarity): RarityStyle => {
+	return { ...RARITY_STYLES[rarity], ...TOOLTIP_OVERRIDES[rarity] };
 };

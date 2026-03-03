@@ -6,12 +6,13 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 
 	const { overlay, inventory } = getGameContext();
-	const modal = $derived(overlay.recycleModal);
+	const modalData = $derived(overlay.recycleModal);
 
-	const def = $derived(modal ? getDef(modal.item.defId) : null);
+	const def = $derived(modalData ? getDef(modalData.item.defId) : null);
+
 	const resources = $derived(def?.recycling ?? []);
 	const attachments = $derived(
-		modal?.item.attachments?.filter((a): a is InstanceItem => a !== null) ?? []
+		modalData?.item.attachments?.filter((a): a is InstanceItem => a !== null) ?? []
 	);
 
 	function handleClose() {
@@ -19,17 +20,17 @@
 	}
 
 	function handleConfirm() {
-		if (!modal) return;
-		inventory.recycleItem(modal.location);
+		if (!modalData) return;
+		inventory.recycleItem(modalData.location);
 		overlay.closeRecycleModal();
 	}
 </script>
 
-{#if modal && def}
+{#if modalData && def}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
-		class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		transition:fade={{ duration: 150 }}
 		onclick={handleClose}
 	>
@@ -44,14 +45,18 @@
 				</h1>
 
 				<p class="mb-5 text-[15px] leading-snug font-medium text-modal-secondary-foreground">
-					You have selected {modal.item.count} item{modal.item.count > 1 ? 's' : ''} to recycle. These
-					are the resources you will get back:
+					You have selected {modalData.item.count} item{modalData.item.count > 1 ? 's' : ''} to recycle.
+					These are the resources you will get back:
 				</p>
 
 				<div class="flex min-h-[110px] flex-wrap gap-2.5 rounded bg-modal-secondary p-3">
-					{#each resources as res (res.itemId)}
+					{#each def.recycling as res (res.itemId)}
 						<ItemCard
-							item={{ uid: res.itemId, defId: res.itemId, count: res.amount * modal.item.count }}
+							item={{
+								uid: res.itemId,
+								defId: res.itemId,
+								count: res.amount * modalData.item.count
+							}}
 							selected={false}
 							className="h-[90px] w-[90px]"
 							readonly={true}

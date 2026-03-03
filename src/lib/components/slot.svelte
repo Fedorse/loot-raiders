@@ -37,11 +37,12 @@
 		oncontextmenu={(e) => {
 			e.preventDefault();
 			if (e.ctrlKey) return;
-			if (item) overlay.openContextMenu(e.clientX, e.clientY, { location, item });
+			if (slotState.item) overlay.openContextMenu(e.clientX, e.clientY, slotState);
 		}}
 		onpointerenter={(e) => {
 			if (item && interaction.status === 'idle') {
-				overlay.showTooltip(e.clientX, e.clientY, item);
+				const rect = e.currentTarget.getBoundingClientRect();
+				overlay.showTooltip(rect.right, rect.top, item);
 			}
 		}}
 		onpointerleave={() => {

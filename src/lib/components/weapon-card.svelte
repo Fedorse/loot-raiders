@@ -26,11 +26,11 @@
 		>
 			{@render absoluteGlowShadow()}
 			{@render absoluteBlob()}
-			<div class="min-h-0 flex-1">
+			<div class="relative z-10 min-h-0 flex-1">
 				<img
 					src={def?.image ?? ''}
 					alt="weapon"
-					class="z-10 max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
+					class="max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
 				/>
 			</div>
 			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
@@ -51,7 +51,7 @@
 </div>
 
 {#snippet absoluteGlowShadow()}
-	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-10 blur-xl {style.glow}"></div>
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"></div>
 {/snippet}
 
 {#snippet absoluteBlob()}
