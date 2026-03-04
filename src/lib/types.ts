@@ -94,3 +94,21 @@ export interface RarityStyle {
 	glow: string;
 	height: string;
 }
+
+export type LootboxPhase = 'idle' | 'spinning' | 'result' | 'opened';
+
+export interface LootItem {
+	defId: string;
+	weight: number;
+	countMin?: number;
+	countMax?: number;
+}
+
+export interface LootboxDef {
+	id: string;
+	name: string;
+	rarity: ItemRarity;
+	image: string;
+	slots: number;
+	lootTable: LootItem[];
+}

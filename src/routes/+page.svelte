@@ -3,6 +3,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
+	import LootboxMachine from '$lib/components/lootbox-machine.svelte';
 
 	const { inventory } = getGameContext();
 
@@ -12,7 +13,7 @@
 
 <div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
 	<div class="flex items-start justify-center gap-4">
-		<div
+		<!-- <div
 			class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs"
 		>
 			<div class="flex items-center gap-4">
@@ -25,7 +26,9 @@
 			<div class="grid grid-cols-4">
 				<StorageGrid storageId="lootBack" class="aspect-square h-20 w-20" />
 			</div>
-		</div>
+		</div> -->
+		<LootboxMachine />
+
 		<div
 			class="z-10 flex flex-col items-start gap-4 rounded-lg bg-background/50 px-4 py-4 backdrop-blur-xs"
 		>

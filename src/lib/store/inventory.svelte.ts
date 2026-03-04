@@ -21,7 +21,7 @@ export class Inventory {
 	);
 
 	constructor() {
-		this.setup();
+		// this.setup();
 	}
 
 	// ---- Universal accessors ----
@@ -220,9 +220,7 @@ export class Inventory {
 
 		const sourceStorageId = loc.storageId;
 		const isEquipSlot =
-			sourceStorageId === 'weapon' ||
-			sourceStorageId === 'shield' ||
-			sourceStorageId === 'augment';
+			sourceStorageId === 'weapon' || sourceStorageId === 'shield' || sourceStorageId === 'augment';
 		const targetStorageId = isEquipSlot ? 'backpack' : sourceStorageId;
 
 		const attachments: InstanceItem[] =
@@ -255,6 +253,23 @@ export class Inventory {
 	}
 
 	// ---- Utilities ----
+
+	clearStorage(storageId: StorageId): void {
+		this.items.filter((slot) => {
+			if (slot.location.type === 'container' && slot.location.storageId === storageId) {
+				this.selectedIds.delete(slot.item.uid);
+				return false;
+			}
+			return true;
+		});
+	}
+	fillStorage(storageId: StorageId, newItems: InstanceItem[]): void {
+		for (const item of newItems) {
+			const loc = this.getFirstEmptySlot(storageId);
+			if (!loc) break;
+			this.setItem(loc, item);
+		}
+	}
 
 	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
 		const config = getStorageConfig(storageId);
@@ -353,10 +368,7 @@ export class Inventory {
 				{ type: 'container', storageId: 'lootBack', index: 4 },
 				this.createItem('att_muzzle_brake_2')
 			],
-			[
-				{ type: 'container', storageId: 'lootBack', index: 5 },
-				this.createItem('att_padded_stock')
-			]
+			[{ type: 'container', storageId: 'lootBack', index: 5 }, this.createItem('att_padded_stock')]
 		];
 		for (const [loc, item] of initial) {
 			this.items.push({ location: loc, item });
