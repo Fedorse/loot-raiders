@@ -119,7 +119,7 @@ export class Interaction {
 		let isSplit = false;
 		let dragItem = this.initialSlot.item;
 
-		if ((e.metaKey || e.altKey) && this.initialSlot.location.type === 'container') {
+		if ((e.metaKey || e.altKey) && this.initialSlot.location.type === 'slot') {
 			const def = getDef(dragItem.defId);
 			if (def.maxStack && dragItem.count > 1) {
 				const splitCount = Math.floor(dragItem.count / 2);
@@ -214,7 +214,7 @@ export class Interaction {
 		if (isValid) return false;
 
 		if (this.dragState.isSplit) {
-			if (slot.location.type !== 'container') return true;
+			if (slot.location.type !== 'slot') return true;
 			const targetStorageId = slot.location.storageId;
 			if (targetStorageId === 'lootBack' || targetStorageId === 'backpack') return false;
 			return true;
@@ -222,17 +222,17 @@ export class Interaction {
 
 		// If source is an attachment location
 		if (this.dragState.sourceLocation.type === 'attachment') {
-			if (slot.location.type !== 'container') return true;
+			if (slot.location.type !== 'slot') return true;
 			const targetStorageId = slot.location.storageId;
 			if (targetStorageId === 'backpack' || targetStorageId === 'lootBack') return false;
 			return true;
 		}
 
 		// Source is a container location
-		if (this.dragState.sourceLocation.type === 'container') {
+		if (this.dragState.sourceLocation.type === 'slot') {
 			const sourceStorageId = this.dragState.sourceLocation.storageId;
 
-			if (slot.location.type === 'container') {
+			if (slot.location.type === 'slot') {
 				if (
 					sourceStorageId === 'weapon' &&
 					(slot.location.storageId === 'backpack' || slot.location.storageId === 'lootBack')

@@ -19,7 +19,7 @@
 
 	const def = $derived(getDef(item.defId));
 	const isWeapon = $derived(
-		def.type === 'weapon' && location.type === 'container' && location.storageId === 'weapon'
+		def.type === 'weapon' && location.type === 'slot' && location.storageId === 'weapon'
 	);
 </script>
 

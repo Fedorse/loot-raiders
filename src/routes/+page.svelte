@@ -3,7 +3,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
-	import LootboxMachine from '$lib/components/lootbox-machine.svelte';
+	import LootboxMachine from '$lib/components/lootbox.svelte';
 
 	const { inventory } = getGameContext();
 

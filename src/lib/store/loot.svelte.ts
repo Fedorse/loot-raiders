@@ -2,8 +2,6 @@ import { LOOTBOX_ORDER, getLootboxDef } from '$lib/config/lootboxes';
 import type { Inventory } from './inventory.svelte';
 import type { LootboxPhase, LootItem, InstanceItem } from '$lib/types';
 
-const SPIN_DURATION = 2000;
-
 export class Lootbox {
 	private inventory!: Inventory;
 
@@ -17,18 +15,31 @@ export class Lootbox {
 
 	spin(): void {
 		if (this.phase !== 'idle') return;
-		this.resultIndex = Math.floor(Math.random() * LOOTBOX_ORDER.length);
+
+		const boxes = LOOTBOX_ORDER.map((rarity) => getLootboxDef(rarity));
+		const totalWeight = boxes.reduce((sum, box) => sum + box.spinWeight, 0);
+
+		let roll = Math.random() * totalWeight;
+
+		for (let i = 0; i < boxes.length; i++) {
+			roll -= boxes[i].spinWeight;
+			if (roll <= 0) {
+				this.resultIndex = i;
+				break;
+			}
+		}
 		this.phase = 'spinning';
-		setTimeout(() => {
-			this.phase = 'result';
-		}, SPIN_DURATION);
+	}
+
+	onSpinComplete(): void {
+		this.phase = 'result';
 	}
 
 	open(): void {
 		if (this.phase !== 'result') return;
 		const box = this.selectedBox;
 		this.inventory.clearStorage('lootBack');
-		const items = this.rollLootTable(box.lootTable, box.slots);
+		const items = this.getRandomLoot(box.lootTable, box.slots);
 		this.inventory.fillStorage('lootBack', items);
 		this.phase = 'opened';
 	}
@@ -39,12 +50,13 @@ export class Lootbox {
 		this.phase = 'idle';
 	}
 
-	private rollLootTable(table: LootItem[], count: number): InstanceItem[] {
-		const totalWeight = table.reduce((sum, entry) => sum + entry.weight, 0);
+	private getRandomLoot(table: LootItem[], count: number): InstanceItem[] {
+		const totalWeight = table.reduce((sum, item) => sum + item.weight, 0);
 		const items: InstanceItem[] = [];
 
 		for (let i = 0; i < count; i++) {
 			let roll = Math.random() * totalWeight;
+
 			for (const entry of table) {
 				roll -= entry.weight;
 				if (roll <= 0) {

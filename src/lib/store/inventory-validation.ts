@@ -10,7 +10,7 @@ export const isAllowedInLocation = (
 	loc: ItemLocation,
 	resolve: ItemResolver
 ): boolean => {
-	if (loc.type === 'container') {
+	if (loc.type === 'slot') {
 		const itemDef = getDef(item.defId);
 		const allowedTypes = getAllowedTypes(loc.storageId);
 		return allowedTypes.includes(itemDef.type);
@@ -58,7 +58,7 @@ export const getAttachmentSlotIndex = (
 export const getDropActionType = (drag: DragState, target: SlotState): DropActionType => {
 	if (!target.item) return 'move';
 	if (canStackItems(drag.item, target.item)) return 'stack';
-	if (target.location.type === 'container' && canAttachToWeapon(drag.item, target.item))
+	if (target.location.type === 'slot' && canAttachToWeapon(drag.item, target.item))
 		return 'attach';
 	if (drag.isSplit) return 'invalid';
 	return 'swap';

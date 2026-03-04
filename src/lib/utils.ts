@@ -9,14 +9,14 @@ export function isWeapon(item: InstanceItem | null): boolean {
 
 export function isEqualLocation(a: ItemLocation, b: ItemLocation): boolean {
 	if (a.type !== b.type) return false;
-	if (a.type === 'container' && b.type === 'container') {
+	if (a.type === 'slot' && b.type === 'slot') {
 		return a.storageId === b.storageId && a.index === b.index;
 	}
 	if (a.type === 'attachment' && b.type === 'attachment') {
 		if (a.attachIndex !== b.attachIndex) return false;
 		const pa = a.parentLocation;
 		const pb = b.parentLocation;
-		return pa.type === 'container' && pb.type === 'container'
+		return pa.type === 'slot' && pb.type === 'slot'
 			&& pa.storageId === pb.storageId && pa.index === pb.index;
 	}
 	return false;

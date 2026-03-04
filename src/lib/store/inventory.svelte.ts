@@ -8,16 +8,17 @@ import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } f
 
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
+
 	selectedIds = new SvelteSet<string>();
 
 	backpack = $derived(
-		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'backpack')
+		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'backpack')
 	);
 	lootBack = $derived(
-		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'lootBack')
+		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'lootBack')
 	);
 	weapon = $derived(
-		this.items.filter((i) => i.location.type === 'container' && i.location.storageId === 'weapon')
+		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'weapon')
 	);
 
 	constructor() {
@@ -27,7 +28,7 @@ export class Inventory {
 	// ---- Universal accessors ----
 
 	getItem(loc: ItemLocation): InstanceItem | null {
-		if (loc.type === 'container') {
+		if (loc.type === 'slot') {
 			const slot = this.items.find((i) => isEqualLocation(i.location, loc));
 			return slot?.item ?? null;
 		}
@@ -38,7 +39,7 @@ export class Inventory {
 	}
 
 	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
-		if (loc.type === 'container') {
+		if (loc.type === 'slot') {
 			if (item === null) {
 				const idx = this.items.findIndex((i) => isEqualLocation(i.location, loc));
 				if (idx !== -1) this.items.splice(idx, 1);
@@ -173,7 +174,7 @@ export class Inventory {
 	// ---- Context menu operations ----
 
 	quickMove(loc: ItemLocation): boolean {
-		if (loc.type !== 'container') return false;
+		if (loc.type !== 'slot') return false;
 		const config = getStorageConfig(loc.storageId);
 		const targetId = config?.quickMoveTarget;
 		if (!targetId) return false;
@@ -188,7 +189,7 @@ export class Inventory {
 	}
 
 	splitStack(loc: ItemLocation): boolean {
-		if (loc.type !== 'container') return false;
+		if (loc.type !== 'slot') return false;
 		const item = this.getItem(loc);
 		if (!item) return false;
 
@@ -211,7 +212,7 @@ export class Inventory {
 	}
 
 	recycleItem(loc: ItemLocation): boolean {
-		if (loc.type !== 'container') return false;
+		if (loc.type !== 'slot') return false;
 		const item = this.getItem(loc);
 		if (!item) return false;
 
@@ -255,14 +256,15 @@ export class Inventory {
 	// ---- Utilities ----
 
 	clearStorage(storageId: StorageId): void {
-		this.items.filter((slot) => {
-			if (slot.location.type === 'container' && slot.location.storageId === storageId) {
+		this.items = this.items.filter((slot) => {
+			if (slot.location.type === 'slot' && slot.location.storageId === storageId) {
 				this.selectedIds.delete(slot.item.uid);
 				return false;
 			}
 			return true;
 		});
 	}
+
 	fillStorage(storageId: StorageId, newItems: InstanceItem[]): void {
 		for (const item of newItems) {
 			const loc = this.getFirstEmptySlot(storageId);
@@ -275,7 +277,7 @@ export class Inventory {
 		const config = getStorageConfig(storageId);
 		if (!config) return null;
 		for (let i = 0; i < config.size; i++) {
-			const loc: ItemLocation = { type: 'container', storageId, index: i };
+			const loc: ItemLocation = { type: 'slot', storageId, index: i };
 			if (!this.getItem(loc)) return loc;
 		}
 		return null;
@@ -320,7 +322,7 @@ export class Inventory {
 		if (!config) return 0;
 		let count = 0;
 		for (let i = 0; i < config.size; i++) {
-			if (!this.getItem({ type: 'container', storageId, index: i })) count++;
+			if (!this.getItem({ type: 'slot', storageId, index: i })) count++;
 		}
 		return count;
 	}
@@ -338,37 +340,22 @@ export class Inventory {
 
 		const initial: [ItemLocation, InstanceItem][] = [
 			// Backpack: weapons
-			[{ type: 'container', storageId: 'backpack', index: 0 }, tempest],
-			[{ type: 'container', storageId: 'backpack', index: 1 }, renegade],
-			[{ type: 'container', storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
-			[{ type: 'container', storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
+			[{ type: 'slot', storageId: 'backpack', index: 0 }, tempest],
+			[{ type: 'slot', storageId: 'backpack', index: 1 }, renegade],
+			[{ type: 'slot', storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
+			[{ type: 'slot', storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
 			// Backpack: resources
 			[
-				{ type: 'container', storageId: 'backpack', index: 10 },
+				{ type: 'slot', storageId: 'backpack', index: 10 },
 				this.createItem('res_arc_circuitry', 10)
 			],
 			// Loot: loose attachments (разные типы)
-			[
-				{ type: 'container', storageId: 'lootBack', index: 0 },
-				this.createItem('att_compensator_3')
-			],
-			[
-				{ type: 'container', storageId: 'lootBack', index: 1 },
-				this.createItem('att_stable_stock_3')
-			],
-			[
-				{ type: 'container', storageId: 'lootBack', index: 2 },
-				this.createItem('att_angled_grip_3')
-			],
-			[
-				{ type: 'container', storageId: 'lootBack', index: 3 },
-				this.createItem('att_ext_light_mag_3')
-			],
-			[
-				{ type: 'container', storageId: 'lootBack', index: 4 },
-				this.createItem('att_muzzle_brake_2')
-			],
-			[{ type: 'container', storageId: 'lootBack', index: 5 }, this.createItem('att_padded_stock')]
+			[{ type: 'slot', storageId: 'lootBack', index: 0 }, this.createItem('att_compensator_3')],
+			[{ type: 'slot', storageId: 'lootBack', index: 1 }, this.createItem('att_stable_stock_3')],
+			[{ type: 'slot', storageId: 'lootBack', index: 2 }, this.createItem('att_angled_grip_3')],
+			[{ type: 'slot', storageId: 'lootBack', index: 3 }, this.createItem('att_ext_light_mag_3')],
+			[{ type: 'slot', storageId: 'lootBack', index: 4 }, this.createItem('att_muzzle_brake_2')],
+			[{ type: 'slot', storageId: 'lootBack', index: 5 }, this.createItem('att_padded_stock')]
 		];
 		for (const [loc, item] of initial) {
 			this.items.push({ location: loc, item });

@@ -3,6 +3,7 @@
 	import { LOOTBOX_ORDER, getLootboxDef } from '$lib/config/lootboxes';
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getStorageConfig } from '$lib/config/storages';
+	import { tweened } from 'svelte/motion';
 	import StorageGrid from './storage-grid.svelte';
 
 	const { lootbox, inventory } = getGameContext();
@@ -19,27 +20,25 @@
 		return getLootboxDef(id);
 	});
 
-	let stripOffset = $state(0);
-	let isAnimating = $state(false);
+	function slotMachineEase(t: number): number {
+		return 1 - Math.pow(1 - t, 4);
+	}
 
+	const stripOffset = tweened(0, { duration: 2000, easing: slotMachineEase });
 	const centerRepeat = Math.floor(REPEATS / 2);
 
-	function handleSpin() {
+	async function handleSpin() {
 		lootbox.spin();
 		const targetIdx = centerRepeat * LOOTBOX_ORDER.length + lootbox.resultIndex;
-		stripOffset = targetIdx * CELL;
-		isAnimating = true;
-
-		setTimeout(() => {
-			isAnimating = false;
-		}, 3000);
+		await stripOffset.set(targetIdx * CELL);
+		lootbox.onSpinComplete();
 	}
 </script>
 
 <div class="flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs">
 	{#if lootbox.phase === 'opened'}
 		<div class="flex items-center gap-4">
-			<h2 class="text-base font-bold uppercase">{lootbox.selectedBox.name}</h2>
+			<h2 class="text-base font-bold uppercase">{lootbox.selectedBox.rarity}</h2>
 			<span class="text-sm">{inventory.lootBack.length}/{lootBackConfig.size}</span>
 		</div>
 		<div class="grid grid-cols-4">
@@ -65,8 +64,7 @@
 			<!-- Strip -->
 			<div
 				class="flex"
-				class:carousel-animate={isAnimating}
-				style="gap: {GAP}px; transform: translateX({-stripOffset + BOX_WIDTH + GAP}px);"
+				style="gap: {GAP}px; transform: translateX({-$stripOffset + BOX_WIDTH + GAP}px);"
 			>
 				{#each boxes as box, i (i)}
 					{@const style = getRarityStyle(box.rarity)}
@@ -81,7 +79,11 @@
 						style="width: {BOX_WIDTH}px; height: {BOX_WIDTH}px;"
 					>
 						<div class="flex h-full w-full items-center justify-center rounded-md bg-black/60">
-							<img src={box.image} alt={box.name} class="h-20 w-20 object-contain drop-shadow-lg" />
+							<img
+								src={box.image}
+								alt={box.rarity}
+								class="h-20 w-20 object-contain drop-shadow-lg"
+							/>
 						</div>
 						<!-- Rarity glow -->
 						<div
@@ -105,7 +107,7 @@
 				class="mt-2 cursor-pointer rounded bg-green-500/90 px-6 py-2 text-sm font-bold tracking-wider text-black uppercase transition-colors hover:bg-green-400"
 				onclick={() => lootbox.open()}
 			>
-				Open {lootbox.selectedBox.name}
+				Open {lootbox.selectedBox.rarity}
 			</button>
 		{:else if lootbox.phase === 'spinning'}
 			<div
@@ -119,8 +121,4 @@
 
 <style>
 	@reference "tailwindcss";
-
-	.carousel-animate {
-		transition: transform 3s cubic-bezier(0.15, 0.85, 0.3, 1);
-	}
 </style>

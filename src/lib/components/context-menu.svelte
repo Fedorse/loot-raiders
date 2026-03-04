@@ -13,7 +13,7 @@
 
 {#if menuData && def}
 	{@const moveTargetId =
-		menuData.slot.location.type === 'container'
+		menuData.slot.location.type === 'slot'
 			? getStorageConfig(menuData.slot.location.storageId)?.quickMoveTarget
 			: undefined}
 

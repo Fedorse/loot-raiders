@@ -9,7 +9,7 @@ export class DebugStore {
 }
 
 export function formatLocation(loc: ItemLocation): string {
-	if (loc.type === 'container') {
+	if (loc.type === 'slot') {
 		return `${loc.storageId}[${loc.index}]`;
 	}
 	return `${formatLocation(loc.parentLocation)} → attach[${loc.attachIndex}]`;

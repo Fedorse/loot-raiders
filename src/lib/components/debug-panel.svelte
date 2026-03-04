@@ -38,7 +38,7 @@
 
 	function getStorageItems(storageId: StorageId) {
 		return inventory.items.filter(
-			(i) => i.location.type === 'container' && i.location.storageId === storageId
+			(i) => i.location.type === 'slot' && i.location.storageId === storageId
 		);
 	}
 
