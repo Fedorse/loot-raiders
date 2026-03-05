@@ -37,7 +37,7 @@
 			</div>
 			<div class="flex h-full w-full justify-center gap-8">
 				<div class="flex flex-col gap-4">
-					<div class="text-sm uppercase">equipment</div>
+					<!-- <div class="text-sm uppercase">equipment</div> -->
 					<div class="flex gap-4">
 						<StorageGrid storageId="augment" class="h-20 w-[120px] " />
 						<StorageGrid storageId="shield" class="h-20 w-[120px] " />
@@ -47,10 +47,10 @@
 
 				<div class="flex flex-col gap-4">
 					<div class="flex items-center gap-4">
-						<div class="text-sm uppercase">backpack</div>
-						{#if backpackConfig}
+						<!-- <div class="text-sm uppercase">backpack</div> -->
+						<!-- {#if backpackConfig}
 							<span class="text-sm">{inventory.backpack.length}/{backpackConfig.size}</span>
-						{/if}
+						{/if} -->
 					</div>
 
 					<div class="grid grid-cols-4">

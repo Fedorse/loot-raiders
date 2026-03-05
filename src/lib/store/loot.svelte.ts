@@ -1,6 +1,19 @@
 import { LOOTBOX_ORDER, getLootboxDef } from '$lib/config/lootboxes';
+import { getDef, ITEM_DB } from '$lib/config/items';
 import type { Inventory } from './inventory.svelte';
-import type { LootboxPhase, LootItem, InstanceItem } from '$lib/types';
+import type { LootboxPhase, InstanceItem, ItemRarity, ItemDefinition } from '$lib/types';
+
+const itemsByRarity: Record<ItemRarity, ItemDefinition[]> = {
+	common: [],
+	uncommon: [],
+	rare: [],
+	epic: [],
+	legendary: []
+};
+
+for (const def of Object.values(ITEM_DB)) {
+	itemsByRarity[def.rarity].push(def);
+}
 
 export class Lootbox {
 	private inventory!: Inventory;
@@ -39,7 +52,7 @@ export class Lootbox {
 		if (this.phase !== 'result') return;
 		const box = this.selectedBox;
 		this.inventory.clearStorage('lootBack');
-		const items = this.getRandomLoot(box.lootTable, box.slots);
+		const items = this.getRandomLoot(box.rarityWeights, box.slots);
 		this.inventory.fillStorage('lootBack', items);
 		this.phase = 'opened';
 	}
@@ -50,24 +63,43 @@ export class Lootbox {
 		this.phase = 'idle';
 	}
 
-	private getRandomLoot(table: LootItem[], count: number): InstanceItem[] {
-		const totalWeight = table.reduce((sum, item) => sum + item.weight, 0);
+	private getRandomLoot(
+		rarityWeights: Record<ItemRarity, number>,
+		count: number
+	): InstanceItem[] {
 		const items: InstanceItem[] = [];
 
 		for (let i = 0; i < count; i++) {
-			let roll = Math.random() * totalWeight;
+			const rarity = this.rollRarity(rarityWeights);
+			const pool = itemsByRarity[rarity];
+			if (!pool.length) continue;
 
-			for (const entry of table) {
-				roll -= entry.weight;
-				if (roll <= 0) {
-					const min = entry.countMin ?? 1;
-					const max = entry.countMax ?? 1;
-					const itemCount = min + Math.floor(Math.random() * (max - min + 1));
-					items.push(this.inventory.createItem(entry.defId, itemCount));
-					break;
-				}
-			}
+			const def = pool[Math.floor(Math.random() * pool.length)];
+			const itemCount = this.getCountForType(def.type);
+
+			items.push(this.inventory.createItem(def.id, itemCount));
 		}
 		return items;
+	}
+
+	private rollRarity(weights: Record<ItemRarity, number>): ItemRarity {
+		const entries = Object.entries(weights) as [ItemRarity, number][];
+		const total = entries.reduce((sum, [, w]) => sum + w, 0);
+		let roll = Math.random() * total;
+
+		for (const [rarity, weight] of entries) {
+			roll -= weight;
+			if (roll <= 0) return rarity;
+		}
+		return entries[0][0];
+	}
+
+	private getCountForType(type: string): number {
+		switch (type) {
+			case 'loot':
+				return 1 + Math.floor(Math.random() * 3);
+			default:
+				return 1;
+		}
 	}
 }

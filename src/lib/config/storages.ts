@@ -3,7 +3,7 @@ import type { StorageConfig, ItemType, StorageId } from '$lib/types';
 export const STORAGE_CONFIGS: Record<StorageId, StorageConfig> = {
 	lootBack: {
 		name: 'lootBack',
-		size: 20,
+		size: 16,
 		allowedTypes: ['loot', 'attachment', 'weapon', 'augment'],
 		quickMoveTarget: 'backpack'
 	},

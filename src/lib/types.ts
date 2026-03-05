@@ -97,17 +97,10 @@ export interface RarityStyle {
 
 export type LootboxPhase = 'idle' | 'spinning' | 'result' | 'opened';
 
-export interface LootItem {
-	defId: string;
-	weight: number;
-	countMin?: number;
-	countMax?: number;
-}
-
 export interface LootboxDef {
 	rarity: ItemRarity;
 	image: string;
 	slots: number;
 	spinWeight: number;
-	lootTable: LootItem[];
+	rarityWeights: Record<ItemRarity, number>;
 }

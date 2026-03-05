@@ -10,9 +10,10 @@
 	const lootBackConfig = getStorageConfig('lootBack');
 
 	const REPEATS = 6;
-	const BOX_WIDTH = 128;
+	const BOX_W = 256;
+	const BOX_H = 176;
 	const GAP = 12;
-	const CELL = BOX_WIDTH + GAP;
+	const CELL = BOX_H + GAP;
 	const STRIP_LENGTH = LOOTBOX_ORDER.length * REPEATS;
 
 	const boxes = Array.from({ length: STRIP_LENGTH }, (_, i) => {
@@ -28,6 +29,7 @@
 	const centerRepeat = Math.floor(REPEATS / 2);
 
 	async function handleSpin() {
+		stripOffset.set(0, { duration: 0 });
 		lootbox.spin();
 		const targetIdx = centerRepeat * LOOTBOX_ORDER.length + lootbox.resultIndex;
 		await stripOffset.set(targetIdx * CELL);
@@ -54,17 +56,20 @@
 		<h2 class="text-base font-bold uppercase">Loot Raiders Cashes</h2>
 
 		<!-- Carousel viewport -->
-		<div class="relative overflow-hidden rounded-lg" style="width: {BOX_WIDTH * 3 + GAP * 2}px;">
+		<div
+			class="relative overflow-hidden rounded-lg"
+			style="width: {BOX_W}px; height: {BOX_H * 2 + GAP}px;"
+		>
 			<!-- Center indicator -->
 			<div
 				class="pointer-events-none absolute top-0 bottom-0 z-10 border-2 border-yellow-400/80"
-				style="left: {BOX_WIDTH + GAP}px; width: {BOX_WIDTH}px;"
+				style="left: 0; width: {BOX_W}px; top: {BOX_H / 2 + GAP / 2}px; bottom: auto; height: {BOX_H}px;"
 			></div>
 
 			<!-- Strip -->
 			<div
-				class="flex"
-				style="gap: {GAP}px; transform: translateX({-$stripOffset + BOX_WIDTH + GAP}px);"
+				class="flex flex-col"
+				style="gap: {GAP}px; transform: translateY({-$stripOffset + BOX_H / 2 + GAP / 2}px);"
 			>
 				{#each boxes as box, i (i)}
 					{@const style = getRarityStyle(box.rarity)}
@@ -73,16 +78,16 @@
 						i === centerRepeat * LOOTBOX_ORDER.length + lootbox.resultIndex}
 					<div
 						class="relative flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gradient-to-b p-[2px]
-                                                        {style.border}"
+							{style.border}"
 						class:ring-2={isWinner}
 						class:ring-yellow-400={isWinner}
-						style="width: {BOX_WIDTH}px; height: {BOX_WIDTH}px;"
+						style="width: {BOX_W}px; height: {BOX_H}px;"
 					>
 						<div class="flex h-full w-full items-center justify-center rounded-md bg-black/60">
 							<img
 								src={box.image}
 								alt={box.rarity}
-								class="h-20 w-20 object-contain drop-shadow-lg"
+								class="h-full w-full object-contain drop-shadow-lg"
 							/>
 						</div>
 						<!-- Rarity glow -->
@@ -100,7 +105,7 @@
 				class="mt-2 cursor-pointer rounded bg-yellow-500/90 px-6 py-2 text-sm font-bold tracking-wider text-black uppercase transition-colors hover:bg-yellow-400"
 				onclick={handleSpin}
 			>
-				Spin
+				Roll
 			</button>
 		{:else if lootbox.phase === 'result'}
 			<button
