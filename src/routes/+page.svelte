@@ -4,6 +4,7 @@
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 	import LootboxMachine from '$lib/components/lootbox.svelte';
+	import TetrisGrid from '$lib/components/tetris-grid.svelte';
 
 	const { inventory } = getGameContext();
 
@@ -62,6 +63,10 @@
 	</div>
 
 	<Shortcuts />
+
+	<div class="fixed right-5 top-16">
+		<TetrisGrid />
+	</div>
 </div>
 
 <style>

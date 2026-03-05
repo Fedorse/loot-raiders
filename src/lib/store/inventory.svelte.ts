@@ -317,6 +317,34 @@ export class Inventory {
 		this.selectedIds.clear();
 	}
 
+	countInBackpack(defId: string): number {
+		return this.backpack
+			.filter((slot) => slot.item.defId === defId)
+			.reduce((sum, slot) => sum + slot.item.count, 0);
+	}
+
+	consumeFromBackpack(defId: string, count: number): void {
+		let remaining = count;
+
+		for (let i = this.items.length - 1; i >= 0; i--) {
+			if (remaining <= 0) break;
+
+			const slot = this.items[i];
+			if (slot.location.type !== 'slot') continue;
+			if (slot.location.storageId !== 'backpack') continue;
+			if (slot.item.defId !== defId) continue;
+
+			if (slot.item.count <= remaining) {
+				remaining -= slot.item.count;
+				this.selectedIds.delete(slot.item.uid);
+				this.items.splice(i, 1);
+			} else {
+				slot.item.count -= remaining;
+				remaining = 0;
+			}
+		}
+	}
+
 	#countEmptySlots(storageId: StorageId): number {
 		const config = getStorageConfig(storageId);
 		if (!config) return 0;

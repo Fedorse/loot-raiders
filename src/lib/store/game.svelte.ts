@@ -4,6 +4,8 @@ import { Interaction } from './interaction.svelte';
 import { Overlay } from './overlay.svelte';
 import { DebugStore } from './debug.svelte';
 import { Lootbox } from './loot.svelte';
+import { Tetris } from './tetris.svelte';
+import { TETRIS_CONFIG } from '$lib/config/tetris';
 
 export class Game {
 	inventory = new Inventory();
@@ -11,6 +13,7 @@ export class Game {
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay);
 	lootbox = new Lootbox(this.inventory);
+	tetris = new Tetris(this.inventory, TETRIS_CONFIG);
 }
 
 const GAME_KEY = Symbol('GAME');

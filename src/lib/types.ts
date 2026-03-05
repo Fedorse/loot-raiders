@@ -97,6 +97,41 @@ export interface RarityStyle {
 
 export type LootboxPhase = 'idle' | 'spinning' | 'result' | 'opened';
 
+// ---- Tetris ----
+export interface TetrisCell {
+	uid: string;
+	groupId: string;
+	defId: string;
+	count: number;
+}
+
+export interface TetrisPoolEntry {
+	defId: string;
+	count: number;
+	weight: number;
+	shape?: [number, number][];
+}
+
+export interface TetrisGroup {
+	groupId: string;
+	defId: string;
+	count: number;
+	row: number;
+	col: number;
+	spanRows: number;
+	spanCols: number;
+}
+
+export interface TetrisConfig {
+	cols: number;
+	rows: number;
+	tickMs: number;
+	gravityMs: number;
+	pool: TetrisPoolEntry[];
+}
+
+export type TetrisPhase = 'idle' | 'playing' | 'gameover';
+
 export interface LootboxDef {
 	rarity: ItemRarity;
 	image: string;
