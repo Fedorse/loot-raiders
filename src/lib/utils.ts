@@ -16,8 +16,16 @@ export function isEqualLocation(a: ItemLocation, b: ItemLocation): boolean {
 		if (a.attachIndex !== b.attachIndex) return false;
 		const pa = a.parentLocation;
 		const pb = b.parentLocation;
-		return pa.type === 'slot' && pb.type === 'slot'
-			&& pa.storageId === pb.storageId && pa.index === pb.index;
+		return (
+			pa.type === 'slot' &&
+			pb.type === 'slot' &&
+			pa.storageId === pb.storageId &&
+			pa.index === pb.index
+		);
 	}
 	return false;
+}
+
+export function randInt(min: number, max: number): number {
+	return min + Math.floor(Math.random() * (max - min + 1));
 }

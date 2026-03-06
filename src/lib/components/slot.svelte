@@ -2,6 +2,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
+	import ItemScanner from './item-scanner.svelte';
 	import type { ItemLocation } from '$lib/types';
 
 	type Props = {
@@ -12,51 +13,74 @@
 
 	let { location, class: className = '', placeholder }: Props = $props();
 
-	const { interaction, inventory, overlay } = getGameContext();
-
-	const isHovered = $derived(interaction.isHovered(location));
-
+	const { interaction, inventory, overlay, loot } = getGameContext();
 	const item = $derived(inventory.getItem(location));
-
 	const itemUid = $derived(item?.uid ?? '');
-
 	const selectedItem = $derived(inventory.isSelected(itemUid));
-
-	const isDraggingThisItem = $derived(interaction.isSource(location));
 
 	const slotState = $derived({ location, item });
 
+	const lootIndex = $derived(
+		location.type === 'slot' && location.storageId === 'lootBack' && item ? location.index : -1
+	);
+	const scanningItem = $derived(lootIndex >= 0 && loot.scanning(lootIndex));
+	const loading = $derived(lootIndex >= 0 && loot.hidden(lootIndex));
+	const showShine = $derived(lootIndex >= 0 && loot.phase !== 'idle');
+
+	const isDraggingThisItem = $derived(interaction.isSource(location));
+
+	const isHovered = $derived(interaction.isHovered(location));
 	const showInvalidHint = $derived(interaction.shouldShowInvalidHint(slotState));
 </script>
 
-<div class="{className}  relative rounded-lg">
+<div class="{className}  relative overflow-hidden rounded-lg">
 	{@render gradientBorder()}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div
-		class="relative z-20 h-full w-full p-[3.5px]"
-		oncontextmenu={(e) => {
-			e.preventDefault();
-			if (e.ctrlKey) return;
-			if (slotState.item) overlay.openContextMenu(e.clientX, e.clientY, slotState);
-		}}
-		onpointerenter={(e) => {
-			if (item && interaction.status === 'idle') {
-				const rect = e.currentTarget.getBoundingClientRect();
-				overlay.showTooltip(rect.right, rect.top, item);
-			}
-		}}
-		onpointerleave={() => {
-			overlay.hideTooltip();
-		}}
-	>
-		{#if item && !isDraggingThisItem}
-			<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
-		{:else}
-			<EmptySlot {slotState} {placeholder} className="h-full w-full" />
-		{/if}
-	</div>
-	{@render invalidIcon()}
+
+	{#if loading || scanningItem}
+		<div class="h-full w-full p-[3.5px]">
+			<div class="relative h-full w-full overflow-hidden rounded-[7px]">
+				{@render loadingItem()}
+			</div>
+		</div>
+	{:else}
+		<div
+			class="relative z-20 h-full w-full p-[3.5px]"
+			oncontextmenu={(e) => {
+				e.preventDefault();
+				if (e.ctrlKey) return;
+				if (slotState.item) overlay.openContextMenu(e.clientX, e.clientY, slotState);
+			}}
+			onpointerenter={(e) => {
+				if (item && interaction.status === 'idle') {
+					const rect = e.currentTarget.getBoundingClientRect();
+					overlay.showTooltip(rect.right, rect.top, item);
+				}
+			}}
+			onpointerleave={() => {
+				overlay.hideTooltip();
+			}}
+		>
+			{#if item && !isDraggingThisItem}
+				<div class="relative h-full w-full" class:shine-effect={showShine}>
+					<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
+				</div>
+			{:else}
+				<EmptySlot {slotState} {placeholder} className="h-full w-full" />
+			{/if}
+		</div>
+		{@render invalidIcon()}
+	{/if}
 </div>
+
+{#snippet loadingItem()}
+	<div class="loading-border h-full w-full rounded-lg p-[1.5px]">
+		<div class="h-full w-full rounded-[7px] bg-[#080b14]"></div>
+	</div>
+	{#if scanningItem}
+		<ItemScanner onscanned={() => loot.slotScanned()} />
+	{/if}
+{/snippet}
 
 {#snippet gradientBorder()}
 	{#if isHovered}
@@ -75,6 +99,54 @@
 {/snippet}
 
 <style>
+	.shine-effect {
+		position: relative;
+		overflow: hidden;
+		border-radius: 7px;
+	}
+
+	.shine-effect::after {
+		content: '';
+		position: absolute;
+		border-radius: inherit;
+
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: 50;
+		pointer-events: none;
+		transform: skewX(-20deg) translateX(-150%);
+		background: linear-gradient(
+			to right,
+			transparent 0%,
+			rgba(255, 255, 255, 0) 10%,
+			rgba(255, 255, 255, 0.6) 50%,
+			rgba(255, 255, 255, 0) 90%
+		);
+		mix-blend-mode: overlay;
+		animation: shine 0.4s ease-out forwards;
+	}
+
+	@keyframes shine {
+		0% {
+			transform: skewX(-20deg) translateX(-150%);
+		}
+		100% {
+			transform: skewX(-20deg) translateX(150%);
+		}
+	}
+
+	.loading-border {
+		background: conic-gradient(
+			from 90deg,
+			var(--glow-cyan),
+			var(--glow-magenta) 180deg,
+			var(--glow-cyan) 360deg
+		);
+		opacity: 0.5;
+	}
+
 	.glow-ring-mask {
 		border-radius: inherit;
 

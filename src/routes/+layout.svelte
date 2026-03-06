@@ -10,13 +10,18 @@
 	let { children } = $props();
 
 	const game = initGame();
-	const { overlay, debug } = game;
+	const { overlay, debug, loot } = game;
 </script>
 
 <svelte:window
 	onkeydown={(e) => {
 		if (e.key === 'Escape') {
 			overlay.handleEscape();
+			return;
+		}
+		if (e.key === ' ') {
+			e.preventDefault();
+			loot.next();
 			return;
 		}
 		if (e.key === 'd' || e.key === 'D') {

@@ -95,8 +95,6 @@ export interface RarityStyle {
 	height: string;
 }
 
-export type LootboxPhase = 'idle' | 'spinning' | 'result' | 'opened';
-
 // ---- Tetris ----
 export interface TetrisCell {
 	uid: string;
@@ -131,11 +129,3 @@ export interface TetrisConfig {
 }
 
 export type TetrisPhase = 'idle' | 'playing' | 'gameover';
-
-export interface LootboxDef {
-	rarity: ItemRarity;
-	image: string;
-	slots: number;
-	spinWeight: number;
-	rarityWeights: Record<ItemRarity, number>;
-}
