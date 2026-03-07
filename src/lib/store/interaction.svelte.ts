@@ -100,6 +100,9 @@ export class Interaction {
 				case 'attach':
 					this.inventory.attach(this.dragState, this.hoveredSlot.location);
 					break;
+				case 'delete':
+					this.inventory.removeItem(this.dragState.sourceLocation);
+					break;
 			}
 		}
 	}
@@ -207,6 +210,7 @@ export class Interaction {
 
 	shouldShowInvalidHint(slot: SlotState): boolean {
 		if (this.status !== 'dragging' || !this.dragState) return false;
+		if (slot.location.type === 'trash') return false;
 
 		const resolver = this.inventory.getItem.bind(this.inventory);
 		const isValid = validateDrop(this.dragState, slot, resolver);

@@ -28,6 +28,7 @@ export class Inventory {
 	// ---- Universal accessors ----
 
 	getItem(loc: ItemLocation): InstanceItem | null {
+		if (loc.type === 'trash') return null;
 		if (loc.type === 'slot') {
 			const slot = this.items.find((i) => isEqualLocation(i.location, loc));
 			return slot?.item ?? null;
@@ -39,6 +40,7 @@ export class Inventory {
 	}
 
 	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
+		if (loc.type === 'trash') return;
 		if (loc.type === 'slot') {
 			if (item === null) {
 				const idx = this.items.findIndex((i) => isEqualLocation(i.location, loc));

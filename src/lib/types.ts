@@ -7,7 +7,8 @@ export type StorageId = 'backpack' | 'lootBack' | 'weapon' | 'augment' | 'shield
 // ---- Universal location ----
 export type ItemLocation =
 	| { type: 'slot'; storageId: StorageId; index: number }
-	| { type: 'attachment'; parentLocation: ItemLocation; attachIndex: number };
+	| { type: 'attachment'; parentLocation: ItemLocation; attachIndex: number }
+	| { type: 'trash' };
 
 // ---- Slot states ----
 export interface OccupiedSlot {

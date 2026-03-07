@@ -4,8 +4,13 @@
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 	import TetrisGrid from '$lib/components/tetris-grid.svelte';
+	import { droppable } from '$lib/actions/actions';
+	import type { SlotState, ItemLocation } from '$lib/types';
 
-	const { loot } = getGameContext();
+	const { loot, interaction } = getGameContext();
+
+	const trashLocation: ItemLocation = { type: 'trash' };
+	const trashSlotState: SlotState = { location: trashLocation, item: null };
 </script>
 
 <div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
@@ -28,6 +33,30 @@
 			<!-- <div class="text-sm uppercase">filter</div> -->
 			<div class="grid grid-cols-4">
 				<StorageGrid storageId="lootBack" class="aspect-square h-20 w-20" />
+			</div>
+
+			<div
+				class="flex min-h-28 w-full flex-col items-center justify-center rounded-lg border transition-all duration-150
+					{interaction.status === 'dragging' && interaction.isHovered(trashLocation)
+					? 'border-red-500 bg-red-500/15 text-red-400'
+					: interaction.status === 'dragging'
+						? 'border-red-500/50 text-red-400/70'
+						: 'border-gray-500/50 text-gray-500/50'}"
+				{@attach droppable(trashSlotState)}
+			>
+				<div class="">
+					<img
+						src="assets/ui/drop.png"
+						alt=""
+						class="size-12 object-contain transition-all duration-150
+							{interaction.status === 'dragging' && interaction.isHovered(trashLocation)
+							? 'opacity-60 grayscale-0'
+							: interaction.status === 'dragging'
+								? 'opacity-30 grayscale'
+								: 'opacity-20 grayscale'}"
+					/>
+				</div>
+				<span class="uppercase">drop item</span>
 			</div>
 		</div>
 

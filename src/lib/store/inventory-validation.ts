@@ -2,7 +2,7 @@ import { getDef } from '$lib/config/items';
 import { getAllowedTypes } from '$lib/config/storages';
 import type { InstanceItem, ItemLocation, DragState, SlotState } from '$lib/types';
 
-export type DropActionType = 'move' | 'stack' | 'attach' | 'swap' | 'invalid';
+export type DropActionType = 'move' | 'stack' | 'attach' | 'swap' | 'delete' | 'invalid';
 export type ItemResolver = (loc: ItemLocation) => InstanceItem | null;
 
 export const isAllowedInLocation = (
@@ -10,6 +10,7 @@ export const isAllowedInLocation = (
 	loc: ItemLocation,
 	resolve: ItemResolver
 ): boolean => {
+	if (loc.type === 'trash') return true;
 	if (loc.type === 'slot') {
 		const itemDef = getDef(item.defId);
 		const allowedTypes = getAllowedTypes(loc.storageId);
@@ -56,6 +57,7 @@ export const getAttachmentSlotIndex = (
 };
 
 export const getDropActionType = (drag: DragState, target: SlotState): DropActionType => {
+	if (target.location.type === 'trash') return 'delete';
 	if (!target.item) return 'move';
 	if (canStackItems(drag.item, target.item)) return 'stack';
 	if (target.location.type === 'slot' && canAttachToWeapon(drag.item, target.item))
@@ -71,6 +73,7 @@ export const validateDrop = (
 ): boolean => {
 	const action = getDropActionType(drag, target);
 	if (action === 'invalid') return false;
+	if (action === 'delete') return true;
 
 	if (action === 'move' || action === 'stack') {
 		return isAllowedInLocation(drag.item, target.location, resolve);

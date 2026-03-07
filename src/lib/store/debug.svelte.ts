@@ -12,5 +12,8 @@ export function formatLocation(loc: ItemLocation): string {
 	if (loc.type === 'slot') {
 		return `${loc.storageId}[${loc.index}]`;
 	}
+	if (loc.type === 'trash') {
+		return 'trash';
+	}
 	return `${formatLocation(loc.parentLocation)} → attach[${loc.attachIndex}]`;
 }
