@@ -3,7 +3,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
-	import TetrisGrid from '$lib/components/tetris-grid.svelte';
+
 	import { droppable } from '$lib/actions/actions';
 	import type { SlotState, ItemLocation } from '$lib/types';
 
@@ -87,9 +87,6 @@
 
 	<Shortcuts />
 
-	<div class="fixed top-16 right-5">
-		<TetrisGrid />
-	</div>
 </div>
 
 <style>
