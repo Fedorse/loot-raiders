@@ -2,6 +2,7 @@ import { getDef } from '$lib/config/items';
 import { isEqualLocation } from '$lib/utils';
 import type { Inventory } from './inventory.svelte';
 import type { Overlay } from './overlay.svelte';
+import type { Selection } from './selection.svelte';
 import { validateDrop, getDropActionType } from '$lib/store/inventory-validation';
 
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
@@ -14,6 +15,7 @@ type InteractionStatus = 'idle' | 'pressing' | 'dragging';
 export class Interaction {
 	private inventory!: Inventory;
 	private overlay!: Overlay;
+	private selection!: Selection;
 
 	status = $state<InteractionStatus>('idle');
 	dragState = $state<DragState | null>(null);
@@ -34,9 +36,10 @@ export class Interaction {
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	constructor(inventory: Inventory, overlay: Overlay) {
+	constructor(inventory: Inventory, overlay: Overlay, selection: Selection) {
 		this.inventory = inventory;
 		this.overlay = overlay;
+		this.selection = selection;
 	}
 
 	startInteraction(slot: SlotState, e: PointerEvent, node: HTMLElement) {
@@ -153,7 +156,7 @@ export class Interaction {
 
 		if (e.altKey || e.metaKey) return;
 		if (e.ctrlKey) {
-			this.inventory.toggleSelectionItem(itemUid);
+			this.selection.toggle(itemUid);
 			return;
 		}
 		if (e.shiftKey) {
@@ -169,7 +172,7 @@ export class Interaction {
 			this.lastClickTime = 0;
 			this.lastClickUid = '';
 		} else {
-			this.inventory.selectSingleItem(itemUid);
+			this.selection.select(itemUid);
 			this.lastClickTime = now;
 			this.lastClickUid = itemUid;
 		}

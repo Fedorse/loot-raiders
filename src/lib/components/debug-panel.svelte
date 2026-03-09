@@ -6,7 +6,7 @@
 	import { formatLocation } from '$lib/store/debug.svelte';
 	import type { StorageId } from '$lib/types';
 
-	const { inventory, interaction, debug } = getGameContext();
+	const { inventory, interaction, debug, selection } = getGameContext();
 
 	let openSections = $state({
 		interaction: true,
@@ -183,7 +183,7 @@
 					{/each}
 					<div class="px-3 pt-1">
 						<span class="text-[10px] text-white/50">
-							selected: [{[...inventory.selectedIds].map(shortUid).join(', ')}]
+							selected: [{[...selection.ids].map(shortUid).join(', ')}]
 						</span>
 					</div>
 				</div>

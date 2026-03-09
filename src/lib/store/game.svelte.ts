@@ -4,13 +4,15 @@ import { Interaction } from './interaction.svelte';
 import { Overlay } from './overlay.svelte';
 import { DebugStore } from './debug.svelte';
 import { LootGenerator } from './loot.svelte';
+import { Selection } from './selection.svelte';
 
 
 export class Game {
-	inventory = new Inventory();
+	selection = new Selection();
+	inventory = new Inventory(this.selection);
 	overlay = new Overlay();
 	debug = new DebugStore();
-	interaction = new Interaction(this.inventory, this.overlay);
+	interaction = new Interaction(this.inventory, this.overlay, this.selection);
 	loot = new LootGenerator(this.inventory);
 
 }

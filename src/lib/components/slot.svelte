@@ -13,10 +13,10 @@
 
 	let { location, class: className = '', placeholder }: Props = $props();
 
-	const { interaction, inventory, overlay, loot } = getGameContext();
+	const { interaction, inventory, overlay, loot, selection } = getGameContext();
 	const item = $derived(inventory.getItem(location));
 	const itemUid = $derived(item?.uid ?? '');
-	const selectedItem = $derived(inventory.isSelected(itemUid));
+	const selectedItem = $derived(selection.isSelected(itemUid));
 
 	const slotState = $derived({ location, item });
 

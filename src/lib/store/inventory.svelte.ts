@@ -1,15 +1,18 @@
 import { getStorageConfig } from '$lib/config/storages';
-import { SvelteSet } from 'svelte/reactivity';
 import { getDef } from '$lib/config/items';
 import { getAttachmentSlotIndex } from './inventory-validation';
 import { isEqualLocation } from '$lib/utils';
+import type { Selection } from './selection.svelte';
 
 import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } from '$lib/types';
 
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
+	private selection: Selection;
 
-	selectedIds = new SvelteSet<string>();
+	constructor(selection: Selection) {
+		this.selection = selection;
+	}
 
 	backpack = $derived(
 		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'backpack')
@@ -20,10 +23,6 @@ export class Inventory {
 	weapon = $derived(
 		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'weapon')
 	);
-
-	constructor() {
-		// this.setup();
-	}
 
 	// ---- Universal accessors ----
 
@@ -63,7 +62,7 @@ export class Inventory {
 
 	removeItem(loc: ItemLocation): void {
 		const item = this.getItem(loc);
-		if (item) this.selectedIds.delete(item.uid);
+		if (item) this.selection.deselect(item.uid);
 		this.setItem(loc, null);
 	}
 
@@ -260,7 +259,7 @@ export class Inventory {
 	clearStorage(storageId: StorageId): void {
 		this.items = this.items.filter((slot) => {
 			if (slot.location.type === 'slot' && slot.location.storageId === storageId) {
-				this.selectedIds.delete(slot.item.uid);
+				this.selection.deselect(slot.item.uid);
 				return false;
 			}
 			return true;
@@ -298,27 +297,6 @@ export class Inventory {
 		return item;
 	}
 
-	isSelected(uid: string): boolean {
-		return this.selectedIds.has(uid);
-	}
-
-	selectSingleItem(uid: string): void {
-		this.selectedIds.clear();
-		this.selectedIds.add(uid);
-	}
-
-	toggleSelectionItem(uid: string): void {
-		if (this.selectedIds.has(uid)) {
-			this.selectedIds.delete(uid);
-		} else {
-			this.selectedIds.add(uid);
-		}
-	}
-
-	clearSelectionItem(): void {
-		this.selectedIds.clear();
-	}
-
 	countInBackpack(defId: string): number {
 		return this.backpack
 			.filter((slot) => slot.item.defId === defId)
@@ -338,7 +316,7 @@ export class Inventory {
 
 			if (slot.item.count <= remaining) {
 				remaining -= slot.item.count;
-				this.selectedIds.delete(slot.item.uid);
+				this.selection.deselect(slot.item.uid);
 				this.items.splice(i, 1);
 			} else {
 				slot.item.count -= remaining;

@@ -114,9 +114,7 @@
 					<div
 						class="flex h-20 w-20 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 					>
-						<div
-							class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface"
-						>
+						<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
 							<div
 								class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
 							></div>
@@ -141,7 +139,6 @@
 	</div>
 
 	<Shortcuts />
-
 </div>
 
 <style>
