@@ -599,7 +599,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 50,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items.',
+		description: 'Used to craft a wide range of items.'
 	},
 	res_rubber_parts: {
 		id: 'res_rubber_parts',
@@ -611,7 +611,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 50,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items.',
+		description: 'Used to craft a wide range of items.'
 	},
 	res_mechanical_components: {
 		id: 'res_mechanical_components',
@@ -623,7 +623,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		weight: 0.5,
 		maxStack: 30,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
 	},
 	res_simple_gun_parts: {
 		id: 'res_simple_gun_parts',
@@ -635,7 +635,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 200,
 		weight: 0.5,
 		maxStack: 30,
-		description: 'Used to craft weapons.',
+		description: 'Used to craft weapons.'
 	},
 	res_adv_mechanical_components: {
 		id: 'res_adv_mechanical_components',
@@ -647,7 +647,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 400,
 		weight: 0.5,
 		maxStack: 20,
-		description: 'Used to craft advanced weapons. Can be recycled into crafting materials.',
+		description: 'Used to craft advanced weapons. Can be recycled into crafting materials.'
 	},
 	res_light_gun_parts: {
 		id: 'res_light_gun_parts',
@@ -659,7 +659,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 200,
 		weight: 0.5,
 		maxStack: 30,
-		description: 'Assorted spare parts used for pistols and SMGs.',
+		description: 'Assorted spare parts used for pistols and SMGs.'
 	},
 	res_medium_gun_parts: {
 		id: 'res_medium_gun_parts',
@@ -671,7 +671,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 200,
 		weight: 0.5,
 		maxStack: 30,
-		description: 'Assorted spare parts used for rifles.',
+		description: 'Assorted spare parts used for rifles.'
 	},
 	res_heavy_gun_parts: {
 		id: 'res_heavy_gun_parts',
@@ -683,7 +683,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 350,
 		weight: 0.5,
 		maxStack: 20,
-		description: 'Used to craft weapons.',
+		description: 'Used to craft weapons.'
 	},
 	res_complex_gun_parts: {
 		id: 'res_complex_gun_parts',
@@ -695,7 +695,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 600,
 		weight: 0.5,
 		maxStack: 15,
-		description: 'Used to craft advanced weapons.',
+		description: 'Used to craft advanced weapons.'
 	},
 	res_magnetic_accelerator: {
 		id: 'res_magnetic_accelerator',
@@ -707,7 +707,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 800,
 		weight: 1,
 		maxStack: 10,
-		description: 'Used to craft advanced weapons.',
+		description: 'Used to craft advanced weapons.'
 	},
 	res_plastic_parts: {
 		id: 'res_plastic_parts',
@@ -719,7 +719,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 50,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items.',
+		description: 'Used to craft a wide range of items.'
 	},
 	res_wires: {
 		id: 'res_wires',
@@ -731,7 +731,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 50,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
 	},
 	res_mod_components: {
 		id: 'res_mod_components',
@@ -743,7 +743,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 500,
 		weight: 0.5,
 		maxStack: 20,
-		description: 'Used to craft weapon mods. Can be recycled into crafting materials.',
+		description: 'Used to craft weapon mods. Can be recycled into crafting materials.'
 	},
 	res_duct_tape: {
 		id: 'res_duct_tape',
@@ -755,7 +755,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 75,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
 	},
 	res_steel_spring: {
 		id: 'res_steel_spring',
@@ -767,7 +767,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 75,
 		weight: 0.5,
 		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
 	},
 	res_processor: {
 		id: 'res_processor',
@@ -779,7 +779,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 200,
 		weight: 0.5,
 		maxStack: 30,
-		description: 'Used in crafting.',
+		description: 'Used in crafting.'
 	},
 
 	// ──────────────────────────────────────
@@ -821,7 +821,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 500,
 		weight: 0.5,
 		maxStack: 15,
-		description: 'Can be recycled into crafting materials or used to upgrade the Gear Bench.',
+		description: 'Can be recycled into crafting materials or used to upgrade the Gear Bench.'
 	},
 	loot_cat_bed: {
 		id: 'loot_cat_bed',
@@ -833,7 +833,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		weight: 1,
 		maxStack: 5,
-		description: 'At least a tiny bit more comfortable than your face.',
+		description: 'At least a tiny bit more comfortable than your face.'
 	},
 
 	// ──────────────────────────────────────
@@ -2405,7 +2405,11 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be thrown to create a violent singularity.',
 		recycling: [
-			{ itemId: 'res_adv_mechanical_components', amount: 1, name: 'Advanced Mechanical Components' },
+			{
+				itemId: 'res_adv_mechanical_components',
+				amount: 1,
+				name: 'Advanced Mechanical Components'
+			},
 			{ itemId: 'loot_arc_alloy', amount: 3, name: 'ARC Alloy' }
 		]
 	},
@@ -2526,7 +2530,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.2,
 		price: 1000,
 		maxStack: 15,
-		description: 'Something tells you that you don\'t want to open this...'
+		description: "Something tells you that you don't want to open this..."
 	},
 	loot_dart_board: {
 		id: 'loot_dart_board',
@@ -2538,7 +2542,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 2000,
 		maxStack: 3,
-		description: 'A trinket that your Raider hasn\'t quite figured out how to repurpose.'
+		description: "A trinket that your Raider hasn't quite figured out how to repurpose."
 	},
 	loot_light_bulb: {
 		id: 'loot_light_bulb',
@@ -2586,7 +2590,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.2,
 		price: 3000,
 		maxStack: 3,
-		description: 'Perfect for telling the time, and showcasing that you\'re an exceedingly dignified person.'
+		description:
+			"Perfect for telling the time, and showcasing that you're an exceedingly dignified person."
 	},
 	loot_silver_teaspoon_set: {
 		id: 'loot_silver_teaspoon_set',
@@ -2759,7 +2764,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	},
 	loot_lil_smoke_grenade: {
 		id: 'loot_lil_smoke_grenade',
-		name: 'Li\'l Smoke Grenade',
+		name: "Li'l Smoke Grenade",
 		type: 'loot',
 		rarity: 'common',
 		image: '/assets/items/QuickUse/LilSmokeGrenade.png',
@@ -2951,7 +2956,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.2,
 		price: 500,
 		maxStack: 5,
-		description: 'A deployable proximity sensor that sounds an alarm when enemy raiders are detected.',
+		description:
+			'A deployable proximity sensor that sounds an alarm when enemy raiders are detected.'
 	},
 	loot_raider_flare: {
 		id: 'loot_raider_flare',
@@ -2963,7 +2969,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.2,
 		price: 500,
 		maxStack: 5,
-		description: 'A deployable device that, when manually triggered, launches a Raider Distress Flare.',
+		description:
+			'A deployable device that, when manually triggered, launches a Raider Distress Flare.'
 	},
 	loot_blaze_grenade: {
 		id: 'loot_blaze_grenade',
@@ -3138,7 +3145,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.2,
 		price: 1500,
 		maxStack: 3,
-		description: 'A grenade that detonates after a delay, stunning enemies within its radius.',
+		description: 'A grenade that detonates after a delay, stunning enemies within its radius.'
 	},
 	loot_photoelectric_cloak: {
 		id: 'loot_photoelectric_cloak',
@@ -3520,7 +3527,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.1,
 		price: 100,
 		maxStack: 1,
-		description: 'Unlocks certain cellar doors near the Blue Gate.',
+		description: 'Unlocks certain cellar doors near the Blue Gate.'
 	},
 	key_blue_gate_confiscation: {
 		id: 'key_blue_gate_confiscation',
@@ -3532,7 +3539,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.1,
 		price: 100,
 		maxStack: 1,
-		description: 'Unlocks a door to the confiscated foods area within the Blue Gate tunnels.',
+		description: 'Unlocks a door to the confiscated foods area within the Blue Gate tunnels.'
 	},
 	key_buried_city_hospital: {
 		id: 'key_buried_city_hospital',
@@ -3544,7 +3551,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.1,
 		price: 100,
 		maxStack: 1,
-		description: 'Opens a locked room in the Hospital in Buried City.',
+		description: 'Opens a locked room in the Hospital in Buried City.'
 	},
 	key_raider_hatch: {
 		id: 'key_raider_hatch',
@@ -3556,8 +3563,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 0.1,
 		price: 100,
 		maxStack: 1,
-		description: 'Used to open Raider Hatches to get out of sticky situations Topside.',
-	},
+		description: 'Used to open Raider Hatches to get out of sticky situations Topside.'
+	}
 };
 
 export const getDef = (defId: string): ItemDefinition => {

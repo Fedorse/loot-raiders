@@ -8,14 +8,14 @@
 	--surface-foreground: #ffffff;
 
 	/* Modal / Panel (light surfaces) */
-	--modal: #F4EFE1;
+	--modal: #f4efe1;
 	--modal-foreground: #111418;
-	--modal-secondary: #E3DEC7;
+	--modal-secondary: #e3dec7;
 	--modal-secondary-foreground: #333;
 	--modal-border: #d2ccbc;
 
 	/* Interactive */
-	--primary: #FFB800;
+	--primary: #ffb800;
 	--primary-hover: #ffc733;
 	--primary-foreground: #111418;
 	--secondary: #626262;
@@ -32,7 +32,7 @@
 	--drag-invalid: oklch(0.18 0.04 20 / 0.9);
 
 	/* Badge */
-	--badge: #1BA15C;
+	--badge: #1ba15c;
 
 	/* Keyboard shortcut buttons */
 	--kbd-from: #c4beb2;

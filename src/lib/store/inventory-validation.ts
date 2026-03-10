@@ -60,8 +60,7 @@ export const getDropActionType = (drag: DragState, target: SlotState): DropActio
 	if (target.location.type === 'trash') return 'delete';
 	if (!target.item) return 'move';
 	if (canStackItems(drag.item, target.item)) return 'stack';
-	if (target.location.type === 'slot' && canAttachToWeapon(drag.item, target.item))
-		return 'attach';
+	if (target.location.type === 'slot' && canAttachToWeapon(drag.item, target.item)) return 'attach';
 	if (drag.isSplit) return 'invalid';
 	return 'swap';
 };

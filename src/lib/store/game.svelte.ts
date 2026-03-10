@@ -6,7 +6,6 @@ import { DebugStore } from './debug.svelte';
 import { LootGenerator } from './loot.svelte';
 import { Selection } from './selection.svelte';
 
-
 export class Game {
 	selection = new Selection();
 	inventory = new Inventory(this.selection);
@@ -14,7 +13,6 @@ export class Game {
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection);
 	loot = new LootGenerator(this.inventory);
-
 }
 
 const GAME_KEY = Symbol('GAME');
