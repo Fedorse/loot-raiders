@@ -5,20 +5,27 @@
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
 	import { droppable } from '$lib/actions/actions';
-	import type { SlotState, ItemLocation, ItemDefinition, AttachmentType } from '$lib/types';
-	import { ITEM_DB } from '$lib/config/items';
-	import { getRarityStyle } from '$lib/config/rarity';
+	import type { SlotState, ItemLocation } from '$lib/types';
 	import AnimatedItemList from '$lib/components/animated-item-list.svelte';
 
-	const { loot, interaction } = getGameContext();
-
-
+	const { loot, interaction, gameLoop } = getGameContext();
 
 	const trashLocation: ItemLocation = { type: 'trash' };
 	const trashSlotState: SlotState = { location: trashLocation, item: null };
 </script>
 
-<div class="flex h-full w-full flex-col items-start gap-6 px-5 py-16">
+<div class="flex h-full w-full flex-col items-start gap-6 px-5">
+	{#if gameLoop.status !== 'idle'}
+		<div
+			class="z-100 flex w-full items-center justify-center gap-2 text-xs font-medium text-white/80"
+		>
+			<span>{gameLoop.score} score</span>
+			<span class="text-white/40">|</span>
+			<span class={gameLoop.timeLeft < 10 ? 'text-red-400' : ''}>
+				{Math.ceil(gameLoop.timeLeft)}s
+			</span>
+		</div>
+	{/if}
 	<div class="flex items-start justify-center gap-4">
 		<div
 			class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs"

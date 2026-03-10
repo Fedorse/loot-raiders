@@ -5,12 +5,17 @@
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import { initGame } from '$lib/store/game.svelte';
+
 	import './layout.css';
 
 	let { children } = $props();
 
 	const game = initGame();
-	const { overlay, debug, loot } = game;
+	const { overlay, debug, loot, gameLoop } = game;
+
+	$effect(() => {
+		return () => gameLoop.stop();
+	});
 </script>
 
 <svelte:window

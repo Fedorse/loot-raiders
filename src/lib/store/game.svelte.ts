@@ -5,6 +5,7 @@ import { Overlay } from './overlay.svelte';
 import { DebugStore } from './debug.svelte';
 import { LootGenerator } from './loot.svelte';
 import { Selection } from './selection.svelte';
+import { GameLoop } from './game-loop.svelte';
 
 export class Game {
 	selection = new Selection();
@@ -13,6 +14,7 @@ export class Game {
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection);
 	loot = new LootGenerator(this.inventory);
+	gameLoop = new GameLoop(this.inventory);
 }
 
 const GAME_KEY = Symbol('GAME');

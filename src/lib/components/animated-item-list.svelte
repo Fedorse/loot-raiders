@@ -1,128 +1,185 @@
 <script lang="ts">
-	import { ITEM_DB } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
-	import type { SlotState, ItemLocation, ItemDefinition, AttachmentType } from '$lib/types';
-	const feedItems = (() => {
-		const all = Object.values(ITEM_DB);
+	import { getGameContext } from '$lib/store/game.svelte';
 
-		// Build attachment pool grouped by kind
-		const attachmentsByKind = new Map<AttachmentType, ItemDefinition[]>();
-		for (const d of all) {
-			if (d.type === 'attachment' && d.attachmentKind) {
-				const list = attachmentsByKind.get(d.attachmentKind) ?? [];
-				list.push(d);
-				attachmentsByKind.set(d.attachmentKind, list);
-			}
-		}
+	const { gameLoop } = getGameContext();
 
-		const byType = new Map<string, ItemDefinition[]>();
-		for (const d of all) {
-			const list = byType.get(d.type) ?? [];
-			list.push(d);
-			byType.set(d.type, list);
+	// Container ref — IO root
+	let viewportEl = $state<HTMLElement>();
+
+	// Single IntersectionObserver for all feed items
+	let observer: IntersectionObserver | undefined;
+	const nodeMap = new Map<Element, string>();
+
+	function ensureObserver(): IntersectionObserver | undefined {
+		if (!observer && viewportEl) {
+			observer = new IntersectionObserver(
+				(entries) => {
+					for (const e of entries) {
+						const id = nodeMap.get(e.target);
+						if (!id) continue;
+						if (e.isIntersecting) gameLoop.markVisible(id);
+						else gameLoop.markHidden(id);
+					}
+				},
+				{ root: viewportEl, threshold: 1.0 }
+			);
 		}
-		const picked: ItemDefinition[] = [];
-		for (const [, list] of byType) {
-			const take = Math.min(list.length, Math.ceil(20 / byType.size));
-			picked.push(...list.slice(0, take));
-		}
-		return picked.slice(0, 20).map((def) => {
-			if (def.type === 'weapon' && def.attachmentSlots?.length) {
-				const attachments = def.attachmentSlots.map((slot) => {
-					if (Math.random() < 0.5) return null;
-					const pool = attachmentsByKind.get(slot.type);
-					if (!pool?.length) return null;
-					return pool[Math.floor(Math.random() * pool.length)];
-				});
-				return { def, count: 1, attachments };
-			}
-			return {
-				def,
-				count: def.type === 'weapon' ? 1 : Math.floor(Math.random() * 9) + 2,
-				attachments: null as (ItemDefinition | null)[] | null
+		return observer;
+	}
+
+	// Svelte action — tracks visibility of each feed item
+	function trackVisibility(id: string) {
+		return (node: HTMLElement) => {
+			nodeMap.set(node, id);
+			ensureObserver()?.observe(node);
+			return () => {
+				observer?.unobserve(node);
+				nodeMap.delete(node);
+				gameLoop.markHidden(id);
 			};
-		});
-	})();
+		};
+	}
+
+	// Cleanup on component destroy
+	$effect(() => {
+		return () => {
+			observer?.disconnect();
+			observer = undefined;
+			nodeMap.clear();
+		};
+	});
 </script>
 
 <div
-	class="scrollbar-none z-10 flex h-[calc(100vh-10rem)] w-52 flex-col gap-2 overflow-y-auto rounded-lg bg-background/50 px-3 py-4"
+	bind:this={viewportEl}
+	class="relative z-10 flex h-[calc(100vh-10rem)] w-52 flex-col overflow-hidden rounded-lg bg-background/50"
 >
-	<h2 class="text-xs font-bold text-white/60 uppercase">Items</h2>
+	<!-- HUD: score + timer -->
+	<div class="z-20 flex items-center justify-between px-3 py-2">
+		<h2 class="text-xs font-bold text-white/60 uppercase">Items</h2>
+		{#if gameLoop.status !== 'idle'}
+			<div class="flex items-center gap-2 text-xs font-medium text-white/80">
+				<span>{gameLoop.score} pts</span>
+				<span class="text-white/40">|</span>
+				<span class={gameLoop.timeLeft < 10 ? 'text-red-400' : ''}>
+					{Math.ceil(gameLoop.timeLeft)}s
+				</span>
+			</div>
+		{/if}
+	</div>
 
-	{#each feedItems as { def, count, attachments } (def.id)}
-		{@const style = getRarityStyle(def.rarity)}
-		<div class="flex w-full justify-center">
-			{#if def.type === 'weapon' && def.attachmentSlots?.length}
-				<!-- Weapon with attachment slots -->
+	{#if gameLoop.status === 'idle'}
+		<!-- Start screen -->
+		<div class="flex flex-1 items-center justify-center">
+			<button
+				class="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold text-white uppercase hover:bg-white/20"
+				onclick={() => gameLoop.start()}
+			>
+				Start
+			</button>
+		</div>
+	{:else if gameLoop.status === 'over'}
+		<!-- Game over screen -->
+		<div class="flex flex-1 flex-col items-center justify-center gap-3">
+			<div class="text-lg font-bold text-white">Game Over</div>
+			<div class="text-2xl font-bold text-white">{gameLoop.score} pts</div>
+			<button
+				class="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold text-white uppercase hover:bg-white/20"
+				onclick={() => gameLoop.start()}
+			>
+				Retry
+			</button>
+		</div>
+	{:else}
+		<!-- Scrolling feed -->
+		<div
+			class="flex flex-col gap-2 px-3 pb-4"
+			style="transform: translateY(-{gameLoop.scrollOffset}px)"
+		>
+			{#each gameLoop.queue as item (item.id)}
+				{@const style = getRarityStyle(item.def.rarity)}
 				<div
-					class="flex w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+					{@attach trackVisibility(item.id)}
+					class="flex w-full justify-center transition-opacity duration-300"
+					class:opacity-20={item.matched}
 				>
-					<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
-						<div class="relative flex h-16 items-center justify-center">
-							<div
-								class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
-							></div>
-							<img
-								src={def.image}
-								alt={def.name}
-								class="relative z-10 h-full w-full object-contain"
-							/>
+					{#if item.def.type === 'weapon' && item.def.attachmentSlots?.length}
+						<!-- Weapon with attachment slots -->
+						<div
+							class="flex w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+						>
+							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
+								<div class="relative flex h-16 items-center justify-center">
+									<div
+										class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
+									></div>
+									<img
+										src={item.def.image}
+										alt={item.def.name}
+										class="relative z-10 h-full w-full object-contain"
+									/>
+								</div>
+								<div class="z-10 flex items-center justify-center gap-0.5 px-1 py-1">
+									{#each item.def.attachmentSlots as slot, i}
+										{@const att = item.attachments?.[i]}
+										{#if att}
+											{@const attStyle = getRarityStyle(att.rarity)}
+											<div
+												class="flex size-7 items-center justify-center overflow-hidden rounded bg-linear-to-tr p-[0.5px] {attStyle.border}"
+											>
+												<div
+													class="flex h-full w-full items-center justify-center rounded-sm bg-surface"
+												>
+													<img
+														src={att.image}
+														alt={att.name}
+														class="size-8 scale-125 object-contain"
+													/>
+												</div>
+											</div>
+										{:else}
+											<div
+												class="flex size-7 items-center justify-center rounded border border-white/15"
+											>
+												<img
+													src={slot.placeholder}
+													alt={slot.type}
+													class="size-8 object-contain opacity-30"
+												/>
+											</div>
+										{/if}
+									{/each}
+								</div>
+							</div>
 						</div>
-						<div class="z-10 flex items-center justify-center gap-0.5 px-1 py-1">
-							{#each def.attachmentSlots as slot, i}
-								{@const att = attachments?.[i]}
-								{#if att}
-									{@const attStyle = getRarityStyle(att.rarity)}
+					{:else}
+						<!-- Simple item -->
+						<div
+							class="flex h-20 w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+						>
+							<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
+								<div
+									class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
+								></div>
+								<img
+									src={item.def.image}
+									alt={item.def.name}
+									class="relative z-10 h-full w-full object-contain"
+								/>
+								{#if item.count > 1}
 									<div
-										class="flex size-7 items-center justify-center overflow-hidden rounded bg-linear-to-tr p-[0.5px] {attStyle.border}"
+										class="absolute right-1 bottom-1 z-20 flex items-center gap-0.5 rounded bg-black/70 px-1 py-0.5 text-xs leading-none font-medium text-white"
 									>
-										<div
-											class="flex h-full w-full items-center justify-center rounded-sm bg-surface"
-										>
-											<img src={att.image} alt={att.name} class="size-8 scale-125 object-contain" />
-										</div>
-									</div>
-								{:else}
-									<div
-										class="flex size-7 items-center justify-center rounded border border-white/15"
-									>
-										<img
-											src={slot.placeholder}
-											alt={slot.type}
-											class="size-8 object-contain opacity-30"
-										/>
+										<span class="text-[9px] text-white/50">x</span>
+										<span class="font-sans text-xs tracking-[-0.05em]">{item.count}</span>
 									</div>
 								{/if}
-							{/each}
-						</div>
-					</div>
-				</div>
-			{:else}
-				<!-- Simple item -->
-				<div
-					class="flex h-20 w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
-				>
-					<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
-						<div
-							class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
-						></div>
-						<img
-							src={def.image}
-							alt={def.name}
-							class="relative z-10 h-full w-full object-contain"
-						/>
-						{#if count > 1}
-							<div
-								class="absolute right-1 bottom-1 z-20 flex items-center gap-0.5 rounded bg-black/70 px-1 py-0.5 text-xs leading-none font-medium text-white"
-							>
-								<span class="text-[9px] text-white/50">x</span>
-								<span class="font-sans text-xs tracking-[-0.05em]">{count}</span>
 							</div>
-						{/if}
-					</div>
+						</div>
+					{/if}
 				</div>
-			{/if}
+			{/each}
 		</div>
-	{/each}
+	{/if}
 </div>
