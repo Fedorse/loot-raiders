@@ -3,68 +3,21 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 
 	const { gameLoop } = getGameContext();
-
-	// Container ref — IO root
-	let viewportEl = $state<HTMLElement>();
-
-	// Single IntersectionObserver for all feed items
-	let observer: IntersectionObserver | undefined;
-	const nodeMap = new Map<Element, string>();
-
-	function ensureObserver(): IntersectionObserver | undefined {
-		if (!observer && viewportEl) {
-			observer = new IntersectionObserver(
-				(entries) => {
-					for (const e of entries) {
-						const id = nodeMap.get(e.target);
-						if (!id) continue;
-						if (e.isIntersecting) gameLoop.markVisible(id);
-						else gameLoop.markHidden(id);
-					}
-				},
-				{ root: viewportEl, threshold: 1.0 }
-			);
-		}
-		return observer;
-	}
-
-	// Svelte action — tracks visibility of each feed item
-	function trackVisibility(id: string) {
-		return (node: HTMLElement) => {
-			nodeMap.set(node, id);
-			ensureObserver()?.observe(node);
-			return () => {
-				observer?.unobserve(node);
-				nodeMap.delete(node);
-				gameLoop.markHidden(id);
-			};
-		};
-	}
-
-	// Cleanup on component destroy
-	$effect(() => {
-		return () => {
-			observer?.disconnect();
-			observer = undefined;
-			nodeMap.clear();
-		};
-	});
 </script>
 
 <div
-	bind:this={viewportEl}
+	bind:clientHeight={gameLoop.containerHeight}
 	class="relative z-10 flex h-[calc(100vh-10rem)] w-52 flex-col overflow-hidden rounded-lg bg-background/50"
 >
 	{#if gameLoop.status === 'playing' || gameLoop.status === 'paused' || gameLoop.status === 'over'}
 		<!-- Scrolling feed -->
 		<div
 			class="flex flex-col gap-2 px-3 pb-4"
-			style="transform: translateY(-{gameLoop.scrollOffset}px)"
+			style="transform: translateY({-gameLoop.totalHeight + gameLoop.scrollOffset}px)"
 		>
 			{#each gameLoop.queue as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
 				<div
-					{@attach trackVisibility(item.id)}
 					class="flex w-full justify-center transition-opacity duration-300"
 					class:opacity-20={item.matched}
 				>

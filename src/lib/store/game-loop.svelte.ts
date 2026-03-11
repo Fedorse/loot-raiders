@@ -1,7 +1,6 @@
 import { getDef } from '$lib/config/items';
 import type { ItemDefinition } from '$lib/types';
 import type { Inventory } from './inventory.svelte';
-import { SvelteSet } from 'svelte/reactivity';
 
 // ---- Types ----
 
@@ -51,6 +50,9 @@ const POINTS_PER_MATCH = 10;
 const TIME_BONUS = 3;
 const INITIAL_TIME = 300;
 const INITIAL_SPEED = 10;
+const ITEM_HEIGHT = 80;
+const WEAPON_HEIGHT = 92;
+const ITEM_GAP = 8;
 
 export class GameLoop {
 	private inventory: Inventory;
@@ -66,12 +68,39 @@ export class GameLoop {
 	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
 
-	// ---- IO-based visibility tracking ----
+	// ---- Positional visibility tracking ----
 
-	private visibleIds = new SvelteSet<string>();
+	containerHeight = $state(0);
+
+	totalHeight = $derived.by(() => {
+		let h = 0;
+		for (const item of this.queue) {
+			if (h > 0) h += ITEM_GAP;
+			h +=
+				item.def.type === 'weapon' && item.def.attachmentSlots?.length
+					? WEAPON_HEIGHT
+					: ITEM_HEIGHT;
+		}
+		return h;
+	});
 
 	visibleItems = $derived.by(() => {
-		return this.queue.filter((item) => !item.matched && this.visibleIds.has(item.id));
+		if (this.containerHeight <= 0) return [];
+		const result: FeedItem[] = [];
+		let y = 0;
+		for (const item of this.queue) {
+			const h =
+				item.def.type === 'weapon' && item.def.attachmentSlots?.length
+					? WEAPON_HEIGHT
+					: ITEM_HEIGHT;
+			const top = y - this.totalHeight + this.scrollOffset;
+			const bottom = top + h;
+			if (bottom > 0 && top < this.containerHeight && !item.matched) {
+				result.push(item);
+			}
+			y += h + ITEM_GAP;
+		}
+		return result;
 	});
 
 	allMatched = $derived(this.queue.length > 0 && this.queue.every((i) => i.matched));
@@ -80,20 +109,9 @@ export class GameLoop {
 		this.inventory = inventory;
 	}
 
-	// ---- Called by component via IntersectionObserver ----
-
-	markVisible(id: string) {
-		this.visibleIds.add(id);
-	}
-
-	markHidden(id: string) {
-		this.visibleIds.delete(id);
-	}
-
 	// ---- Public API ----
 
 	start() {
-		this.visibleIds.clear();
 		this.queue = createTestQueue();
 		this.scrollOffset = 0;
 		this.score = 0;
