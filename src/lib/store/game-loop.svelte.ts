@@ -14,7 +14,7 @@ export interface FeedItem {
 	matched: boolean;
 }
 
-export type GameStatus = 'idle' | 'playing' | 'over';
+export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
 // ---- Hardcoded test pool (shared with loot.svelte.ts) ----
 
@@ -108,6 +108,24 @@ export class GameLoop {
 	stop() {
 		cancelAnimationFrame(this.rafId);
 		this.status = 'over';
+	}
+
+	pause() {
+		if (this.status !== 'playing') return;
+		cancelAnimationFrame(this.rafId);
+		this.status = 'paused';
+	}
+
+	resume() {
+		if (this.status !== 'paused') return;
+		this.status = 'playing';
+		this.lastTime = performance.now();
+		this.rafId = requestAnimationFrame((t) => this.tick(t));
+	}
+
+	toggle() {
+		if (this.status === 'playing') this.pause();
+		else if (this.status === 'paused') this.resume();
 	}
 
 	// ---- Game loop ----

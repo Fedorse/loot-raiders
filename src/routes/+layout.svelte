@@ -4,6 +4,7 @@
 	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
+	import GameMenu from '$lib/components/game-menu.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 
 	import './layout.css';
@@ -21,7 +22,13 @@
 <svelte:window
 	onkeydown={(e) => {
 		if (e.key === 'Escape') {
-			overlay.handleEscape();
+			if (gameLoop.status === 'playing') {
+				gameLoop.pause();
+			} else if (gameLoop.status === 'paused') {
+				gameLoop.resume();
+			} else {
+				overlay.handleEscape();
+			}
 			return;
 		}
 		if (e.key === ' ') {
@@ -51,6 +58,7 @@
 <TooltipOverlay />
 <RecycleModal />
 <DebugPanel />
+<GameMenu />
 
 <style>
 	@reference "tailwindcss";

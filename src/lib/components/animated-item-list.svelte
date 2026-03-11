@@ -55,43 +55,7 @@
 	bind:this={viewportEl}
 	class="relative z-10 flex h-[calc(100vh-10rem)] w-52 flex-col overflow-hidden rounded-lg bg-background/50"
 >
-	<!-- HUD: score + timer -->
-	<div class="z-20 flex items-center justify-between px-3 py-2">
-		<h2 class="text-xs font-bold text-white/60 uppercase">Items</h2>
-		{#if gameLoop.status !== 'idle'}
-			<div class="flex items-center gap-2 text-xs font-medium text-white/80">
-				<span>{gameLoop.score} pts</span>
-				<span class="text-white/40">|</span>
-				<span class={gameLoop.timeLeft < 10 ? 'text-red-400' : ''}>
-					{Math.ceil(gameLoop.timeLeft)}s
-				</span>
-			</div>
-		{/if}
-	</div>
-
-	{#if gameLoop.status === 'idle'}
-		<!-- Start screen -->
-		<div class="flex flex-1 items-center justify-center">
-			<button
-				class="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold text-white uppercase hover:bg-white/20"
-				onclick={() => gameLoop.start()}
-			>
-				Start
-			</button>
-		</div>
-	{:else if gameLoop.status === 'over'}
-		<!-- Game over screen -->
-		<div class="flex flex-1 flex-col items-center justify-center gap-3">
-			<div class="text-lg font-bold text-white">Game Over</div>
-			<div class="text-2xl font-bold text-white">{gameLoop.score} pts</div>
-			<button
-				class="rounded-lg bg-white/10 px-4 py-2 text-sm font-bold text-white uppercase hover:bg-white/20"
-				onclick={() => gameLoop.start()}
-			>
-				Retry
-			</button>
-		</div>
-	{:else}
+	{#if gameLoop.status === 'playing' || gameLoop.status === 'paused' || gameLoop.status === 'over'}
 		<!-- Scrolling feed -->
 		<div
 			class="flex flex-col gap-2 px-3 pb-4"
