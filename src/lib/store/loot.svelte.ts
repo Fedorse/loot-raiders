@@ -1,30 +1,97 @@
-import { ITEM_DB, getDef } from '$lib/config/items';
+import { ITEM_DB } from '$lib/config/items';
 import type { Inventory } from './inventory.svelte';
-import type { ItemRarity, ItemDefinition } from '$lib/types';
+import type { ItemRarity, ItemDefinition, ItemType } from '$lib/types';
 import { randInt } from '$lib/utils';
-import { TEST_ITEM_IDS } from './game-loop.svelte';
 
-// ---- Random generation (commented out for now) ----
+const TYPE_WEIGHTS: Partial<Record<ItemType, number>> = {
+	loot: 75,
+	attachment: 10,
+	weapon: 8,
+	shield: 2
+};
 
-// const RARITY_WEIGHTS: Record<ItemRarity, number> = {
-// 	common: 40,
-// 	uncommon: 30,
-// 	rare: 20,
-// 	epic: 8,
-// 	legendary: 2
-// };
-//
-// const itemsByRarity: Record<ItemRarity, ItemDefinition[]> = {
-// 	common: [],
-// 	uncommon: [],
-// 	rare: [],
-// 	epic: [],
-// 	legendary: []
-// };
-//
-// for (const def of Object.values(ITEM_DB)) {
-// 	itemsByRarity[def.rarity].push(def);
-// }
+const TYPE_CAPS: Partial<Record<ItemType, number>> = {
+	weapon: 2,
+	augment: 1,
+	shield: 1
+};
+
+const RARITY_WEIGHTS: Record<ItemRarity, number> = {
+	common: 40,
+	uncommon: 30,
+	rare: 20,
+	epic: 8,
+	legendary: 2
+};
+
+const STACK_RANGES: Record<ItemRarity, [number, number]> = {
+	common: [1, 5],
+	uncommon: [1, 3],
+	rare: [1, 2],
+	epic: [1, 1],
+	legendary: [1, 1]
+};
+
+type ItemPool = Record<ItemType, Record<ItemRarity, ItemDefinition[]>>;
+
+function buildItemPool(): ItemPool {
+	const pool = {} as ItemPool;
+	for (const type of ['loot', 'weapon', 'augment', 'shield', 'attachment'] as ItemType[]) {
+		pool[type] = { common: [], uncommon: [], rare: [], epic: [], legendary: [] };
+	}
+	for (const def of Object.values(ITEM_DB)) {
+		pool[def.type][def.rarity].push(def);
+	}
+	return pool;
+}
+
+const itemPool = buildItemPool();
+
+function weightedRoll<T extends string>(weights: Record<T, number>): T {
+	const entries = Object.entries(weights) as [T, number][];
+	const total = entries.reduce((sum, [, w]) => sum + w, 0);
+	let roll = Math.random() * total;
+	for (const [key, weight] of entries) {
+		roll -= weight;
+		if (roll <= 0) return key;
+	}
+	return entries[0][0];
+}
+
+function pickRandom<T>(arr: T[]): T {
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ---- Roll one item (3 layers) ----
+
+function rollType(typeCounts: Record<string, number>): ItemType {
+	// Respect caps: zero out weight for types that hit their cap
+	const adjusted = { ...TYPE_WEIGHTS };
+	for (const [type, cap] of Object.entries(TYPE_CAPS)) {
+		if ((typeCounts[type] ?? 0) >= cap) {
+			adjusted[type as ItemType] = 0;
+		}
+	}
+	return weightedRoll(adjusted);
+}
+
+function rollRarity(type: ItemType): ItemRarity {
+	// If pool is empty for a rarity, zero out its weight
+	const adjusted = { ...RARITY_WEIGHTS };
+	for (const rarity of Object.keys(adjusted) as ItemRarity[]) {
+		if (itemPool[type][rarity].length === 0) {
+			adjusted[rarity] = 0;
+		}
+	}
+	return weightedRoll(adjusted);
+}
+
+function rollCount(type: ItemType, rarity: ItemRarity, def: ItemDefinition): number {
+	if (type !== 'loot') return 1;
+	const [min, max] = STACK_RANGES[rarity];
+	const maxStack = def.maxStack ?? 1;
+	return randInt(min, Math.min(max, maxStack));
+}
 
 type LoadingStatus = 'idle' | 'loading' | 'done';
 
@@ -40,8 +107,8 @@ export class LootGenerator {
 
 	next(): void {
 		this.inventory.clearStorage('lootBack');
-		const count = randInt(6, 16);
-		const items = Array.from({ length: count }, () => this.rollItem());
+		const count = randInt(4, 16);
+		const items = this.generateLoot(count);
 		this.inventory.fillStorage('lootBack', items);
 		this.totalItems = count;
 		this.loadingIndex = 0;
@@ -62,30 +129,23 @@ export class LootGenerator {
 		return this.phase === 'loading' && index > this.loadingIndex;
 	}
 
-	private rollItem() {
-		// Hardcoded: pick random item from TEST_ITEM_IDS pool
-		const defId = TEST_ITEM_IDS[Math.floor(Math.random() * TEST_ITEM_IDS.length)];
-		return this.inventory.createItem(defId, 1);
+	private generateLoot(count: number) {
+		const typeCounts: Record<string, number> = {};
+		return Array.from({ length: count }, () => {
+			// Layer 1: type
+			const type = rollType(typeCounts);
+			typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+
+			// Layer 2: rarity
+			const rarity = rollRarity(type);
+
+			// Pick random item from pool
+			const def = pickRandom(itemPool[type][rarity]);
+
+			// Layer 3: count
+			const itemCount = rollCount(type, rarity, def);
+
+			return this.inventory.createItem(def.id, itemCount);
+		});
 	}
-
-	// ---- Random generation (commented out for now) ----
-
-	// private rollItem() {
-	// 	const rarity = weightedRoll(RARITY_WEIGHTS);
-	// 	const pool = itemsByRarity[rarity];
-	// 	const def = pool[Math.floor(Math.random() * pool.length)];
-	// 	const count = def.type === 'loot' ? randInt(1, 3) : 1;
-	// 	return this.inventory.createItem(def.id, count);
-	// }
 }
-
-// function weightedRoll(weights: Record<ItemRarity, number>): ItemRarity {
-// 	const entries = Object.entries(weights) as [ItemRarity, number][];
-// 	const total = entries.reduce((sum, [, w]) => sum + w, 0);
-// 	let roll = Math.random() * total;
-// 	for (const [rarity, weight] of entries) {
-// 		roll -= weight;
-// 		if (roll <= 0) return rarity;
-// 	}
-// 	return entries[0][0];
-// }
