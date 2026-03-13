@@ -2,14 +2,15 @@
 	interface Props {
 		duration?: number;
 		onscanned?: () => void;
+		pause?: boolean;
 	}
 
-	let { duration = 1, onscanned }: Props = $props();
+	let { duration = 1, onscanned, pause = false }: Props = $props();
 </script>
 
 <div
 	class="scanner-beam pointer-events-none absolute inset-0"
-	style="--scan-duration: {duration}s;"
+	style="--scan-duration: {duration}s; animation-play-state: {pause ? 'paused' : 'running'};"
 	onanimationend={onscanned}
 ></div>
 

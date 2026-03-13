@@ -13,7 +13,7 @@
 
 	let { location, class: className = '', placeholder }: Props = $props();
 
-	const { interaction, inventory, overlay, loot, selection } = getGameContext();
+	const { interaction, inventory, overlay, loot, selection, gameLoop } = getGameContext();
 	const item = $derived(inventory.getItem(location));
 	const itemUid = $derived(item?.uid ?? '');
 	const selectedItem = $derived(selection.isSelected(itemUid));
@@ -78,7 +78,7 @@
 		<div class="h-full w-full rounded-[7px] bg-[#080b14]"></div>
 	</div>
 	{#if scanningItem}
-		<ItemScanner onscanned={() => loot.slotScanned()} />
+		<ItemScanner onscanned={() => loot.slotScanned()} pause={gameLoop.status === 'paused'} />
 	{/if}
 {/snippet}
 

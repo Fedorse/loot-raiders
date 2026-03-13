@@ -31,7 +31,7 @@
 			}
 			return;
 		}
-		if (e.key === ' ') {
+		if (e.key === ' ' && gameLoop.status === 'playing') {
 			e.preventDefault();
 			loot.next();
 			return;

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
-	import { getStorageConfig } from '$lib/config/storages';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
 	import { droppable } from '$lib/actions/actions';
@@ -40,7 +39,7 @@
 					class="rounded bg-white/10 px-3 py-1 text-sm uppercase hover:bg-white/20
                         disabled:cursor-not-allowed disabled:opacity-30"
 					onclick={() => loot.next()}
-					disabled={loot.phase === 'loading'}
+					disabled={loot.phase === 'loading' || gameLoop.status !== 'playing'}
 				>
 					next
 				</button>
