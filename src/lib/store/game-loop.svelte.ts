@@ -1,9 +1,6 @@
-import { ITEM_DB } from '$lib/config/items';
-import type { ItemDefinition, ItemType } from '$lib/types';
+import type { ItemDefinition } from '$lib/types';
 import type { Inventory } from './inventory.svelte';
-import { rollType, rollRarity, rollCount, pickRandom, itemPool } from './loot.svelte';
-
-// ---- Types ----
+import { generateLootItems, TRACK_PROFILE } from './loot.svelte';
 
 export interface FeedItem {
 	id: string;
@@ -16,14 +13,12 @@ export interface FeedItem {
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
-// ---- Constants ----
-
 const POINTS_PER_MATCH = 10;
 const TIME_BONUS = 3;
 const INITIAL_TIME = 300;
-const INITIAL_SPEED = 300;
+const INITIAL_SPEED = 30;
 const ITEM_HEIGHT = 80;
-const WEAPON_HEIGHT = 92;
+const WEAPON_HEIGHT = 102;
 const ITEM_GAP = 8;
 
 export class GameLoop {
@@ -31,16 +26,12 @@ export class GameLoop {
 	private rafId = 0;
 	private lastTime = 0;
 
-	// ---- Reactive state ----
-
 	queue = $state<FeedItem[]>([]);
 	scrollOffset = $state(0);
 	score = $state(0);
 	timeLeft = $state(INITIAL_TIME);
 	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
-
-	// ---- Positional visibility tracking ----
 
 	containerHeight = $state(0);
 
@@ -81,10 +72,8 @@ export class GameLoop {
 		this.inventory = inventory;
 	}
 
-	// ---- Public API ----
-
 	start() {
-		this.queue = generateFeedQueue(100);
+		this.queue = generateTrackQueue(100);
 		this.scrollOffset = 0;
 		this.score = 0;
 		this.timeLeft = INITIAL_TIME;
@@ -118,8 +107,6 @@ export class GameLoop {
 		else if (this.status === 'paused') this.resume();
 	}
 
-	// ---- Game loop ----
-
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
@@ -132,6 +119,11 @@ export class GameLoop {
 		}
 
 		this.scrollOffset += this.speed * dt;
+
+		const distanceToTop = this.totalHeight - this.scrollOffset;
+		if (distanceToTop < 2000) {
+			this.extendTrack();
+		}
 
 		if (this.allMatched) {
 			this.stop();
@@ -156,50 +148,48 @@ export class GameLoop {
 			this.timeLeft += TIME_BONUS;
 		}
 	}
+	private extendTrack() {
+		// 1. Генерируем пачку новых предметов
+		const newItems = generateTrackQueue(30);
+
+		// 2. Добавляем их в начало (наверх списка)
+		// Так как список визуально привязан к низу (-totalHeight),
+		// добавление наверх не сдвинет текущие элементы на экране!
+		this.queue = [...newItems, ...this.queue];
+
+		// 3. Очистка (Garbage Collection)
+		// Удаляем старые элементы снизу, чтобы браузер не умер от тысяч DOM-узлов
+		const MAX_ITEMS = 100;
+		if (this.queue.length > MAX_ITEMS) {
+			const itemsToRemove = this.queue.slice(MAX_ITEMS);
+
+			// Считаем высоту, которую мы сейчас отрежем снизу
+			let removedHeight = 0;
+			for (const item of itemsToRemove) {
+				const h =
+					item.def.type === 'weapon' && item.def.attachmentSlots?.length
+						? WEAPON_HEIGHT
+						: ITEM_HEIGHT;
+				removedHeight += h + ITEM_GAP;
+			}
+
+			// Отрезаем хвост массива
+			this.queue = this.queue.slice(0, MAX_ITEMS);
+			// Компенсируем скролл, чтобы список не дернулся вниз
+			this.scrollOffset -= removedHeight;
+		}
+	}
 }
 
-// ---- Feed generation ----
+function generateTrackQueue(count: number): FeedItem[] {
+	const rawItems = generateLootItems(TRACK_PROFILE, count);
 
-const FEED_TYPE_CAPS: Partial<Record<ItemType, number>> = {
-	weapon: 15,
-	shield: 8,
-	augment: 5
-};
-
-function generateFeedQueue(count: number): FeedItem[] {
-	const typeCounts: Record<string, number> = {};
-
-	return Array.from({ length: count }, () => {
-		const type = rollType(typeCounts, FEED_TYPE_CAPS);
-		typeCounts[type] = (typeCounts[type] ?? 0) + 1;
-
-		const rarity = rollRarity(type);
-		const def = pickRandom(itemPool[type][rarity]);
-		const itemCount = rollCount(type, rarity, def);
-		const attachments = rollAttachments(def);
-
-		return {
-			id: crypto.randomUUID(),
-			defId: def.id,
-			count: itemCount,
-			def,
-			attachments,
-			matched: false
-		};
-	});
-}
-
-function rollAttachments(def: ItemDefinition): (ItemDefinition | null)[] | null {
-	if (def.type !== 'weapon' || !def.attachmentSlots?.length) return null;
-
-	return def.attachmentSlots.map((slot) => {
-		if (Math.random() > 0.3) return null;
-
-		const candidates = Object.values(ITEM_DB).filter(
-			(d) => d.type === 'attachment' && d.attachmentKind === slot.type
-		);
-		if (candidates.length === 0) return null;
-
-		return pickRandom(candidates);
-	});
+	return rawItems.map((raw) => ({
+		id: crypto.randomUUID(),
+		defId: raw.def.id,
+		count: raw.count,
+		def: raw.def,
+		attachments: raw.attachments,
+		matched: false
+	}));
 }

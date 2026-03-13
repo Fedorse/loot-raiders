@@ -24,7 +24,7 @@
 					{#if item.def.type === 'weapon' && item.def.attachmentSlots?.length}
 						<!-- Weapon with attachment slots -->
 						<div
-							class="flex w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+							class="flex h-[102px] w-44 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 						>
 							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
 								<div class="relative flex h-16 items-center justify-center">
