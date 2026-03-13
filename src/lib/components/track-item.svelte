@@ -3,19 +3,20 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 
 	const { gameLoop } = getGameContext();
+	const track = gameLoop.track;
 </script>
 
 <div
-	bind:clientHeight={gameLoop.containerHeight}
+	bind:clientHeight={track.containerHeight}
 	class="relative z-10 flex h-[calc(100vh-10rem)] w-52 flex-col overflow-hidden rounded-lg bg-background/50"
 >
 	{#if gameLoop.status === 'playing' || gameLoop.status === 'paused' || gameLoop.status === 'over'}
 		<!-- Scrolling feed -->
 		<div
 			class="flex flex-col gap-2 px-3 pb-4"
-			style="transform: translateY({-gameLoop.totalHeight + gameLoop.scrollOffset}px)"
+			style="transform: translateY({-track.totalHeight + track.scrollOffset}px)"
 		>
-			{#each gameLoop.queue as item (item.id)}
+			{#each track.queue as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
 				<div
 					class="flex w-full justify-center transition-opacity duration-300"

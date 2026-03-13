@@ -148,7 +148,6 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 
 export class LootGenerator {
 	private inventory: Inventory;
-
 	phase = $state<LoadingStatus>('idle');
 	loadingIndex = $state(-1);
 	totalItems = $state(0);

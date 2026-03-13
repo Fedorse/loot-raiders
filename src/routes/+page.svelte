@@ -6,7 +6,7 @@
 
 	import { droppable } from '$lib/actions/actions';
 	import type { SlotState, ItemLocation } from '$lib/types';
-	import AnimatedItemList from '$lib/components/animated-item-list.svelte';
+	import AnimatedItemList from '$lib/components/track-item.svelte';
 
 	const { loot, interaction, gameLoop } = getGameContext();
 
@@ -19,7 +19,10 @@
 		<div
 			class="z-100 flex w-full items-center justify-center gap-2 text-xs font-medium text-white/80"
 		>
-			<span>{gameLoop.score} score</span>
+			<div class="flex items-center">
+				<span>{gameLoop.score}</span>
+				<img src="/assets/ui/Coins.png" alt="coins" class="size-6 object-contain" />
+			</div>
 			<span class="text-white/40">|</span>
 			<span class={gameLoop.timeLeft < 10 ? 'text-red-400' : ''}>
 				{Math.ceil(gameLoop.timeLeft)}s
