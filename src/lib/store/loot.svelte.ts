@@ -3,20 +3,20 @@ import type { Inventory } from './inventory.svelte';
 import type { ItemRarity, ItemDefinition, ItemType } from '$lib/types';
 import { randInt } from '$lib/utils';
 
-const TYPE_WEIGHTS: Partial<Record<ItemType, number>> = {
+export const TYPE_WEIGHTS: Partial<Record<ItemType, number>> = {
 	loot: 75,
-	attachment: 10,
+	attachment: 5,
 	weapon: 8,
 	shield: 2
 };
 
-const TYPE_CAPS: Partial<Record<ItemType, number>> = {
+export const TYPE_CAPS: Partial<Record<ItemType, number>> = {
 	weapon: 2,
 	augment: 1,
 	shield: 1
 };
 
-const RARITY_WEIGHTS: Record<ItemRarity, number> = {
+export const RARITY_WEIGHTS: Record<ItemRarity, number> = {
 	common: 40,
 	uncommon: 30,
 	rare: 20,
@@ -24,7 +24,7 @@ const RARITY_WEIGHTS: Record<ItemRarity, number> = {
 	legendary: 2
 };
 
-const STACK_RANGES: Record<ItemRarity, [number, number]> = {
+export const STACK_RANGES: Record<ItemRarity, [number, number]> = {
 	common: [1, 5],
 	uncommon: [1, 3],
 	rare: [1, 2],
@@ -45,9 +45,9 @@ function buildItemPool(): ItemPool {
 	return pool;
 }
 
-const itemPool = buildItemPool();
+export const itemPool = buildItemPool();
 
-function weightedRoll<T extends string>(weights: Record<T, number>): T {
+export function weightedRoll<T extends string>(weights: Record<T, number>): T {
 	const entries = Object.entries(weights) as [T, number][];
 	const total = entries.reduce((sum, [, w]) => sum + w, 0);
 	let roll = Math.random() * total;
@@ -58,24 +58,27 @@ function weightedRoll<T extends string>(weights: Record<T, number>): T {
 	return entries[0][0];
 }
 
-function pickRandom<T>(arr: T[]): T {
+export function pickRandom<T>(arr: T[]): T {
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
 // ---- Roll one item (3 layers) ----
 
-function rollType(typeCounts: Record<string, number>): ItemType {
+export function rollType(
+	typeCounts: Record<string, number>,
+	caps: Partial<Record<ItemType, number>> = TYPE_CAPS
+): ItemType {
 	// Respect caps: zero out weight for types that hit their cap
-	const adjusted = { ...TYPE_WEIGHTS };
-	for (const [type, cap] of Object.entries(TYPE_CAPS)) {
-		if ((typeCounts[type] ?? 0) >= cap) {
+	const adjusted = { ...TYPE_WEIGHTS } as Record<ItemType, number>;
+	for (const [type, cap] of Object.entries(caps)) {
+		if ((typeCounts[type] ?? 0) >= (cap as number)) {
 			adjusted[type as ItemType] = 0;
 		}
 	}
 	return weightedRoll(adjusted);
 }
 
-function rollRarity(type: ItemType): ItemRarity {
+export function rollRarity(type: ItemType): ItemRarity {
 	// If pool is empty for a rarity, zero out its weight
 	const adjusted = { ...RARITY_WEIGHTS };
 	for (const rarity of Object.keys(adjusted) as ItemRarity[]) {
@@ -86,7 +89,7 @@ function rollRarity(type: ItemType): ItemRarity {
 	return weightedRoll(adjusted);
 }
 
-function rollCount(type: ItemType, rarity: ItemRarity, def: ItemDefinition): number {
+export function rollCount(type: ItemType, rarity: ItemRarity, def: ItemDefinition): number {
 	if (type !== 'loot') return 1;
 	const [min, max] = STACK_RANGES[rarity];
 	const maxStack = def.maxStack ?? 1;

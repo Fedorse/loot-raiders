@@ -1,6 +1,7 @@
-import { getDef } from '$lib/config/items';
-import type { ItemDefinition } from '$lib/types';
+import { ITEM_DB } from '$lib/config/items';
+import type { ItemDefinition, ItemType } from '$lib/types';
 import type { Inventory } from './inventory.svelte';
+import { rollType, rollRarity, rollCount, pickRandom, itemPool } from './loot.svelte';
 
 // ---- Types ----
 
@@ -15,41 +16,12 @@ export interface FeedItem {
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
-// ---- Hardcoded test pool (shared with loot.svelte.ts) ----
-
-export const TEST_ITEM_IDS = [
-	// weapons (4)
-	'wpn_kettle',
-	'wpn_rattler',
-	'wpn_arpeggio',
-	'wpn_hairpin',
-	// loot (10)
-	'loot_chemicals',
-	'loot_fabric',
-	'loot_battery',
-	'loot_oil',
-	'loot_bandage',
-	'loot_rubber_duck',
-	'loot_frying_pan',
-	'loot_light_bulb',
-	'loot_mushroom',
-	'loot_firecracker',
-	// resources (4)
-	'res_metal_parts',
-	'res_rubber_parts',
-	'res_wires',
-	'res_plastic_parts',
-	// ammo (2)
-	'ammo_light',
-	'ammo_medium'
-];
-
 // ---- Constants ----
 
 const POINTS_PER_MATCH = 10;
 const TIME_BONUS = 3;
 const INITIAL_TIME = 300;
-const INITIAL_SPEED = 10;
+const INITIAL_SPEED = 300;
 const ITEM_HEIGHT = 80;
 const WEAPON_HEIGHT = 92;
 const ITEM_GAP = 8;
@@ -112,7 +84,7 @@ export class GameLoop {
 	// ---- Public API ----
 
 	start() {
-		this.queue = createTestQueue();
+		this.queue = generateFeedQueue(100);
 		this.scrollOffset = 0;
 		this.score = 0;
 		this.timeLeft = INITIAL_TIME;
@@ -186,56 +158,48 @@ export class GameLoop {
 	}
 }
 
-// ---- Hardcoded test queue ----
+// ---- Feed generation ----
 
-function createTestQueue(): FeedItem[] {
-	return TEST_ITEM_IDS.map((defId) => {
-		const def = getDef(defId);
+const FEED_TYPE_CAPS: Partial<Record<ItemType, number>> = {
+	weapon: 15,
+	shield: 8,
+	augment: 5
+};
+
+function generateFeedQueue(count: number): FeedItem[] {
+	const typeCounts: Record<string, number> = {};
+
+	return Array.from({ length: count }, () => {
+		const type = rollType(typeCounts, FEED_TYPE_CAPS);
+		typeCounts[type] = (typeCounts[type] ?? 0) + 1;
+
+		const rarity = rollRarity(type);
+		const def = pickRandom(itemPool[type][rarity]);
+		const itemCount = rollCount(type, rarity, def);
+		const attachments = rollAttachments(def);
+
 		return {
 			id: crypto.randomUUID(),
-			defId,
-			count: 1,
+			defId: def.id,
+			count: itemCount,
 			def,
-			attachments: null,
+			attachments,
 			matched: false
 		};
 	});
 }
 
-// ---- Random generation (commented out for now) ----
+function rollAttachments(def: ItemDefinition): (ItemDefinition | null)[] | null {
+	if (def.type !== 'weapon' || !def.attachmentSlots?.length) return null;
 
-// function generateQueue(count: number): FeedItem[] {
-// 	const all = Object.values(ITEM_DB);
-//
-// 	const attachmentsByKind = new Map<AttachmentType, ItemDefinition[]>();
-// 	for (const d of all) {
-// 		if (d.type === 'attachment' && d.attachmentKind) {
-// 			const list = attachmentsByKind.get(d.attachmentKind) ?? [];
-// 			list.push(d);
-// 			attachmentsByKind.set(d.attachmentKind, list);
-// 		}
-// 	}
-//
-// 	return Array.from({ length: count }, () => {
-// 		const def = all[Math.floor(Math.random() * all.length)];
-//
-// 		let attachments: (ItemDefinition | null)[] | null = null;
-// 		if (def.type === 'weapon' && def.attachmentSlots?.length) {
-// 			attachments = def.attachmentSlots.map((slot) => {
-// 				if (Math.random() < 0.5) return null;
-// 				const pool = attachmentsByKind.get(slot.type);
-// 				if (!pool?.length) return null;
-// 				return pool[Math.floor(Math.random() * pool.length)];
-// 			});
-// 		}
-//
-// 		return {
-// 			id: crypto.randomUUID(),
-// 			defId: def.id,
-// 			count: 1,
-// 			def,
-// 			attachments,
-// 			matched: false
-// 		};
-// 	});
-// }
+	return def.attachmentSlots.map((slot) => {
+		if (Math.random() > 0.3) return null;
+
+		const candidates = Object.values(ITEM_DB).filter(
+			(d) => d.type === 'attachment' && d.attachmentKind === slot.type
+		);
+		if (candidates.length === 0) return null;
+
+		return pickRandom(candidates);
+	});
+}
