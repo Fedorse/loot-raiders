@@ -30,7 +30,7 @@
 
 {#if attachment && def && style && !isDraggingThisItem}
 	<div
-		class="relative z-20 aspect-square size-8 rounded-lg"
+		class="relative z-20 aspect-square size-10 rounded-lg"
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
 		{@attach draggable(slotState)}
@@ -38,7 +38,7 @@
 		onpointerleave={() => (isHovered = false)}
 	>
 		{@render glowRing()}
-		<div class="relative z-10 size-8 h-full w-full p-[2px]">
+		<div class="relative z-10 size-10 h-full w-full p-[2px]">
 			<div
 				class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 			>
@@ -59,7 +59,7 @@
 	</div>
 {:else}
 	<div
-		class="relative z-20 aspect-square size-8 rounded-lg"
+		class="relative z-20 aspect-square size-10 rounded-lg"
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
 		onpointerenter={() => (isHovered = true)}

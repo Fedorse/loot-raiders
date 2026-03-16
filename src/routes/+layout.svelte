@@ -6,6 +6,7 @@
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
 	import { initGame } from '$lib/store/game.svelte';
+	import Shortcuts from '$lib/components/shortcuts.svelte';
 
 	import './layout.css';
 
@@ -58,7 +59,6 @@
 <TooltipOverlay />
 <RecycleModal />
 <DebugPanel />
-
 <GameMenu />
 
 <style>

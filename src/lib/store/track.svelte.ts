@@ -10,8 +10,8 @@ export interface TrackItem {
 	matched: boolean;
 }
 
-const ITEM_HEIGHT = 80;
-const WEAPON_HEIGHT = 102;
+const ITEM_HEIGHT = 96;
+const WEAPON_HEIGHT = 120;
 const ITEM_GAP = 8;
 const MAX_ITEMS = 100;
 

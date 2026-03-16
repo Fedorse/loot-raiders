@@ -16,7 +16,7 @@
 
 {#if draggedItem && def}
 	<div
-		class="pointer-events-none fixed top-0 left-0 z-50 flex h-20 w-20 items-center justify-center rounded-lg
+		class="pointer-events-none fixed top-0 left-0 z-50 flex h-24 w-24 items-center justify-center rounded-lg
                 will-change-transform {interaction.isValidDrop
 			? ' bg-drag-valid'
 			: ' bg-drag-invalid'}"
