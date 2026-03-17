@@ -14,6 +14,13 @@ const ITEM_HEIGHT = 96;
 const WEAPON_HEIGHT = 120;
 const ITEM_GAP = 8;
 const MAX_ITEMS = 100;
+const VISIBLE_INSET = 100;
+
+function getItemHeight(item: TrackItem): number {
+	return item.def.type === 'weapon' && item.def.attachmentSlots?.length
+		? WEAPON_HEIGHT
+		: ITEM_HEIGHT;
+}
 
 function generateTrackQueue(count: number): TrackItem[] {
 	const rawItems = generateLootItems(TRACK_PROFILE, count);
@@ -37,10 +44,7 @@ export class Track {
 		let h = 0;
 		for (const item of this.queue) {
 			if (h > 0) h += ITEM_GAP;
-			h +=
-				item.def.type === 'weapon' && item.def.attachmentSlots?.length
-					? WEAPON_HEIGHT
-					: ITEM_HEIGHT;
+			h += getItemHeight(item);
 		}
 		return h;
 	});
@@ -50,13 +54,10 @@ export class Track {
 		const result: TrackItem[] = [];
 		let y = 0;
 		for (const item of this.queue) {
-			const h =
-				item.def.type === 'weapon' && item.def.attachmentSlots?.length
-					? WEAPON_HEIGHT
-					: ITEM_HEIGHT;
+			const h = getItemHeight(item);
 			const top = y - this.totalHeight + this.scrollOffset;
 			const bottom = top + h;
-			if (bottom > 0 && top < this.containerHeight && !item.matched) {
+			if (bottom > VISIBLE_INSET && top < this.containerHeight - VISIBLE_INSET && !item.matched) {
 				result.push(item);
 			}
 			y += h + ITEM_GAP;
@@ -88,9 +89,7 @@ export class Track {
 		if (idx === -1) return;
 
 		const item = this.queue[idx];
-		const isWeapon = item.def.type === 'weapon' && !!item.def.attachmentSlots?.length;
-		const itemHeight = isWeapon ? WEAPON_HEIGHT : ITEM_HEIGHT;
-		const removedHeight = itemHeight + (this.queue.length > 1 ? ITEM_GAP : 0);
+		const removedHeight = getItemHeight(item) + (this.queue.length > 1 ? ITEM_GAP : 0);
 
 		this.queue = this.queue.filter((i) => i.id !== id);
 		this.scrollOffset -= removedHeight;
@@ -105,11 +104,7 @@ export class Track {
 
 			let removedHeight = 0;
 			for (const item of itemsToRemove) {
-				const h =
-					item.def.type === 'weapon' && item.def.attachmentSlots?.length
-						? WEAPON_HEIGHT
-						: ITEM_HEIGHT;
-				removedHeight += h + ITEM_GAP;
+				removedHeight += getItemHeight(item) + ITEM_GAP;
 			}
 
 			this.queue = this.queue.slice(0, MAX_ITEMS);

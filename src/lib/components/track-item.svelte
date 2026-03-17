@@ -1,18 +1,36 @@
 <script lang="ts">
+	import type { ItemDefinition, RarityStyle } from '$lib/types';
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import EraseScanner from './erase-scanner.svelte';
 
 	const { gameLoop } = getGameContext();
 	const track = gameLoop.track;
+
+	const ERASE_DURATION_WEAPON = 0.6;
+	const ERASE_DURATION_ITEM = 3;
 </script>
+
+{#snippet eraseOverlay(itemId: string, duration: number)}
+	<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
+		<EraseScanner
+			{duration}
+			pause={gameLoop.status === 'paused'}
+			onscanned={() => track.removeMatched(itemId)}
+		/>
+	</div>
+{/snippet}
+
+{#snippet itemImage(def: ItemDefinition, style: RarityStyle)}
+	<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"></div>
+	<img src={def.image} alt={def.name} class="relative z-10 h-full w-full object-contain" />
+{/snippet}
 
 <div
 	bind:clientHeight={track.containerHeight}
 	class="relative z-10 flex h-full w-62 flex-col overflow-hidden bg-background/50"
 >
-	{#if gameLoop.status === 'playing' || gameLoop.status === 'paused' || gameLoop.status === 'over'}
-		<!-- Scrolling feed -->
+	{#if gameLoop.status !== 'idle'}
 		<div
 			class="flex flex-col gap-2 px-3 pb-4"
 			style="transform: translateY({-track.totalHeight + track.scrollOffset}px)"
@@ -27,28 +45,13 @@
 						>
 							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									<div
-										class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]"
-									>
-										<EraseScanner
-											duration={0.6}
-											pause={gameLoop.status === 'paused'}
-											onscanned={() => track.removeMatched(item.id)}
-										/>
-									</div>
+									{@render eraseOverlay(item.id, ERASE_DURATION_WEAPON)}
 								{/if}
 								<div class="relative flex h-16 items-center justify-center">
-									<div
-										class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
-									></div>
-									<img
-										src={item.def.image}
-										alt={item.def.name}
-										class="relative z-10 h-full w-full object-contain"
-									/>
+									{@render itemImage(item.def, style)}
 								</div>
 								<div class="z-10 flex items-center justify-center gap-0.5 px-1 py-3">
-									{#each item.def.attachmentSlots as slot, i}
+									{#each item.def.attachmentSlots as slot, i (slot.type + i)}
 										{@const att = item.attachments?.[i]}
 										{#if att}
 											{@const attStyle = getRarityStyle(att.rarity)}
@@ -86,24 +89,9 @@
 						>
 							<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									<div
-										class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]"
-									>
-										<EraseScanner
-											duration={3 }
-											pause={gameLoop.status === 'paused'}
-											onscanned={() => track.removeMatched(item.id)}
-										/>
-									</div>
+									{@render eraseOverlay(item.id, ERASE_DURATION_ITEM)}
 								{/if}
-								<div
-									class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
-								></div>
-								<img
-									src={item.def.image}
-									alt={item.def.name}
-									class="relative z-10 h-full w-full object-contain"
-								/>
+								{@render itemImage(item.def, style)}
 								{#if item.count > 1 && !item.matched}
 									<div
 										class="absolute right-0 bottom-0 z-30 flex min-w-11 items-center justify-center rounded-tl-md border-t border-l bg-black/40 px-2 py-1"
