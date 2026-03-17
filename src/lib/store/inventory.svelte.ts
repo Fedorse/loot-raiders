@@ -357,6 +357,7 @@ export class Inventory {
 				{ type: 'slot', storageId: 'backpack', index: 10 },
 				this.createItem('res_arc_circuitry', 10)
 			],
+
 			// Loot: loose attachments (разные типы)
 			[{ type: 'slot', storageId: 'lootBack', index: 0 }, this.createItem('att_compensator_3')],
 			[{ type: 'slot', storageId: 'lootBack', index: 1 }, this.createItem('att_stable_stock_3')],

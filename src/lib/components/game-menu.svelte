@@ -10,10 +10,7 @@
 		class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		transition:fade={{ duration: 150 }}
 	>
-		<div
-			class="flex flex-col items-center gap-6"
-			transition:scale={{ duration: 200, start: 0.95 }}
-		>
+		<div class="flex flex-col items-center gap-6" transition:scale={{ duration: 200, start: 0.95 }}>
 			{#if gameLoop.status === 'idle'}
 				<h1 class="text-4xl font-black tracking-tight text-white uppercase">Loot Raiders</h1>
 				<button

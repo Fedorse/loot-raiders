@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
+	import EraseScanner from './erase-scanner.svelte';
 
 	const { gameLoop } = getGameContext();
 	const track = gameLoop.track;
@@ -26,7 +27,15 @@
 						>
 							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render matchedOverlay()}
+									<div
+										class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]"
+									>
+										<EraseScanner
+											duration={0.6}
+											pause={gameLoop.status === 'paused'}
+											onscanned={() => track.removeMatched(item.id)}
+										/>
+									</div>
 								{/if}
 								<div class="relative flex h-16 items-center justify-center">
 									<div
@@ -72,13 +81,20 @@
 							</div>
 						</div>
 					{:else}
-						<!-- Simple item -->
 						<div
 							class="flex h-24 w-52 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 						>
 							<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render matchedOverlay()}
+									<div
+										class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]"
+									>
+										<EraseScanner
+											duration={3 }
+											pause={gameLoop.status === 'paused'}
+											onscanned={() => track.removeMatched(item.id)}
+										/>
+									</div>
 								{/if}
 								<div
 									class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] opacity-20 blur-xl {style.glow}"
@@ -92,7 +108,8 @@
 									<div
 										class="absolute right-0 bottom-0 z-30 flex min-w-11 items-center justify-center rounded-tl-md border-t border-l bg-black/40 px-2 py-1"
 										style="border-color: color-mix(in srgb, var(--rarity-{item.def
-											.rarity}) 50%, transparent); box-shadow: 0 0 10px color-mix(in srgb, var(--rarity-{item.def.rarity}) 50%, transparent)"
+											.rarity}) 50%, transparent); box-shadow: 0 0 10px color-mix(in srgb, var(--rarity-{item
+											.def.rarity}) 50%, transparent)"
 									>
 										<span class="font-mono text-xs leading-none text-white tabular-nums"
 											>x {item.count}</span
@@ -115,27 +132,3 @@
 		></div>
 	{/if}
 </div>
-
-{#snippet matchedOverlay()}
-	<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
-		<div class="absolute inset-0 bg-black/40"></div>
-		<div class="matched-stripes absolute inset-0"></div>
-
-		<div class="absolute top-2 right-2 flex size-7 items-center justify-center">
-			<img src="/assets/ui/check-mark.png" alt="coins" class="size-7 opacity-50" />
-		</div>
-	</div>
-{/snippet}
-
-<style>
-	.matched-stripes {
-		background-image: repeating-linear-gradient(
-			-45deg,
-			rgba(255, 255, 255, 0.12) 0px,
-			rgba(255, 255, 255, 0.12) 3px,
-			transparent 3px,
-			transparent 12px
-		);
-		opacity: 0.7;
-	}
-</style>

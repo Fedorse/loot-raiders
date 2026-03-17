@@ -67,7 +67,7 @@ export class Track {
 	allMatched = $derived(this.queue.length > 0 && this.queue.every((i) => i.matched));
 
 	reset(count: number) {
-		this.queue = generateTrackQueue(count);
+		this.queue = [...generateTrackQueue(count)];
 		this.scrollOffset = 0;
 	}
 
@@ -81,6 +81,19 @@ export class Track {
 	markMatched(id: string): void {
 		const item = this.queue.find((i) => i.id === id);
 		if (item) item.matched = true;
+	}
+
+	removeMatched(id: string): void {
+		const idx = this.queue.findIndex((i) => i.id === id);
+		if (idx === -1) return;
+
+		const item = this.queue[idx];
+		const isWeapon = item.def.type === 'weapon' && !!item.def.attachmentSlots?.length;
+		const itemHeight = isWeapon ? WEAPON_HEIGHT : ITEM_HEIGHT;
+		const removedHeight = itemHeight + (this.queue.length > 1 ? ITEM_GAP : 0);
+
+		this.queue = this.queue.filter((i) => i.id !== id);
+		this.scrollOffset -= removedHeight;
 	}
 
 	private extend(): void {

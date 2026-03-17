@@ -5,7 +5,7 @@
 		pause?: boolean;
 	}
 
-	let { duration = 1, onscanned, pause = false }: Props = $props();
+	let { duration = 0.2, onscanned, pause = false }: Props = $props();
 </script>
 
 <div
