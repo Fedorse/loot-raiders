@@ -1,0 +1,37 @@
+<script lang="ts">
+	import { droppable } from '$lib/actions/actions';
+	import { getGameContext } from '$lib/store/game.svelte';
+	import type { SlotState, ItemLocation } from '$lib/types';
+
+	const { interaction } = getGameContext();
+
+	const trashLocation: ItemLocation = { type: 'trash' };
+	const trashSlotState: SlotState = { location: trashLocation, item: null };
+
+	const isDragging = $derived(interaction.status === 'dragging');
+	const isHovered = $derived(isDragging && interaction.isHovered(trashLocation));
+</script>
+
+<div class="relative w-full p-[6px]" {@attach droppable(trashSlotState)}>
+	<div
+		class="pointer-events-none absolute inset-0 rounded-[9px] border-2 transition-colors duration-150
+		{isHovered
+			? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
+			: isDragging
+				? 'border-red-600/40'
+				: 'border-transparent'}"
+	></div>
+
+	<div
+		class="relative flex min-h-40 w-full flex-col items-center justify-center gap-2 rounded-lg border border-white/20 transition-all duration-150
+"
+	>
+		<img
+			src="assets/ui/drop.png"
+			alt="Drop Item"
+			class="size-12 object-contain transition-all duration-150
+"
+		/>
+		<span class="font-sans text-sm text-white uppercase">drop item</span>
+	</div>
+</div>

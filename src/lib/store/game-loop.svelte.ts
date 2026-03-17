@@ -81,14 +81,12 @@ export class GameLoop {
 	}
 
 	private checkMatches() {
-		const backpack = this.inventory.backpack;
-
 		for (const trackItem of this.track.visibleItems) {
-			const match = backpack.find((bp) => bp.item.defId === trackItem.defId);
-			if (!match) continue;
+			const available = this.inventory.countInBackpack(trackItem.defId);
+			if (available < trackItem.count) continue;
 
+			this.inventory.consumeFromBackpack(trackItem.defId, trackItem.count);
 			this.track.markMatched(trackItem.id);
-			this.inventory.removeItem(match.location);
 			this.score += POINTS_PER_MATCH;
 			this.timeLeft += TIME_BONUS;
 		}

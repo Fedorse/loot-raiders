@@ -3,14 +3,10 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
 
-	import { droppable } from '$lib/actions/actions';
-	import type { SlotState, ItemLocation } from '$lib/types';
 	import AnimatedItemList from '$lib/components/track-item.svelte';
+	import DropZone from '$lib/components/drop-zone.svelte';
 
-	const { loot, interaction, gameLoop } = getGameContext();
-
-	const trashLocation: ItemLocation = { type: 'trash' };
-	const trashSlotState: SlotState = { location: trashLocation, item: null };
+	const { gameLoop } = getGameContext();
 </script>
 
 <div class="flex h-full items-center justify-center gap-6">
@@ -49,29 +45,7 @@
 					<StorageGrid storageId="lootBack" class="aspect-square h-24 w-24" />
 				</div>
 
-				<div
-					class="flex min-h-40 w-full flex-col items-center justify-center rounded-lg border transition-all duration-150
-					{interaction.status === 'dragging' && interaction.isHovered(trashLocation)
-						? 'border-red-500 bg-red-500/15 text-red-400'
-						: interaction.status === 'dragging'
-							? 'border-red-500/50 text-red-400/70'
-							: 'border-gray-500/50 text-gray-500/50'}"
-					{@attach droppable(trashSlotState)}
-				>
-					<div class="">
-						<img
-							src="assets/ui/drop.png"
-							alt=""
-							class="size-12 object-contain transition-all duration-150
-							{interaction.status === 'dragging' && interaction.isHovered(trashLocation)
-								? 'opacity-60 grayscale-0'
-								: interaction.status === 'dragging'
-									? 'opacity-30 grayscale'
-									: 'opacity-20 grayscale'}"
-						/>
-					</div>
-					<span class="uppercase">drop item</span>
-				</div>
+				<DropZone />
 			</div>
 
 			<div
