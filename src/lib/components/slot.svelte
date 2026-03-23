@@ -2,7 +2,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import ItemSlot from './item-slot.svelte';
 	import EmptySlot from './empty-slot.svelte';
-	import ItemScanner from './item-scanner.svelte';
+	import Scanner from './scanner.svelte';
 	import type { ItemLocation } from '$lib/types';
 
 	type Props = {
@@ -17,6 +17,7 @@
 	const item = $derived(inventory.getItem(location));
 	const itemUid = $derived(item?.uid ?? '');
 	const selectedItem = $derived(selection.isSelected(itemUid));
+	const match = $derived(item?.match ?? false);
 
 	const slotState = $derived({ location, item });
 
@@ -64,6 +65,7 @@
 			{#if item && !isDraggingThisItem}
 				<div class="relative h-full w-full" class:shine-effect={showShine}>
 					<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
+					{@render matchItem()}
 				</div>
 			{:else}
 				<EmptySlot {slotState} {placeholder} className="h-full w-full" />
@@ -73,12 +75,26 @@
 	{/if}
 </div>
 
+{#snippet matchItem()}
+	{#if match}
+		<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
+			<Scanner
+				duration={1}
+				direction="vertical"
+				wipe
+				pause={gameLoop.status === 'paused'}
+				onscanned={() => inventory.removeMatch(itemUid)}
+			/>
+		</div>
+	{/if}
+{/snippet}
+
 {#snippet loadingItem()}
 	<div class="loading-border h-full w-full rounded-lg p-[1.5px]">
 		<div class="h-full w-full rounded-[7px] bg-[#080b14]"></div>
 	</div>
 	{#if scanningItem}
-		<ItemScanner onscanned={() => loot.slotScanned()} pause={gameLoop.status === 'paused'} />
+		<Scanner onscanned={() => loot.slotScanned()} pause={gameLoop.status === 'paused'} />
 	{/if}
 {/snippet}
 

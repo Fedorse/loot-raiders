@@ -156,26 +156,52 @@ export class LootGenerator {
 		this.inventory = inventory;
 	}
 
+	private static readonly MOCK_LOOT: { defId: string; count: number }[] = [
+		{ defId: 'res_arc_circuitry', count: 2 },
+		{ defId: 'loot_chemicals', count: 1 },
+		{ defId: 'res_arc_circuitry', count: 1 },
+		{ defId: 'wpn_tempest', count: 1 },
+		{ defId: 'loot_fabric', count: 1 },
+		{ defId: 'res_arc_circuitry', count: 3 },
+		{ defId: 'loot_battery', count: 1 },
+		{ defId: 'res_metal_parts', count: 2 },
+		{ defId: 'res_arc_circuitry', count: 1 },
+		{ defId: 'loot_oil', count: 1 }
+	];
+
 	next(): void {
 		this.inventory.clearStorage('lootBack');
-		const count = randInt(4, 16);
-		const rawItems = generateLootItems(STANDARD_CACHE_PROFILE, count);
 
-		const items: InstanceItem[] = rawItems.map((raw) => {
-			const item = this.inventory.createItem(raw.def.id, raw.count);
-			if (raw.attachments && item.attachments) {
-				item.attachments = raw.attachments.map((attDef) =>
-					attDef ? this.inventory.createItem(attDef.id, 1) : null
-				);
-			}
-			return item;
-		});
+		const items: InstanceItem[] = LootGenerator.MOCK_LOOT.map((mock) =>
+			this.inventory.createItem(mock.defId, mock.count)
+		);
 
 		this.inventory.fillStorage('lootBack', items);
-		this.totalItems = count;
+		this.totalItems = items.length;
 		this.loadingIndex = 0;
 		this.phase = 'loading';
 	}
+
+	// next(): void {
+	// 	this.inventory.clearStorage('lootBack');
+	// 	const count = randInt(4, 16);
+	// 	const rawItems = generateLootItems(STANDARD_CACHE_PROFILE, count);
+	//
+	// 	const items: InstanceItem[] = rawItems.map((raw) => {
+	// 		const item = this.inventory.createItem(raw.def.id, raw.count);
+	// 		if (raw.attachments && item.attachments) {
+	// 			item.attachments = raw.attachments.map((attDef) =>
+	// 				attDef ? this.inventory.createItem(attDef.id, 1) : null
+	// 			);
+	// 		}
+	// 		return item;
+	// 	});
+	//
+	// 	this.inventory.fillStorage('lootBack', items);
+	// 	this.totalItems = count;
+	// 	this.loadingIndex = 0;
+	// 	this.phase = 'loading';
+	// }
 
 	slotScanned(): void {
 		this.loadingIndex++;

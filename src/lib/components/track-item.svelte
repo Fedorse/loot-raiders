@@ -2,19 +2,18 @@
 	import type { ItemDefinition, RarityStyle } from '$lib/types';
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
-	import EraseScanner from './erase-scanner.svelte';
+	import Scanner from './scanner.svelte';
 
 	const { gameLoop } = getGameContext();
 	const track = gameLoop.track;
-
-	const ERASE_DURATION_WEAPON = 0.6;
-	const ERASE_DURATION_ITEM = 3;
 </script>
 
-{#snippet eraseOverlay(itemId: string, duration: number)}
+{#snippet scanerMatch(itemId: string, duration: number)}
 	<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
-		<EraseScanner
+		<Scanner
+			wipe
 			{duration}
+			direction="vertical"
 			pause={gameLoop.status === 'paused'}
 			onscanned={() => track.removeMatched(itemId)}
 		/>
@@ -37,15 +36,23 @@
 		>
 			{#each track.queue as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
-				<div class="flex w-full justify-center transition-opacity duration-300">
-					{#if item.def.type === 'weapon' && item.def.attachmentSlots?.length}
+				{@const isWeapon = item.def.type === 'weapon' && !!item.def.attachmentSlots?.length}
+
+				<div
+					class="flex w-full justify-center"
+					class:track-shrink={item.matched}
+					style:--shrink-h="{isWeapon ? 120 : 96}px"
+					style:--shrink-dur="1s"
+					style:animation-play-state={gameLoop.status === 'paused' ? 'paused' : 'running'}
+				>
+					{#if isWeapon}
 						<!-- Weapon with attachment slots -->
 						<div
 							class="flex h-[120px] w-52 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 						>
 							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render eraseOverlay(item.id, ERASE_DURATION_WEAPON)}
+									{@render scanerMatch(item.id, 1)}
 								{/if}
 								<div class="relative flex h-16 items-center justify-center">
 									{@render itemImage(item.def, style)}
@@ -89,7 +96,7 @@
 						>
 							<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render eraseOverlay(item.id, ERASE_DURATION_ITEM)}
+									{@render scanerMatch(item.id, 1)}
 								{/if}
 								{@render itemImage(item.def, style)}
 								{#if item.count > 1 && !item.matched}
@@ -120,3 +127,71 @@
 		></div>
 	{/if}
 </div>
+
+<style>
+	/* .track-shrink {
+		animation: track-collapse var(--shrink-dur) ease-in forwards;
+		overflow: hidden;
+	}
+
+	@keyframes track-collapse {
+		0% {
+			max-height: var(--shrink-h);
+		}
+		60% {
+			max-height: var(--shrink-h);
+		}
+		100% {
+			max-height: 0;
+		}
+	} */
+
+	.track-shrink {
+		overflow: hidden;
+		transform-origin: center top;
+		animation: track-collapse var(--shrink-dur) ease-in forwards;
+	}
+
+	@keyframes track-collapse {
+		0% {
+			max-height: var(--shrink-h);
+			opacity: 1;
+			transform: scale(1);
+			filter: brightness(1) blur(0);
+		}
+		55% {
+			max-height: var(--shrink-h);
+			opacity: 1;
+			transform: scale(1);
+		}
+		100% {
+			max-height: 0;
+			opacity: 0;
+			transform: scale(0.92);
+			filter: brightness(1.4) blur(2px);
+		}
+	}
+
+	/* @keyframes track-collapse {
+    0% {
+        max-height: var(--shrink-h);
+        transform: scale(1);
+        opacity: 1;
+        filter: brightness(1);
+    }
+    30% {
+
+        max-height: var(--shrink-h);
+        transform: scale(1);
+    }
+    80% {
+        filter: brightness(2) blue(2px); 
+    }
+    100% {
+        max-height: 0;
+        transform: scale(0.8);
+        opacity: 0;
+        margin-bottom: -8px; 
+    }
+} */
+</style>

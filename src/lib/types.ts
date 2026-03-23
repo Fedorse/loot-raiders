@@ -34,6 +34,7 @@ export interface InstanceItem {
 	defId: string;
 	count: number;
 	attachments?: (InstanceItem | null)[];
+	match?: boolean;
 }
 
 //---- Item definition----

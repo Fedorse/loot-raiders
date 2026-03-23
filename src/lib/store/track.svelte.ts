@@ -1,5 +1,6 @@
+import { ITEM_DB } from '$lib/config/items';
 import type { ItemDefinition } from '$lib/types';
-import { generateLootItems, TRACK_PROFILE } from './loot.svelte';
+// import { generateLootItems, TRACK_PROFILE } from './loot.svelte';
 
 export interface TrackItem {
 	id: string;
@@ -22,18 +23,42 @@ function getItemHeight(item: TrackItem): number {
 		: ITEM_HEIGHT;
 }
 
-function generateTrackQueue(count: number): TrackItem[] {
-	const rawItems = generateLootItems(TRACK_PROFILE, count);
+const MOCK_TRACK_ITEMS: { defId: string; count: number }[] = [
+	{ defId: 'res_arc_circuitry', count: 2 },
+	{ defId: 'loot_chemicals', count: 1 },
+	{ defId: 'res_arc_circuitry', count: 1 },
+	{ defId: 'wpn_tempest', count: 1 },
+	{ defId: 'loot_fabric', count: 1 },
+	{ defId: 'res_arc_circuitry', count: 3 },
+	{ defId: 'loot_battery', count: 1 },
+	{ defId: 'res_metal_parts', count: 2 },
+	{ defId: 'res_arc_circuitry', count: 1 },
+	{ defId: 'loot_oil', count: 1 }
+];
 
-	return rawItems.map((raw) => ({
+function generateTrackQueue(_count: number): TrackItem[] {
+	return MOCK_TRACK_ITEMS.map((mock) => ({
 		id: crypto.randomUUID(),
-		defId: raw.def.id,
-		count: raw.count,
-		def: raw.def,
-		attachments: raw.attachments,
+		defId: mock.defId,
+		count: mock.count,
+		def: ITEM_DB[mock.defId],
+		attachments: null,
 		matched: false
 	}));
 }
+
+// function generateTrackQueue(count: number): TrackItem[] {
+// 	const rawItems = generateLootItems(TRACK_PROFILE, count);
+//
+// 	return rawItems.map((raw) => ({
+// 		id: crypto.randomUUID(),
+// 		defId: raw.def.id,
+// 		count: raw.count,
+// 		def: raw.def,
+// 		attachments: raw.attachments,
+// 		matched: false
+// 	}));
+// }
 
 export class Track {
 	queue = $state<TrackItem[]>([]);
@@ -96,19 +121,20 @@ export class Track {
 	}
 
 	private extend(): void {
-		const newItems = generateTrackQueue(30);
-		this.queue = [...newItems, ...this.queue];
-
-		if (this.queue.length > MAX_ITEMS) {
-			const itemsToRemove = this.queue.slice(MAX_ITEMS);
-
-			let removedHeight = 0;
-			for (const item of itemsToRemove) {
-				removedHeight += getItemHeight(item) + ITEM_GAP;
-			}
-
-			this.queue = this.queue.slice(0, MAX_ITEMS);
-			this.scrollOffset -= removedHeight;
-		}
+		// disabled for testing with mock data
+		// const newItems = generateTrackQueue(30);
+		// this.queue = [...newItems, ...this.queue];
+		//
+		// if (this.queue.length > MAX_ITEMS) {
+		// 	const itemsToRemove = this.queue.slice(MAX_ITEMS);
+		//
+		// 	let removedHeight = 0;
+		// 	for (const item of itemsToRemove) {
+		// 		removedHeight += getItemHeight(item) + ITEM_GAP;
+		// 	}
+		//
+		// 	this.queue = this.queue.slice(0, MAX_ITEMS);
+		// 	this.scrollOffset -= removedHeight;
+		// }
 	}
 }

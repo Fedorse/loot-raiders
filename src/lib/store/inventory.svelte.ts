@@ -299,7 +299,7 @@ export class Inventory {
 
 	countInBackpack(defId: string): number {
 		return this.backpack
-			.filter((slot) => slot.item.defId === defId)
+			.filter((slot) => slot.item.defId === defId && !slot.item.match)
 			.reduce((sum, slot) => sum + slot.item.count, 0);
 	}
 
@@ -316,12 +316,23 @@ export class Inventory {
 
 			if (slot.item.count <= remaining) {
 				remaining -= slot.item.count;
-				this.selection.deselect(slot.item.uid);
-				this.items.splice(i, 1);
+				slot.item.count = 0;
+				slot.item.match = true;
 			} else {
 				slot.item.count -= remaining;
+				slot.item.match = true;
 				remaining = 0;
 			}
+		}
+	}
+	removeMatch(uid: string): void {
+		const idx = this.items.findIndex((i) => i.item.uid === uid);
+		if (idx === -1) return;
+		if (this.items[idx].item.count <= 0) {
+			this.selection.deselect(uid);
+			this.items.splice(idx, 1);
+		} else {
+			this.items[idx].item.match = false;
 		}
 	}
 
@@ -333,41 +344,5 @@ export class Inventory {
 			if (!this.getItem({ type: 'slot', storageId, index: i })) count++;
 		}
 		return count;
-	}
-
-	setup(): void {
-		// Weapon with pre-installed attachments (muzzle, underbarrel, magazine)
-		const tempest = this.createItem('wpn_tempest');
-		tempest.attachments![0] = this.createItem('att_compensator_2');
-		tempest.attachments![1] = this.createItem('att_vertical_grip_1');
-		tempest.attachments![2] = this.createItem('att_ext_medium_mag_2');
-
-		// Weapon with one attachment (muzzle slot filled, magazine + stock empty)
-		const renegade = this.createItem('wpn_renegade');
-		renegade.attachments![0] = this.createItem('att_silencer_1');
-
-		const initial: [ItemLocation, InstanceItem][] = [
-			// Backpack: weapons
-			[{ type: 'slot', storageId: 'backpack', index: 0 }, tempest],
-			[{ type: 'slot', storageId: 'backpack', index: 1 }, renegade],
-			[{ type: 'slot', storageId: 'backpack', index: 2 }, this.createItem('wpn_kettle')],
-			[{ type: 'slot', storageId: 'backpack', index: 3 }, this.createItem('wpn_bobcat')],
-			// Backpack: resources
-			[
-				{ type: 'slot', storageId: 'backpack', index: 10 },
-				this.createItem('res_arc_circuitry', 10)
-			],
-
-			// Loot: loose attachments (разные типы)
-			[{ type: 'slot', storageId: 'lootBack', index: 0 }, this.createItem('att_compensator_3')],
-			[{ type: 'slot', storageId: 'lootBack', index: 1 }, this.createItem('att_stable_stock_3')],
-			[{ type: 'slot', storageId: 'lootBack', index: 2 }, this.createItem('att_angled_grip_3')],
-			[{ type: 'slot', storageId: 'lootBack', index: 3 }, this.createItem('att_ext_light_mag_3')],
-			[{ type: 'slot', storageId: 'lootBack', index: 4 }, this.createItem('att_muzzle_brake_2')],
-			[{ type: 'slot', storageId: 'lootBack', index: 5 }, this.createItem('att_padded_stock')]
-		];
-		for (const [loc, item] of initial) {
-			this.items.push({ location: loc, item });
-		}
 	}
 }
