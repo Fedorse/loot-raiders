@@ -17,8 +17,6 @@
 	const item = $derived(inventory.getItem(location));
 	const itemUid = $derived(item?.uid ?? '');
 	const selectedItem = $derived(selection.isSelected(itemUid));
-	const match = $derived(item?.match ?? false);
-
 	const slotState = $derived({ location, item });
 
 	const lootIndex = $derived(
@@ -64,8 +62,12 @@
 		>
 			{#if item && !isDraggingThisItem}
 				<div class="relative h-full w-full" class:shine-effect={showShine}>
-					<ItemSlot {slotState} {selectedItem} className="h-full w-full" />
-					{@render matchItem()}
+					<ItemSlot
+						{slotState}
+						{selectedItem}
+						className="h-full w-full"
+						onmatched={() => inventory.removeMatch(itemUid)}
+					/>
 				</div>
 			{:else}
 				<EmptySlot {slotState} {placeholder} className="h-full w-full" />
@@ -74,20 +76,6 @@
 		{@render invalidIcon()}
 	{/if}
 </div>
-
-{#snippet matchItem()}
-	{#if match}
-		<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
-			<Scanner
-				duration={1}
-				direction="vertical"
-				wipe
-				pause={gameLoop.status === 'paused'}
-				onscanned={() => inventory.removeMatch(itemUid)}
-			/>
-		</div>
-	{/if}
-{/snippet}
 
 {#snippet loadingItem()}
 	<div class="loading-border h-full w-full rounded-lg p-[1.5px]">

@@ -29,3 +29,9 @@ export function isEqualLocation(a: ItemLocation, b: ItemLocation): boolean {
 export function randInt(min: number, max: number): number {
 	return min + Math.floor(Math.random() * (max - min + 1));
 }
+
+export const formatTime = (seconds: number) => {
+	const mins = Math.floor(Math.ceil(seconds) / 60);
+	const secs = Math.ceil(seconds) % 60;
+	return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+};

@@ -129,23 +129,6 @@
 </div>
 
 <style>
-	/* .track-shrink {
-		animation: track-collapse var(--shrink-dur) ease-in forwards;
-		overflow: hidden;
-	}
-
-	@keyframes track-collapse {
-		0% {
-			max-height: var(--shrink-h);
-		}
-		60% {
-			max-height: var(--shrink-h);
-		}
-		100% {
-			max-height: 0;
-		}
-	} */
-
 	.track-shrink {
 		overflow: hidden;
 		transform-origin: center top;
@@ -171,27 +154,4 @@
 			filter: brightness(1.4) blur(2px);
 		}
 	}
-
-	/* @keyframes track-collapse {
-    0% {
-        max-height: var(--shrink-h);
-        transform: scale(1);
-        opacity: 1;
-        filter: brightness(1);
-    }
-    30% {
-
-        max-height: var(--shrink-h);
-        transform: scale(1);
-    }
-    80% {
-        filter: brightness(2) blue(2px); 
-    }
-    100% {
-        max-height: 0;
-        transform: scale(0.8);
-        opacity: 0;
-        margin-bottom: -8px; 
-    }
-} */
 </style>

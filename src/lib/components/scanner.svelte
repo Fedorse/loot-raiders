@@ -37,7 +37,7 @@
 		position: absolute;
 		inset: 0;
 		background: black;
-		opacity: 0.9;
+		opacity: 0.5;
 		clip-path: inset(0 100% 0 0);
 		animation: wipe-h var(--duration) ease-in forwards;
 	}

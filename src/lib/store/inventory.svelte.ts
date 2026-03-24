@@ -297,13 +297,19 @@ export class Inventory {
 		return item;
 	}
 
-	countInBackpack(defId: string): number {
-		return this.backpack
-			.filter((slot) => slot.item.defId === defId && !slot.item.match)
+	countAvailable(defId: string): number {
+		return this.items
+			.filter(
+				(slot) =>
+					slot.location.type === 'slot' &&
+					slot.location.storageId !== 'lootBack' &&
+					slot.item.defId === defId &&
+					!slot.item.match
+			)
 			.reduce((sum, slot) => sum + slot.item.count, 0);
 	}
 
-	consumeFromBackpack(defId: string, count: number): void {
+	consumeMatched(defId: string, count: number): void {
 		let remaining = count;
 
 		for (let i = this.items.length - 1; i >= 0; i--) {
@@ -311,7 +317,7 @@ export class Inventory {
 
 			const slot = this.items[i];
 			if (slot.location.type !== 'slot') continue;
-			if (slot.location.storageId !== 'backpack') continue;
+			if (slot.location.storageId === 'lootBack') continue;
 			if (slot.item.defId !== defId) continue;
 
 			if (slot.item.count <= remaining) {

@@ -10,9 +10,10 @@
 		slotState: SlotState;
 		className?: string;
 		selectedItem: boolean;
+		onmatched?: () => void;
 	};
 
-	let { slotState, className = '', selectedItem }: Props = $props();
+	let { slotState, className = '', selectedItem, onmatched }: Props = $props();
 
 	const item = $derived(slotState.item!);
 	const location = $derived(slotState.location);
@@ -29,8 +30,8 @@
 	{@attach draggable(slotState)}
 >
 	{#if isWeapon}
-		<WeaponCard {item} selected={selectedItem} {location} className="h-full w-full" />
+		<WeaponCard {item} selected={selectedItem} {location} className="h-full w-full" {onmatched} />
 	{:else}
-		<ItemCard {item} selected={selectedItem} {location} className="h-full w-full" />
+		<ItemCard {item} selected={selectedItem} {location} className="h-full w-full" {onmatched} />
 	{/if}
 </div>

@@ -82,10 +82,10 @@ export class GameLoop {
 
 	private checkMatches() {
 		for (const trackItem of this.track.visibleItems) {
-			const available = this.inventory.countInBackpack(trackItem.defId);
+			const available = this.inventory.countAvailable(trackItem.defId);
 			if (available < trackItem.count) continue;
 
-			this.inventory.consumeFromBackpack(trackItem.defId, trackItem.count);
+			this.inventory.consumeMatched(trackItem.defId, trackItem.count);
 			this.track.markMatched(trackItem.id);
 			this.score += POINTS_PER_MATCH;
 			this.timeLeft += TIME_BONUS;

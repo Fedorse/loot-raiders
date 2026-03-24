@@ -2,6 +2,7 @@
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
+	import Scanner from './scanner.svelte';
 	import type { InstanceItem, ItemLocation } from '$lib/types';
 
 	type Props = {
@@ -10,11 +11,13 @@
 		className?: string;
 		selected: boolean;
 		readonly?: boolean;
+		onmatched?: () => void;
 	};
 
-	let { item, location, className = 'h-20 w-20', selected, readonly }: Props = $props();
+	let { item, location, className = 'h-20 w-20', selected, readonly, onmatched }: Props =
+		$props();
 
-	const { interaction } = getGameContext();
+	const { interaction, gameLoop } = getGameContext();
 
 	const def = $derived(getDef(item.defId));
 	const style = $derived(getRarityStyle(def.rarity));
@@ -29,23 +32,36 @@
 		class=" flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 	>
 		<div
-			class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] {selected
+			class="relative h-full w-full overflow-hidden rounded-[7px] {selected
 				? 'bg-white'
 				: 'bg-surface'}"
 		>
-			<div class="relative min-h-0 flex-1 items-center justify-center">
-				{@render absoluteGlowShadow()}
-				{@render absoluteBlob()}
-				<img
-					src={def.image}
-					alt="Loot"
-					class="relative z-10 h-full w-full object-contain transition-transform {readonly
-						? ''
-						: 'group-hover:scale-105'} "
-				/>
-			</div>
+			{#if item.match}
+				<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+					<Scanner
+						duration={1}
+						direction="vertical"
+						wipe
+						pause={gameLoop.status === 'paused'}
+						onscanned={onmatched}
+					/>
+				</div>
+			{/if}
+			<div class="relative flex h-full w-full flex-col">
+				<div class="relative min-h-0 flex-1 items-center justify-center">
+					{@render absoluteGlowShadow()}
+					{@render absoluteBlob()}
+					<img
+						src={def.image}
+						alt="Loot"
+						class="relative z-10 h-full w-full object-contain transition-transform {readonly
+							? ''
+							: 'group-hover:scale-105'} "
+					/>
+				</div>
 
-			{@render footer()}
+				{@render footer()}
+			</div>
 		</div>
 	</div>
 </div>
@@ -92,3 +108,4 @@
 		{/if}
 	</div>
 {/snippet}
+

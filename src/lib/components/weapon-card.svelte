@@ -1,7 +1,9 @@
 <script lang="ts">
 	import AttachmentSlot from '$lib/components/attachment-slot.svelte';
+	import Scanner from './scanner.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';
+	import { getGameContext } from '$lib/store/game.svelte';
 	import type { InstanceItem, ItemLocation } from '$lib/types';
 
 	type Props = {
@@ -9,11 +11,13 @@
 		className?: string;
 		location: ItemLocation;
 		selected: boolean;
+		onmatched?: () => void;
 	};
 
-	let { item, className = 'h-40', location }: Props = $props();
+	let { item, className = 'h-40', location, onmatched }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
+	const { gameLoop } = getGameContext();
 	const style = $derived(getRarityStyle(def.rarity));
 </script>
 
@@ -24,6 +28,17 @@
 		<div
 			class="weapon-card__body relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-t-[8px] bg-surface transition-shadow duration-300"
 		>
+			{#if item.match}
+				<div class="pointer-events-none absolute inset-0 z-30 overflow-hidden">
+					<Scanner
+						duration={1}
+						direction="vertical"
+						wipe
+						pause={gameLoop.status === 'paused'}
+						onscanned={onmatched}
+					/>
+				</div>
+			{/if}
 			{@render absoluteGlowShadow()}
 			{@render absoluteBlob()}
 			<div class="relative z-10 min-h-0 flex-1">
