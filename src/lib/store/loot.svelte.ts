@@ -149,8 +149,8 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 export class LootGenerator {
 	private inventory: Inventory;
 	phase = $state<LoadingStatus>('idle');
-	loadingIndex = $state(-1);
-	totalItems = $state(0);
+	lootQueue = $state<string[]>([]);
+	private scanIndex = $state(-1);
 
 	constructor(inventory: Inventory) {
 		this.inventory = inventory;
@@ -177,8 +177,8 @@ export class LootGenerator {
 		);
 
 		this.inventory.fillStorage('lootBack', items);
-		this.totalItems = items.length;
-		this.loadingIndex = 0;
+		this.lootQueue = items.map((i) => i.uid);
+		this.scanIndex = 0;
 		this.phase = 'loading';
 	}
 
@@ -204,17 +204,19 @@ export class LootGenerator {
 	// }
 
 	slotScanned(): void {
-		this.loadingIndex++;
-		if (this.loadingIndex >= this.totalItems) {
+		this.scanIndex++;
+		if (this.scanIndex >= this.lootQueue.length) {
 			this.phase = 'done';
 		}
 	}
 
-	scanning(index: number): boolean {
-		return this.phase === 'loading' && index === this.loadingIndex;
+	scanning(uid: string): boolean {
+		return this.phase === 'loading' && this.lootQueue[this.scanIndex] === uid;
 	}
 
-	hidden(index: number): boolean {
-		return this.phase === 'loading' && index > this.loadingIndex;
+	hidden(uid: string): boolean {
+		if (this.phase !== 'loading') return false;
+		const idx = this.lootQueue.indexOf(uid);
+		return idx >= 0 && idx > this.scanIndex;
 	}
 }

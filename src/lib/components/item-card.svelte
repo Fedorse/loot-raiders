@@ -14,8 +14,7 @@
 		onmatched?: () => void;
 	};
 
-	let { item, location, className = 'h-20 w-20', selected, readonly, onmatched }: Props =
-		$props();
+	let { item, location, className = 'h-20 w-20', selected, readonly, onmatched }: Props = $props();
 
 	const { interaction, gameLoop } = getGameContext();
 
@@ -109,3 +108,26 @@
 	</div>
 {/snippet}
 
+<!-- 
+<style>                                                                                                                                                                                                   
+  .match-dissolve {                                                                                                                                                                                       
+    animation: slot-dissolve 1.8s ease-in forwards;                                                                                                                                                
+  }                                                                                                                                                                                                       
+                                                                                                                                                                                                          
+  @keyframes slot-dissolve {                                                                                                                                                                              
+    0% {                                                                                                                                                                                                  
+      opacity: 1;                                                                                                                                                                                         
+      transform: scale(1);                                                                                                                                                                                
+      filter: brightness(1) blur(0);                                                                                                                                                                      
+    }                                                                                                                                                                                                     
+    55% {                                                                                                                                                                                                 
+      opacity: 1;                                                                                                                                                                                         
+      transform: scale(1);                                                                                                                                                                                
+    }                                                                                                                                                                                                     
+    100% {                                                                                                                                                                                                
+      opacity: 0;                                                                                                                                                                                         
+      transform: scale(0.92);                                                                                                                                                                             
+      filter: brightness(1.4) blur(2px);                                                                                                                                                                  
+    }                                                                                                                                                                                                     
+        }                                                                                                                                                                                                       
+      </style>     -->

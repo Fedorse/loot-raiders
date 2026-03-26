@@ -19,12 +19,12 @@
 	const selectedItem = $derived(selection.isSelected(itemUid));
 	const slotState = $derived({ location, item });
 
-	const lootIndex = $derived(
-		location.type === 'slot' && location.storageId === 'lootBack' && item ? location.index : -1
+	const isLootBack = $derived(
+		location.type === 'slot' && location.storageId === 'lootBack' && !!item
 	);
-	const scanningItem = $derived(lootIndex >= 0 && loot.scanning(lootIndex));
-	const loading = $derived(lootIndex >= 0 && loot.hidden(lootIndex));
-	const showShine = $derived(lootIndex >= 0 && loot.phase !== 'idle');
+	const scanningItem = $derived(isLootBack && loot.scanning(itemUid));
+	const loading = $derived(isLootBack && loot.hidden(itemUid));
+	const showShine = $derived(isLootBack && loot.phase !== 'idle');
 
 	const isDraggingThisItem = $derived(interaction.isSource(location));
 
