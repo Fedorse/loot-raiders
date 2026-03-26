@@ -45,6 +45,9 @@
 	{:else}
 		<div
 			class="relative z-20 h-full w-full p-[3.5px]"
+			onpointerdown={(e) => {
+				if (e.button === 0 && !item) selection.clear();
+			}}
 			oncontextmenu={(e) => {
 				e.preventDefault();
 				if (e.ctrlKey) return;

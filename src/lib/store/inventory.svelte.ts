@@ -92,6 +92,7 @@ export class Inventory {
 	}
 
 	stack(drag: DragState, targetLoc: ItemLocation): void {
+		if (isEqualLocation(drag.sourceLocation, targetLoc)) return;
 		const targetItem = this.getItem(targetLoc);
 		if (!targetItem) return;
 
@@ -250,6 +251,13 @@ export class Inventory {
 					count: result.amount * item.count
 				});
 			}
+		}
+		return true;
+	}
+
+	recycleItems(entries: { item: InstanceItem; location: ItemLocation }[]): boolean {
+		for (const entry of entries) {
+			this.recycleItem(entry.location);
 		}
 		return true;
 	}
