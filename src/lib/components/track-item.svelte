@@ -4,8 +4,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import Scanner from './scanner.svelte';
 
-	const { gameLoop } = getGameContext();
-	const track = gameLoop.track;
+	const { gameLoop, track } = getGameContext();
 </script>
 
 {#snippet scanerMatch(itemId: string, duration: number)}

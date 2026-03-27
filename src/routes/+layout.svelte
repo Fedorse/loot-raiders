@@ -6,17 +6,28 @@
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
 	import { initGame } from '$lib/store/game.svelte';
-	import Shortcuts from '$lib/components/shortcuts.svelte';
 
 	import './layout.css';
 
 	let { children } = $props();
 
 	const game = initGame();
-	const { overlay, debug, loot, gameLoop } = game;
+	const { overlay, debug, loot, gameLoop, interaction } = game;
 
 	$effect(() => {
 		return () => gameLoop.stop();
+	});
+
+	$effect(() => {
+		const type = interaction.dragType;
+		if (type === 'weapon') {
+			document.body.classList.add('dragging-weapon');
+		} else if (type === 'attachment') {
+			document.body.classList.add('dragging-attachment');
+		}
+		return () => {
+			document.body.classList.remove('dragging-weapon', 'dragging-attachment');
+		};
 	});
 </script>
 
@@ -60,15 +71,3 @@
 <RecycleModal />
 <DebugPanel />
 <GameMenu />
-
-<style>
-	@reference "tailwindcss";
-
-	:global(body.dragging-weapon [data-slot-type='attachment']) {
-		pointer-events: none !important;
-	}
-
-	:global(body.dragging-attachment [data-slot-type='attachment']) {
-		pointer-events: auto !important;
-	}
-</style>

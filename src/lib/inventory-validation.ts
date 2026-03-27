@@ -47,20 +47,23 @@ export const canAttachToWeapon = (sourceItem: InstanceItem, targetItem: Instance
 };
 
 export const getAttachmentSlotIndex = (
-	attachmentItem: InstanceItem,
-	weaponItem: InstanceItem
+	sourceItem: InstanceItem,
+	targetItem: InstanceItem
 ): number => {
-	const attachDef = getDef(attachmentItem.defId);
-	const weaponDef = getDef(weaponItem.defId);
-	if (!weaponDef.attachmentSlots) return -1;
-	return weaponDef.attachmentSlots.findIndex((s) => s.type === attachDef.attachmentKind);
+	const sourceDef = getDef(sourceItem.defId);
+	const targetDef = getDef(targetItem.defId);
+	if (!targetDef.attachmentSlots) return -1;
+	return targetDef.attachmentSlots.findIndex((s) => s.type === sourceDef.attachmentKind);
 };
 
+// Priority: delete > move (empty slot) > stack > attach > invalid (split blocks swap) > swap
 export const getDropActionType = (drag: DragState, target: SlotState): DropActionType => {
 	if (target.location.type === 'trash') return 'delete';
 	if (!target.item) return 'move';
 	if (canStackItems(drag.item, target.item)) return 'stack';
+	// Attach only when target is a slot-level weapon (not an attachment-location item)
 	if (target.location.type === 'slot' && canAttachToWeapon(drag.item, target.item)) return 'attach';
+	// Split only allows move/stack (handled above); it cannot trigger a swap
 	if (drag.isSplit) return 'invalid';
 	return 'swap';
 };
@@ -78,14 +81,17 @@ export const validateDrop = (
 		return isAllowedInLocation(drag.item, target.location, resolve);
 	}
 
+	// Already classified as attach by getDropActionType (which checked canAttachToWeapon)
 	if (action === 'attach') {
-		return canAttachToWeapon(drag.item, target.item!);
+		return true;
 	}
 
-	// swap: check both directions
-	if (!isAllowedInLocation(drag.item, target.location, resolve)) return false;
+	// swap: both items must be allowed in each other's location
+	if (action === 'swap') {
+		if (!isAllowedInLocation(drag.item, target.location, resolve)) return false;
+		if (drag.sourceLocation.type === 'attachment') return false;
+		return isAllowedInLocation(target.item!, drag.sourceLocation, resolve);
+	}
 
-	// source item from target must fit in the drag's source location
-	if (drag.sourceLocation.type === 'attachment') return false;
-	return isAllowedInLocation(target.item!, drag.sourceLocation, resolve);
+	return false;
 };

@@ -1,6 +1,6 @@
 import { getStorageConfig } from '$lib/config/storages';
 import { getDef } from '$lib/config/items';
-import { getAttachmentSlotIndex } from './inventory-validation';
+import { getAttachmentSlotIndex } from '../inventory-validation';
 import { isEqualLocation } from '$lib/utils';
 import type { Selection } from './selection.svelte';
 
@@ -14,17 +14,7 @@ export class Inventory {
 		this.selection = selection;
 	}
 
-	backpack = $derived(
-		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'backpack')
-	);
-	lootBack = $derived(
-		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'lootBack')
-	);
-	weapon = $derived(
-		this.items.filter((i) => i.location.type === 'slot' && i.location.storageId === 'weapon')
-	);
-
-	// ---- Universal accessors ----
+	// ---- Read accessors ----
 
 	getItem(loc: ItemLocation): InstanceItem | null {
 		if (loc.type === 'trash') return null;
@@ -37,6 +27,40 @@ export class Inventory {
 		if (!parentSlot?.item?.attachments) return null;
 		return parentSlot.item.attachments[loc.attachIndex] ?? null;
 	}
+
+	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
+		const config = getStorageConfig(storageId);
+		if (!config) return null;
+		for (let i = 0; i < config.size; i++) {
+			const loc: ItemLocation = { type: 'slot', storageId, index: i };
+			if (!this.getItem(loc)) return loc;
+		}
+		return null;
+	}
+
+	countAvailable(defId: string): number {
+		return this.items
+			.filter(
+				(slot) =>
+					slot.location.type === 'slot' &&
+					slot.location.storageId !== 'lootBack' &&
+					slot.item.defId === defId &&
+					!slot.item.match
+			)
+			.reduce((sum, slot) => sum + slot.item.count, 0);
+	}
+
+	#countEmptySlots(storageId: StorageId): number {
+		const config = getStorageConfig(storageId);
+		if (!config) return 0;
+		let count = 0;
+		for (let i = 0; i < config.size; i++) {
+			if (!this.getItem({ type: 'slot', storageId, index: i })) count++;
+		}
+		return count;
+	}
+
+	// ---- Write accessors ----
 
 	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
 		if (loc.type === 'trash') return;
@@ -66,21 +90,16 @@ export class Inventory {
 		this.setItem(loc, null);
 	}
 
-	// ---- Drop operations (called by Interaction) ----
+	// ---- Domain operations: drop (called by Interaction) ----
 
 	move(drag: DragState, targetLoc: ItemLocation): void {
 		if (isEqualLocation(drag.sourceLocation, targetLoc)) return;
 
 		if (drag.isSplit) {
-			// Create clone with split count, decrement original
 			const original = this.getItem(drag.sourceLocation);
 			if (!original) return;
 
-			const splitItem: InstanceItem = {
-				uid: crypto.randomUUID(),
-				defId: original.defId,
-				count: drag.item.count
-			};
+			const splitItem = this.createItem(original.defId, drag.item.count);
 			original.count -= drag.item.count;
 			this.setItem(targetLoc, splitItem);
 		} else {
@@ -97,6 +116,7 @@ export class Inventory {
 		if (!targetItem) return;
 
 		const def = getDef(drag.item.defId);
+		// Caller (Interaction) guarantees maxStack exists via canStackItems validation
 		const maxStack = def.maxStack!;
 		const total = drag.item.count + targetItem.count;
 
@@ -147,33 +167,22 @@ export class Inventory {
 
 		if (drag.isSplit) return; // Can't attach a split
 
-		// Remove attachment from source
 		const sourceItem = this.getItem(drag.sourceLocation);
 		if (!sourceItem) return;
 
-		// Determine if source was also an attachment (cross-weapon swap)
-		const isSourceAttachment = drag.sourceLocation.type === 'attachment';
-
 		this.removeItem(drag.sourceLocation);
 
-		// Attach new item
 		if (weapon.attachments) {
 			weapon.attachments[targetSlotIdx] = sourceItem;
 		}
 
-		// Return existing attachment to source location
+		// Return existing attachment to source location (works for both inventory and cross-weapon swaps)
 		if (existingAttachment) {
-			if (isSourceAttachment) {
-				// Swap between weapons: put old attachment back in source attachment slot
-				this.setItem(drag.sourceLocation, existingAttachment);
-			} else {
-				// From inventory: return to source container slot
-				this.setItem(drag.sourceLocation, existingAttachment);
-			}
+			this.setItem(drag.sourceLocation, existingAttachment);
 		}
 	}
 
-	// ---- Context menu operations ----
+	// ---- Domain operations: context actions ----
 
 	quickMove(loc: ItemLocation): boolean {
 		if (loc.type !== 'slot') return false;
@@ -204,11 +213,7 @@ export class Inventory {
 		const splitCount = Math.floor(item.count / 2);
 		item.count -= splitCount;
 
-		this.setItem(emptySlot, {
-			uid: crypto.randomUUID(),
-			defId: item.defId,
-			count: splitCount
-		});
+		this.setItem(emptySlot, this.createItem(item.defId, splitCount));
 
 		return true;
 	}
@@ -245,78 +250,16 @@ export class Inventory {
 		for (const result of def.recycling) {
 			const slot = this.getFirstEmptySlot(targetStorageId);
 			if (slot) {
-				this.setItem(slot, {
-					uid: crypto.randomUUID(),
-					defId: result.itemId,
-					count: result.amount * item.count
-				});
+				this.setItem(slot, this.createItem(result.itemId, result.amount * item.count));
 			}
 		}
 		return true;
 	}
 
-	recycleItems(entries: { item: InstanceItem; location: ItemLocation }[]): boolean {
-		for (const entry of entries) {
-			this.recycleItem(entry.location);
-		}
-		return true;
-	}
+	// ---- Domain operations: match (called by GameLoop / track-item) ----
 
-	// ---- Utilities ----
-
-	clearStorage(storageId: StorageId): void {
-		this.items = this.items.filter((slot) => {
-			if (slot.location.type === 'slot' && slot.location.storageId === storageId) {
-				this.selection.deselect(slot.item.uid);
-				return false;
-			}
-			return true;
-		});
-	}
-
-	fillStorage(storageId: StorageId, newItems: InstanceItem[]): void {
-		for (const item of newItems) {
-			const loc = this.getFirstEmptySlot(storageId);
-			if (!loc) break;
-			this.setItem(loc, item);
-		}
-	}
-
-	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
-		const config = getStorageConfig(storageId);
-		if (!config) return null;
-		for (let i = 0; i < config.size; i++) {
-			const loc: ItemLocation = { type: 'slot', storageId, index: i };
-			if (!this.getItem(loc)) return loc;
-		}
-		return null;
-	}
-
-	createItem(defId: string, count = 1): InstanceItem {
-		const def = getDef(defId);
-		const item: InstanceItem = {
-			uid: crypto.randomUUID(),
-			defId,
-			count
-		};
-		if (def.attachmentSlots) {
-			item.attachments = def.attachmentSlots.map(() => null);
-		}
-		return item;
-	}
-
-	countAvailable(defId: string): number {
-		return this.items
-			.filter(
-				(slot) =>
-					slot.location.type === 'slot' &&
-					slot.location.storageId !== 'lootBack' &&
-					slot.item.defId === defId &&
-					!slot.item.match
-			)
-			.reduce((sum, slot) => sum + slot.item.count, 0);
-	}
-
+	// Sets match=true even on partial consumption — this is intentional:
+	// the flag triggers the UI scan animation while count may still be > 0
 	consumeMatched(defId: string, count: number): void {
 		let remaining = count;
 
@@ -339,6 +282,9 @@ export class Inventory {
 			}
 		}
 	}
+
+	// If fully consumed (count <= 0): remove from inventory.
+	// If partially consumed (count > 0): clear match flag so the item remains usable.
 	removeMatch(uid: string): void {
 		const idx = this.items.findIndex((i) => i.item.uid === uid);
 		if (idx === -1) return;
@@ -350,13 +296,36 @@ export class Inventory {
 		}
 	}
 
-	#countEmptySlots(storageId: StorageId): number {
-		const config = getStorageConfig(storageId);
-		if (!config) return 0;
-		let count = 0;
-		for (let i = 0; i < config.size; i++) {
-			if (!this.getItem({ type: 'slot', storageId, index: i })) count++;
+	// ---- Helper / internal utilities ----
+
+	clearStorage(storageId: StorageId): void {
+		this.items = this.items.filter((slot) => {
+			if (slot.location.type === 'slot' && slot.location.storageId === storageId) {
+				this.selection.deselect(slot.item.uid);
+				return false;
+			}
+			return true;
+		});
+	}
+
+	fillStorage(storageId: StorageId, newItems: InstanceItem[]): void {
+		for (const item of newItems) {
+			const loc = this.getFirstEmptySlot(storageId);
+			if (!loc) break;
+			this.setItem(loc, item);
 		}
-		return count;
+	}
+
+	createItem(defId: string, count = 1): InstanceItem {
+		const def = getDef(defId);
+		const item: InstanceItem = {
+			uid: crypto.randomUUID(),
+			defId,
+			count
+		};
+		if (def.attachmentSlots) {
+			item.attachments = def.attachmentSlots.map(() => null);
+		}
+		return item;
 	}
 }

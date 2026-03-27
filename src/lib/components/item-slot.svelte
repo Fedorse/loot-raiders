@@ -30,7 +30,7 @@
 	{@attach draggable(slotState)}
 >
 	{#if isWeapon}
-		<WeaponCard {item} selected={selectedItem} {location} className="h-full w-full" {onmatched} />
+		<WeaponCard {item} {location} className="h-full w-full" {onmatched} />
 	{:else}
 		<ItemCard {item} selected={selectedItem} {location} className="h-full w-full" {onmatched} />
 	{/if}

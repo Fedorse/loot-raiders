@@ -1,4 +1,5 @@
 import { ITEM_DB } from '$lib/config/items';
+import { MOCK_ITEMS } from '$lib/config/mock-data';
 import type { ItemDefinition } from '$lib/types';
 // import { generateLootItems, TRACK_PROFILE } from './loot.svelte';
 
@@ -14,8 +15,8 @@ export interface TrackItem {
 const ITEM_HEIGHT = 96;
 const WEAPON_HEIGHT = 120;
 const ITEM_GAP = 8;
-const MAX_ITEMS = 100;
 const VISIBLE_INSET = 100;
+// const MAX_ITEMS = 100;
 
 function getItemHeight(item: TrackItem): number {
 	return item.def.type === 'weapon' && item.def.attachmentSlots?.length
@@ -23,21 +24,8 @@ function getItemHeight(item: TrackItem): number {
 		: ITEM_HEIGHT;
 }
 
-const MOCK_TRACK_ITEMS: { defId: string; count: number }[] = [
-	{ defId: 'res_arc_circuitry', count: 2 },
-	{ defId: 'loot_chemicals', count: 1 },
-	{ defId: 'res_arc_circuitry', count: 1 },
-	{ defId: 'wpn_tempest', count: 1 },
-	{ defId: 'loot_fabric', count: 1 },
-	{ defId: 'res_arc_circuitry', count: 3 },
-	{ defId: 'loot_battery', count: 1 },
-	{ defId: 'res_metal_parts', count: 2 },
-	{ defId: 'res_arc_circuitry', count: 1 },
-	{ defId: 'loot_oil', count: 1 }
-];
-
-function generateTrackQueue(_count: number): TrackItem[] {
-	return MOCK_TRACK_ITEMS.map((mock) => ({
+function generateTrackQueue(): TrackItem[] {
+	return MOCK_ITEMS.map((mock) => ({
 		id: crypto.randomUUID(),
 		defId: mock.defId,
 		count: mock.count,
@@ -74,6 +62,8 @@ export class Track {
 		return h;
 	});
 
+	// Matched items are excluded here so GameLoop.checkMatches skips them immediately.
+	// Visual removal happens later via removeMatched() after the scan animation completes.
 	visibleItems = $derived.by(() => {
 		if (this.containerHeight <= 0) return [];
 		const result: TrackItem[] = [];
@@ -92,18 +82,13 @@ export class Track {
 
 	allMatched = $derived(this.queue.length > 0 && this.queue.every((i) => i.matched));
 
-	reset(count: number) {
-		this.queue = [...generateTrackQueue(count)];
+	// ---- Queue lifecycle ----
+
+	reset() {
+		this.queue = [...generateTrackQueue()];
 		this.scrollOffset = 0;
 	}
 
-	movement(dt: number, speed: number) {
-		this.scrollOffset += speed * dt;
-		const distanceToTop = this.totalHeight - this.scrollOffset;
-		if (distanceToTop < 2000) {
-			this.extend();
-		}
-	}
 	markMatched(id: string): void {
 		const item = this.queue.find((i) => i.id === id);
 		if (item) item.matched = true;
@@ -120,8 +105,19 @@ export class Track {
 		this.scrollOffset -= removedHeight;
 	}
 
+	// ---- Scrolling ----
+
+	movement(dt: number, speed: number) {
+		this.scrollOffset += speed * dt;
+		const distanceToTop = this.totalHeight - this.scrollOffset;
+		if (distanceToTop < 2000) {
+			this.extend();
+		}
+	}
+
+	// Intentional no-op — scaffolding hook called every tick by movement().
+	// Will hold real queue generation once mock data is replaced.
 	private extend(): void {
-		// disabled for testing with mock data
 		// const newItems = generateTrackQueue(30);
 		// this.queue = [...newItems, ...this.queue];
 		//

@@ -8,7 +8,7 @@ node_modules
 /.svelte-kit
 /build
 .claude/worktrees/
-
+/REFACTOR_PLAN.md
 # OS
 .DS_Store
 Thumbs.db

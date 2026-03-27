@@ -63,7 +63,6 @@ export interface ItemDefinition {
 	price: number;
 	maxStack?: number;
 
-	gradeIcon?: string;
 	attachmentSlots?: AttachmentSlotDef[];
 
 	recycling?: RecyclingResult[];

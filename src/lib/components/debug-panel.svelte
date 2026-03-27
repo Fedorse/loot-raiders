@@ -2,7 +2,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { STORAGE_CONFIGS } from '$lib/config/storages';
-	import { getDropActionType } from '$lib/store/inventory-validation';
+	import { getDropActionType } from '$lib/inventory-validation';
 	import { formatLocation } from '$lib/store/debug.svelte';
 	import type { StorageId } from '$lib/types';
 

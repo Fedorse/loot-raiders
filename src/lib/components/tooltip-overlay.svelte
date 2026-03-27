@@ -10,7 +10,7 @@
 	const { overlay } = getGameContext();
 	const tooltipData = $derived(overlay.tooltip);
 
-	let tooltipRef: HTMLElement;
+	let tooltipRef = $state<HTMLElement>();
 	let adjustedX = $state(0);
 	let adjustedY = $state(0);
 
@@ -37,7 +37,6 @@
 </script>
 
 {#if tooltipData && def && tooltipData.item}
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		bind:this={tooltipRef}
 		class="pointer-events-none fixed z-[100] flex w-[340px] flex-col"
@@ -71,13 +70,15 @@
 					{def.name}
 				</h1>
 
-				<p class="mb-2 text-sm leading-snug font-medium text-modal-secondary-foreground">
-					{def.description}
-				</p>
+				{#if def.description}
+					<p class="mb-2 text-sm leading-snug font-medium text-modal-secondary-foreground">
+						{def.description}
+					</p>
+				{/if}
 
 				{#if isWeapon}
 					<div class="flex gap-1.5">
-						{#each def.attachmentSlots as slot, i}
+						{#each def.attachmentSlots ?? [] as slot, i (i)}
 							{@const attached = attachments[i]}
 							{@const attDef = attached ? getDef(attached.defId) : null}
 							{@render attachmentItem(attDef, slot.placeholder)}
@@ -122,7 +123,7 @@
 
 				{#if isAttachment}
 					<div class="mb-4 flex flex-col gap-1">
-						{#each def.statBonuses as bonus}
+						{#each def.statBonuses ?? [] as bonus, i (i)}
 							<span class="text-sm leading-snug font-medium text-modal-secondary-foreground">
 								{bonus}
 							</span>

@@ -2,7 +2,7 @@
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
-	import AnimatedItemList from '$lib/components/track-item.svelte';
+	import TrackItem from '$lib/components/track-item.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import { formatTime } from '$lib/utils';
 
@@ -60,7 +60,7 @@
 		<Shortcuts />
 	</div>
 
-	<AnimatedItemList />
+	<TrackItem />
 </div>
 
 {#snippet scoreTimeTab()}

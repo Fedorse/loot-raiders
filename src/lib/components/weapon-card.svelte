@@ -10,7 +10,6 @@
 		item: InstanceItem;
 		className?: string;
 		location: ItemLocation;
-		selected: boolean;
 		onmatched?: () => void;
 	};
 
@@ -49,7 +48,7 @@
 				/>
 			</div>
 			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
-				{#each def.attachmentSlots ?? [] as slotDef, index}
+				{#each def.attachmentSlots ?? [] as slotDef, index (index)}
 					<AttachmentSlot
 						parentLocation={location}
 						attachIndex={index}
@@ -85,11 +84,3 @@
 		</div>
 	</div>
 {/snippet}
-
-<style>
-	/* Подсветка оружия при наведении на слот атачмента или когда слот — дроп-таргет */
-	.weapon-card:has(.weapon-card__slots .slot-root:hover) .weapon-card__body,
-	.weapon-card:has(.weapon-card__slots .is-drop-target) .weapon-card__body {
-		box-shadow: inset 0 0 0 2px rgb(255 255 255 / 0.4);
-	}
-</style>

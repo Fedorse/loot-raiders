@@ -1,4 +1,5 @@
 import { ITEM_DB } from '$lib/config/items';
+import { MOCK_ITEMS } from '$lib/config/mock-data';
 import type { Inventory } from './inventory.svelte';
 import type { ItemRarity, ItemDefinition, ItemType, InstanceItem } from '$lib/types';
 import { randInt } from '$lib/utils';
@@ -56,6 +57,8 @@ export const TRACK_PROFILE: LootProfile = {
 		return DEFAULT_STACK_RANGES[def.rarity];
 	}
 };
+
+// ---- Generation functions ----
 
 function buildItemPool(): ItemPool {
 	const pool = {} as ItemPool;
@@ -149,30 +152,18 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 export class LootGenerator {
 	private inventory: Inventory;
 	phase = $state<LoadingStatus>('idle');
-	lootQueue = $state<string[]>([]);
+	private lootQueue = $state<string[]>([]);
+	// -1 = idle sentinel; set to 0 when scanning starts in next()
 	private scanIndex = $state(-1);
 
 	constructor(inventory: Inventory) {
 		this.inventory = inventory;
 	}
 
-	private static readonly MOCK_LOOT: { defId: string; count: number }[] = [
-		{ defId: 'res_arc_circuitry', count: 2 },
-		{ defId: 'loot_chemicals', count: 1 },
-		{ defId: 'res_arc_circuitry', count: 1 },
-		{ defId: 'wpn_tempest', count: 1 },
-		{ defId: 'loot_fabric', count: 1 },
-		{ defId: 'res_arc_circuitry', count: 3 },
-		{ defId: 'loot_battery', count: 1 },
-		{ defId: 'res_metal_parts', count: 2 },
-		{ defId: 'res_arc_circuitry', count: 1 },
-		{ defId: 'loot_oil', count: 1 }
-	];
-
 	next(): void {
 		this.inventory.clearStorage('lootBack');
 
-		const items: InstanceItem[] = LootGenerator.MOCK_LOOT.map((mock) =>
+		const items: InstanceItem[] = MOCK_ITEMS.map((mock) =>
 			this.inventory.createItem(mock.defId, mock.count)
 		);
 
@@ -181,27 +172,6 @@ export class LootGenerator {
 		this.scanIndex = 0;
 		this.phase = 'loading';
 	}
-
-	// next(): void {
-	// 	this.inventory.clearStorage('lootBack');
-	// 	const count = randInt(4, 16);
-	// 	const rawItems = generateLootItems(STANDARD_CACHE_PROFILE, count);
-	//
-	// 	const items: InstanceItem[] = rawItems.map((raw) => {
-	// 		const item = this.inventory.createItem(raw.def.id, raw.count);
-	// 		if (raw.attachments && item.attachments) {
-	// 			item.attachments = raw.attachments.map((attDef) =>
-	// 				attDef ? this.inventory.createItem(attDef.id, 1) : null
-	// 			);
-	// 		}
-	// 		return item;
-	// 	});
-	//
-	// 	this.inventory.fillStorage('lootBack', items);
-	// 	this.totalItems = count;
-	// 	this.loadingIndex = 0;
-	// 	this.phase = 'loading';
-	// }
 
 	slotScanned(): void {
 		this.scanIndex++;
@@ -220,3 +190,24 @@ export class LootGenerator {
 		return idx >= 0 && idx > this.scanIndex;
 	}
 }
+
+// next(): void {
+// 	this.inventory.clearStorage('lootBack');
+// 	const count = randInt(4, 16);
+// 	const rawItems = generateLootItems(STANDARD_CACHE_PROFILE, count);
+//
+// 	const items: InstanceItem[] = rawItems.map((raw) => {
+// 		const item = this.inventory.createItem(raw.def.id, raw.count);
+// 		if (raw.attachments && item.attachments) {
+// 			item.attachments = raw.attachments.map((attDef) =>
+// 				attDef ? this.inventory.createItem(attDef.id, 1) : null
+// 			);
+// 		}
+// 		return item;
+// 	});
+//
+// 	this.inventory.fillStorage('lootBack', items);
+// 	this.lootQueue = items.map((i) => i.uid);
+// 	this.scanIndex = 0;
+// 	this.phase = 'loading';
+// }

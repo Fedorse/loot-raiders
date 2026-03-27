@@ -10,8 +10,8 @@
 	const draggedItem = $derived(interaction.draggedItem);
 	const def = $derived(draggedItem ? getDef(draggedItem.defId) : null);
 
-	const x = $derived(interaction.pointer.x - interaction.offset.x * GHOST_SIZE);
-	const y = $derived(interaction.pointer.y - interaction.offset.y * GHOST_SIZE);
+	const x = $derived(interaction.pointer.x - interaction.grabOffset.x * GHOST_SIZE);
+	const y = $derived(interaction.pointer.y - interaction.grabOffset.y * GHOST_SIZE);
 </script>
 
 {#if draggedItem && def}

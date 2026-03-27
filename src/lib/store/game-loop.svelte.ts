@@ -1,5 +1,5 @@
 import type { Inventory } from './inventory.svelte';
-import { Track } from './track.svelte';
+import type { Track } from './track.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
@@ -13,18 +13,22 @@ export class GameLoop {
 	private rafId = 0;
 	private lastTime = 0;
 
-	track = new Track();
+	track: Track;
 	score = $state(0);
 	timeLeft = $state(INITIAL_TIME);
 	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
 
-	constructor(inventory: Inventory) {
+	constructor(inventory: Inventory, track: Track) {
 		this.inventory = inventory;
+		this.track = track;
 	}
 
+	// ---- Lifecycle ----
+
 	start() {
-		this.track.reset(100);
+		cancelAnimationFrame(this.rafId);
+		this.track.reset();
 		this.score = 0;
 		this.timeLeft = INITIAL_TIME;
 		this.speed = INITIAL_SPEED;
@@ -52,15 +56,13 @@ export class GameLoop {
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
-	toggle() {
-		if (this.status === 'playing') this.pause();
-		else if (this.status === 'paused') this.resume();
-	}
+	// ---- Tick / loop ----
 
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
 
+		// Game over: timer expired
 		this.timeLeft -= dt;
 		if (this.timeLeft <= 0) {
 			this.timeLeft = 0;
@@ -70,6 +72,7 @@ export class GameLoop {
 
 		this.track.movement(dt, this.speed);
 
+		// Game over: every track item has been matched
 		if (this.track.allMatched) {
 			this.stop();
 			return;
@@ -79,6 +82,8 @@ export class GameLoop {
 
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
+
+	// ---- Match rules ----
 
 	private checkMatches() {
 		for (const trackItem of this.track.visibleItems) {

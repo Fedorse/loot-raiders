@@ -11,7 +11,7 @@
 	const config = getStorageConfig(storageId);
 </script>
 
-{#each Array(config.size) as _, index (index)}
+{#each Array.from({ length: config.size }, (__, i) => i) as index (index)}
 	<Slot
 		location={{ type: 'slot', storageId: config.name, index }}
 		placeholder={config.placeholder}
