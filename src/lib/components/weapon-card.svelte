@@ -13,7 +13,7 @@
 		onmatched?: () => void;
 	};
 
-	let { item, className = 'h-40', location, onmatched }: Props = $props();
+	let { item, className = '', location, onmatched }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
 	const { gameLoop } = getGameContext();
@@ -42,7 +42,7 @@
 			{@render absoluteBlob()}
 			<div class="relative z-10 min-h-0 flex-1">
 				<img
-					src={def?.image ?? ''}
+					src={def.image}
 					alt="weapon"
 					class="max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
 				/>

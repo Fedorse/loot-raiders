@@ -25,7 +25,6 @@
 	const style = $derived(def ? getRarityStyle(def.rarity) : null);
 
 	let isHovered = $state(false);
-	const showDropHighlight = $derived(isHovered);
 </script>
 
 {#if attachment && def && style && !isDraggingThisItem}
@@ -38,7 +37,7 @@
 		onpointerleave={() => (isHovered = false)}
 	>
 		{@render glowRing()}
-		<div class="relative z-10 size-10 h-full w-full p-[2px]">
+		<div class="relative z-10 h-full w-full p-[2px]">
 			<div
 				class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 			>
@@ -79,7 +78,7 @@
 {/if}
 
 {#snippet glowRing()}
-	{#if showDropHighlight}
+	{#if isHovered}
 		<div class="glow-ring-mask absolute inset-0 z-0">
 			<div class="glow-animation absolute inset-[-100%]"></div>
 		</div>

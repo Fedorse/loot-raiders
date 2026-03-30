@@ -20,8 +20,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Semi-Automatic',
 		armorPenetration: 'Very Weak',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 3, name: 'Metal Parts' },
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' }
+			{ itemId: 'res_metal_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -45,7 +45,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		magazineSize: 12,
 		firingMode: 'Fully-Automatic',
 		armorPenetration: 'Moderate',
-		recycling: [{ itemId: 'res_metal_parts', amount: 8, name: 'Metal Parts' }],
+		recycling: [{ itemId: 'res_metal_parts', amount: 8 }],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
@@ -68,8 +68,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: '3-Round Burst',
 		armorPenetration: 'Moderate',
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 2, name: 'Mechanical Components' },
-			{ itemId: 'res_simple_gun_parts', amount: 2, name: 'Simple Gun Parts' }
+			{ itemId: 'res_mechanical_components', amount: 2 },
+			{ itemId: 'res_simple_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -97,9 +97,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 2,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_medium_gun_parts', amount: 2, name: 'Medium Gun Parts' }
+			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -126,9 +125,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_heavy_gun_parts', amount: 2, name: 'Heavy Gun Parts' }
+			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -156,8 +154,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Break-Action',
 		armorPenetration: 'Strong',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'res_metal_parts', amount: 2 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -184,9 +182,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_medium_gun_parts', amount: 2, name: 'Medium Gun Parts' }
+			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -210,8 +207,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: '2-Round Burst',
 		armorPenetration: 'Strong',
 		recycling: [
-			{ itemId: 'res_magnetic_accelerator', amount: 2, name: 'Magnetic Accelerator' },
-			{ itemId: 'res_complex_gun_parts', amount: 1, name: 'Complex Gun Parts' }
+			{ itemId: 'res_magnetic_accelerator', amount: 2 },
+			{ itemId: 'res_complex_gun_parts', amount: 1 }
 		],
 		attachmentSlots: [
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
@@ -238,8 +235,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Fully-Automatic',
 		armorPenetration: 'Very Weak',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 3, name: 'Metal Parts' },
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' }
+			{ itemId: 'res_metal_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -267,9 +264,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 2,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_light_gun_parts', amount: 2, name: 'Light Gun Parts' }
+			{ itemId: 'res_light_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -298,8 +294,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Pump-Action',
 		armorPenetration: 'Weak',
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 2, name: 'Mechanical Components' },
-			{ itemId: 'res_simple_gun_parts', amount: 2, name: 'Simple Gun Parts' }
+			{ itemId: 'res_mechanical_components', amount: 2 },
+			{ itemId: 'res_simple_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.png' },
@@ -327,9 +323,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 2,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_heavy_gun_parts', amount: 2, name: 'Heavy Gun Parts' }
+			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.png' },
@@ -358,8 +353,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Slide-Action',
 		armorPenetration: 'Very Weak',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'res_metal_parts', amount: 2 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		],
 		attachmentSlots: [
 			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.png' }
@@ -381,8 +376,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Semi-Automatic',
 		armorPenetration: 'Very Weak',
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_simple_gun_parts', amount: 2, name: 'Simple Gun Parts' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_simple_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -408,9 +403,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_medium_gun_parts', amount: 2, name: 'Medium Gun Parts' }
+			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
@@ -438,8 +432,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Single-Action',
 		armorPenetration: 'Strong',
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 2, name: 'Mechanical Components' },
-			{ itemId: 'res_simple_gun_parts', amount: 2, name: 'Simple Gun Parts' }
+			{ itemId: 'res_mechanical_components', amount: 2 },
+			{ itemId: 'res_simple_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -469,9 +463,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_medium_gun_parts', amount: 2, name: 'Medium Gun Parts' }
+			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -502,9 +495,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_medium_gun_parts', amount: 2, name: 'Medium Gun Parts' }
+			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.png' },
@@ -529,8 +521,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Bolt-Action',
 		armorPenetration: 'Very Strong',
 		recycling: [
-			{ itemId: 'res_magnetic_accelerator', amount: 2, name: 'Magnetic Accelerator' },
-			{ itemId: 'res_complex_gun_parts', amount: 1, name: 'Complex Gun Parts' }
+			{ itemId: 'res_magnetic_accelerator', amount: 2 },
+			{ itemId: 'res_complex_gun_parts', amount: 1 }
 		]
 	},
 
@@ -556,9 +548,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 2,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'res_heavy_gun_parts', amount: 2, name: 'Heavy Gun Parts' }
+			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
@@ -581,8 +572,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		firingMode: 'Fully-Automatic',
 		armorPenetration: 'Very Strong',
 		recycling: [
-			{ itemId: 'res_magnetic_accelerator', amount: 2, name: 'Magnetic Accelerator' },
-			{ itemId: 'res_complex_gun_parts', amount: 1, name: 'Complex Gun Parts' }
+			{ itemId: 'res_magnetic_accelerator', amount: 2 },
+			{ itemId: 'res_complex_gun_parts', amount: 1 }
 		]
 	},
 
@@ -796,7 +787,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		maxStack: 12,
 		description: 'Obtained from ARC enemies or activities. Used to craft components.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 10, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 10 }]
 	},
 	res_toaster: {
 		id: 'res_toaster',
@@ -809,7 +800,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 2,
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	res_bastion_cell: {
 		id: 'res_bastion_cell',
@@ -858,7 +849,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.png',
 		weight: 5,
 		price: 400,
-		recycling: [{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 5 }]
 	},
 
 	// ──────────────────────────────────────
@@ -876,7 +867,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces horizontal recoil.',
 		statBonuses: ['20% Reduced Horizontal Recoil'],
-		recycling: [{ itemId: 'res_plastic_parts', amount: 6, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 6 }]
 	},
 	att_angled_grip_3: {
 		id: 'att_angled_grip_3',
@@ -891,8 +882,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly reduces horizontal recoil but slows ADS.',
 		statBonuses: ['40% Reduced Horizontal Recoil', '30% Reduced ADS Speed'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 2, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 2 }
 		]
 	},
 	att_vertical_grip_1: {
@@ -907,7 +898,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces vertical recoil.',
 		statBonuses: ['20% Reduced Vertical Recoil'],
-		recycling: [{ itemId: 'res_plastic_parts', amount: 6, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 6 }]
 	},
 	att_vertical_grip_2: {
 		id: 'att_vertical_grip_2',
@@ -922,8 +913,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces vertical recoil.',
 		statBonuses: ['30% Reduced Vertical Recoil'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_duct_tape', amount: 1, name: 'Duct Tape' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 1 }
 		]
 	},
 	att_vertical_grip_3: {
@@ -939,8 +930,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly reduces vertical recoil but slows ADS.',
 		statBonuses: ['40% Reduced Vertical Recoil', '30% Reduced ADS Speed'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 2, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 2 }
 		]
 	},
 	att_horizontal_grip: {
@@ -960,8 +951,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'30% Reduced ADS Speed'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 2, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 2 }
 		]
 	},
 
@@ -980,7 +971,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces shot dispersion.',
 		statBonuses: ['20% Reduced Per-Shot Dispersion', '10% Reduced Max Dispersion'],
-		recycling: [{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 5 }]
 	},
 	att_compensator_2: {
 		id: 'att_compensator_2',
@@ -995,8 +986,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces shot dispersion.',
 		statBonuses: ['40% Reduced Per-Shot Dispersion', '20% Reduced Max Dispersion'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 1 }
 		]
 	},
 	att_compensator_3: {
@@ -1016,8 +1007,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'20% Increased Durability Burn'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 	att_muzzle_brake_1: {
@@ -1032,7 +1023,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces recoil.',
 		statBonuses: ['15% Reduced Horizontal Recoil', '15% Reduced Vertical Recoil'],
-		recycling: [{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 5 }]
 	},
 	att_muzzle_brake_2: {
 		id: 'att_muzzle_brake_2',
@@ -1047,8 +1038,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces recoil.',
 		statBonuses: ['20% Reduced Horizontal Recoil', '20% Reduced Vertical Recoil'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 1 }
 		]
 	},
 	att_muzzle_brake_3: {
@@ -1068,8 +1059,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'20% Increased Durability Burn'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 	att_silencer_1: {
@@ -1085,8 +1076,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces noise.',
 		statBonuses: ['20% Reduced Noise'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 1 }
 		]
 	},
 	att_silencer_2: {
@@ -1102,8 +1093,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces noise.',
 		statBonuses: ['40% Reduced Noise'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 	att_extended_barrel: {
@@ -1119,8 +1110,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Increases bullet velocity but adds vertical recoil.',
 		statBonuses: ['25% Increased Bullet Velocity', '15% Increased Vertical Recoil'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 1 }
 		]
 	},
 
@@ -1139,7 +1130,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces base dispersion.',
 		statBonuses: ['10% Reduced Base Dispersion'],
-		recycling: [{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 5 }]
 	},
 	att_shotgun_choke_2: {
 		id: 'att_shotgun_choke_2',
@@ -1154,8 +1145,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces base dispersion.',
 		statBonuses: ['20% Reduced Base Dispersion'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 1 }
 		]
 	},
 	att_shotgun_choke_3: {
@@ -1171,8 +1162,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly reduces dispersion but increases durability burn.',
 		statBonuses: ['30% Reduced Base Dispersion', '20% Increased Durability Burn'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 
@@ -1191,7 +1182,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+5 Magazine Size'],
-		recycling: [{ itemId: 'res_plastic_parts', amount: 6, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 6 }]
 	},
 	att_ext_light_mag_2: {
 		id: 'att_ext_light_mag_2',
@@ -1206,8 +1197,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+10 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_steel_spring', amount: 1, name: 'Steel Spring' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 1 }
 		]
 	},
 	att_ext_light_mag_3: {
@@ -1223,8 +1214,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly increases magazine capacity.',
 		statBonuses: ['+15 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_steel_spring', amount: 2, name: 'Steel Spring' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 2 }
 		]
 	},
 	att_ext_medium_mag_1: {
@@ -1239,7 +1230,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+4 Magazine Size'],
-		recycling: [{ itemId: 'res_plastic_parts', amount: 6, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 6 }]
 	},
 	att_ext_medium_mag_2: {
 		id: 'att_ext_medium_mag_2',
@@ -1254,8 +1245,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+8 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_steel_spring', amount: 1, name: 'Steel Spring' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 1 }
 		]
 	},
 	att_ext_medium_mag_3: {
@@ -1271,8 +1262,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly increases magazine capacity.',
 		statBonuses: ['+12 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_steel_spring', amount: 2, name: 'Steel Spring' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 2 }
 		]
 	},
 	att_ext_shotgun_mag_1: {
@@ -1287,7 +1278,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+2 Magazine Size'],
-		recycling: [{ itemId: 'res_plastic_parts', amount: 6, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 6 }]
 	},
 	att_ext_shotgun_mag_2: {
 		id: 'att_ext_shotgun_mag_2',
@@ -1302,8 +1293,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Increases magazine capacity.',
 		statBonuses: ['+4 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_steel_spring', amount: 1, name: 'Steel Spring' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 1 }
 		]
 	},
 	att_ext_shotgun_mag_3: {
@@ -1319,8 +1310,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Greatly increases magazine capacity.',
 		statBonuses: ['+6 Magazine Size'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_steel_spring', amount: 2, name: 'Steel Spring' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 2 }
 		]
 	},
 
@@ -1339,7 +1330,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		description: 'Reduces recoil and dispersion recovery time.',
 		statBonuses: ['20% Reduced Recoil Recovery', '20% Reduced Dispersion Recovery'],
-		recycling: [{ itemId: 'res_rubber_parts', amount: 6, name: 'Rubber Parts' }]
+		recycling: [{ itemId: 'res_rubber_parts', amount: 6 }]
 	},
 	att_stable_stock_2: {
 		id: 'att_stable_stock_2',
@@ -1354,8 +1345,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Reduces recoil and dispersion recovery time.',
 		statBonuses: ['35% Reduced Recoil Recovery', '35% Reduced Dispersion Recovery'],
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		]
 	},
 	att_stable_stock_3: {
@@ -1375,8 +1366,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'20% Increased Equip Time'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 2 }
 		]
 	},
 	att_padded_stock: {
@@ -1397,8 +1388,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'30% Reduced ADS Speed'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 1, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 1 }
 		]
 	},
 	att_lightweight_stock: {
@@ -1418,8 +1409,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'50% Increased Vertical Recoil'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 1, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 1 }
 		]
 	},
 	att_kinetic_converter: {
@@ -1439,8 +1430,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			'20% Increased Vertical Recoil'
 		],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_duct_tape', amount: 2, name: 'Duct Tape' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_duct_tape', amount: 2 }
 		]
 	},
 
@@ -1460,8 +1451,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		description: 'Adds projectiles but reduces per-projectile damage.',
 		statBonuses: ['+3 Projectiles Per Shot', '70% Reduced Projectile Damage'],
 		recycling: [
-			{ itemId: 'res_mod_components', amount: 1, name: 'Mod Components' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' }
+			{ itemId: 'res_mod_components', amount: 1 },
+			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 
@@ -1515,7 +1506,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 200,
 		maxStack: 15,
 		description: 'Obtained from ARC enemies. Used to craft components.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	loot_battery: {
 		id: 'loot_battery',
@@ -1528,7 +1519,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 250,
 		maxStack: 15,
 		description: 'Used to craft a wide range of items.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	loot_canister: {
 		id: 'loot_canister',
@@ -1541,7 +1532,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 300,
 		maxStack: 15,
 		description: 'Used to craft a wide range of items.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 3 }]
 	},
 	loot_crude_explosives: {
 		id: 'loot_crude_explosives',
@@ -1554,7 +1545,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 270,
 		maxStack: 10,
 		description: 'Used to craft explosives.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 3, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 3 }]
 	},
 	loot_durable_cloth: {
 		id: 'loot_durable_cloth',
@@ -1567,7 +1558,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 10,
 		description: 'Used to craft medical supplies.',
-		recycling: [{ itemId: 'loot_fabric', amount: 6, name: 'Fabric' }]
+		recycling: [{ itemId: 'loot_fabric', amount: 6 }]
 	},
 	loot_electrical_components: {
 		id: 'loot_electrical_components',
@@ -1581,8 +1572,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 10,
 		description: 'Used to craft a wide range of items.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_plastic_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	loot_magnet: {
@@ -1596,7 +1587,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 300,
 		maxStack: 15,
 		description: 'Used to craft a wide range of items.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	loot_oil: {
 		id: 'loot_oil',
@@ -1609,7 +1600,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 300,
 		maxStack: 15,
 		description: 'Used to craft weapons and explosives.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 3, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 3 }]
 	},
 	loot_great_mullein: {
 		id: 'loot_great_mullein',
@@ -1622,7 +1613,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 300,
 		maxStack: 15,
 		description: 'Used to craft medical supplies.',
-		recycling: [{ itemId: 'loot_assorted_seeds', amount: 2, name: 'Assorted Seeds' }]
+		recycling: [{ itemId: 'loot_assorted_seeds', amount: 2 }]
 	},
 	loot_number_plate: {
 		id: 'loot_number_plate',
@@ -1635,7 +1626,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 270,
 		maxStack: 5,
 		description: 'Can be recycled into metal parts.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 3, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 3 }]
 	},
 	loot_crumpled_plastic_bottle: {
 		id: 'loot_crumpled_plastic_bottle',
@@ -1648,7 +1639,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 270,
 		maxStack: 3,
 		description: 'Can be recycled into plastic parts.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 4, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 4 }]
 	},
 	loot_camera_lens: {
 		id: 'loot_camera_lens',
@@ -1661,7 +1652,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 5,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 8, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 8 }]
 	},
 	loot_deflated_football: {
 		id: 'loot_deflated_football',
@@ -1675,8 +1666,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Just by looking at this, you too start to feel slightly deflated.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 9, name: 'Rubber Parts' },
-			{ itemId: 'loot_fabric', amount: 9, name: 'Fabric' }
+			{ itemId: 'res_rubber_parts', amount: 9 },
+			{ itemId: 'loot_fabric', amount: 9 }
 		]
 	},
 	loot_ruined_baton: {
@@ -1691,8 +1682,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 6, name: 'Metal Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_metal_parts', amount: 6 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	loot_ruined_handcuffs: {
@@ -1706,7 +1697,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 5,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 8, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 8 }]
 	},
 	loot_ruined_tactical_vest: {
 		id: 'loot_ruined_tactical_vest',
@@ -1720,8 +1711,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_fabric', amount: 5, name: 'Fabric' },
-			{ itemId: 'loot_magnet', amount: 1, name: 'Magnet' }
+			{ itemId: 'loot_fabric', amount: 5 },
+			{ itemId: 'loot_magnet', amount: 1 }
 		]
 	},
 	loot_adv_arc_powercell: {
@@ -1735,7 +1726,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 5,
 		description: 'Very valuable resource that drops from certain ARC enemies.',
-		recycling: [{ itemId: 'loot_arc_powercell', amount: 2, name: 'ARC Powercell' }]
+		recycling: [{ itemId: 'loot_arc_powercell', amount: 2 }]
 	},
 	loot_adv_electrical: {
 		id: 'loot_adv_electrical',
@@ -1749,8 +1740,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used to craft a wide range of items.',
 		recycling: [
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' },
-			{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' }
+			{ itemId: 'res_wires', amount: 1 },
+			{ itemId: 'loot_electrical_components', amount: 1 }
 		]
 	},
 	loot_antiseptic: {
@@ -1764,7 +1755,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 5,
 		description: 'Used to craft medical supplies.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 10, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 10 }]
 	},
 	loot_arc_flex_rubber: {
 		id: 'loot_arc_flex_rubber',
@@ -1777,7 +1768,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 3,
 		description: 'Found by scavenging destroyed ARC machines.',
-		recycling: [{ itemId: 'res_rubber_parts', amount: 16, name: 'Rubber Parts' }]
+		recycling: [{ itemId: 'res_rubber_parts', amount: 16 }]
 	},
 	loot_arc_motion_core: {
 		id: 'loot_arc_motion_core',
@@ -1790,7 +1781,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 5,
 		description: 'Obtained from ARC enemies. Used to craft components.',
-		recycling: [{ itemId: 'loot_arc_alloy', amount: 2, name: 'ARC Alloy' }]
+		recycling: [{ itemId: 'loot_arc_alloy', amount: 2 }]
 	},
 	loot_arc_performance_steel: {
 		id: 'loot_arc_performance_steel',
@@ -1803,7 +1794,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 3,
 		description: 'Obtained from ARC enemies. Used to craft components.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 12, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 12 }]
 	},
 	loot_arc_thermo_lining: {
 		id: 'loot_arc_thermo_lining',
@@ -1816,7 +1807,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'loot_fabric', amount: 16, name: 'Fabric' }]
+		recycling: [{ itemId: 'loot_fabric', amount: 16 }]
 	},
 	loot_coolant: {
 		id: 'loot_coolant',
@@ -1830,8 +1821,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 5, name: 'Chemicals' },
-			{ itemId: 'loot_oil', amount: 2, name: 'Oil' }
+			{ itemId: 'loot_chemicals', amount: 5 },
+			{ itemId: 'loot_oil', amount: 2 }
 		]
 	},
 	loot_explosive_compound: {
@@ -1845,7 +1836,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 5,
 		description: 'Used to craft explosives.',
-		recycling: [{ itemId: 'loot_crude_explosives', amount: 2, name: 'Crude Explosives' }]
+		recycling: [{ itemId: 'loot_crude_explosives', amount: 2 }]
 	},
 	loot_moss: {
 		id: 'loot_moss',
@@ -1858,7 +1849,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 500,
 		maxStack: 5,
 		description: 'Can be used to regain a small amount of health.',
-		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3, name: 'Assorted Seeds' }]
+		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3 }]
 	},
 	loot_sensors: {
 		id: 'loot_sensors',
@@ -1872,8 +1863,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used in crafting.',
 		recycling: [
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' },
-			{ itemId: 'res_metal_parts', amount: 1, name: 'Metal Parts' }
+			{ itemId: 'res_wires', amount: 1 },
+			{ itemId: 'res_metal_parts', amount: 1 }
 		]
 	},
 	loot_speaker_component: {
@@ -1888,8 +1879,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used in crafting.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 2, name: 'Plastic Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_plastic_parts', amount: 2 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	loot_syringe: {
@@ -1904,8 +1895,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used to craft medical supplies.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' },
-			{ itemId: 'loot_chemicals', amount: 2, name: 'Chemicals' }
+			{ itemId: 'res_plastic_parts', amount: 3 },
+			{ itemId: 'loot_chemicals', amount: 2 }
 		]
 	},
 	loot_synthesized_fuel: {
@@ -1920,8 +1911,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used to craft utility items and explosives. Can be thrown.',
 		recycling: [
-			{ itemId: 'loot_oil', amount: 1, name: 'Oil' },
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' }
+			{ itemId: 'loot_oil', amount: 1 },
+			{ itemId: 'res_plastic_parts', amount: 1 }
 		]
 	},
 	loot_voltage_converter: {
@@ -1936,8 +1927,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Used in crafting.',
 		recycling: [
-			{ itemId: 'res_wires', amount: 1, name: 'Wires' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'res_wires', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		]
 	},
 	loot_dog_collar: {
@@ -1952,8 +1943,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'After all this time, you can still smell the goodness.',
 		recycling: [
-			{ itemId: 'loot_fabric', amount: 8, name: 'Fabric' },
-			{ itemId: 'res_metal_parts', amount: 1, name: 'Metal Parts' }
+			{ itemId: 'loot_fabric', amount: 8 },
+			{ itemId: 'res_metal_parts', amount: 1 }
 		]
 	},
 	loot_broken_flashlight: {
@@ -1968,8 +1959,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_battery', amount: 2, name: 'Battery' },
-			{ itemId: 'res_metal_parts', amount: 6, name: 'Metal Parts' }
+			{ itemId: 'loot_battery', amount: 2 },
+			{ itemId: 'res_metal_parts', amount: 6 }
 		]
 	},
 	loot_broken_guidance_system: {
@@ -1983,7 +1974,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 2000,
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_processor', amount: 4, name: 'Processor' }]
+		recycling: [{ itemId: 'res_processor', amount: 4 }]
 	},
 	loot_damaged_heat_sink: {
 		id: 'loot_damaged_heat_sink',
@@ -1997,8 +1988,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 6, name: 'Metal Parts' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'res_metal_parts', amount: 6 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 	loot_expired_respirator: {
@@ -2013,8 +2004,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'The filters are clogged with sand and noxious fumes.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 8, name: 'Rubber Parts' },
-			{ itemId: 'loot_fabric', amount: 4, name: 'Fabric' }
+			{ itemId: 'res_rubber_parts', amount: 8 },
+			{ itemId: 'loot_fabric', amount: 4 }
 		]
 	},
 	loot_freq_mod_box: {
@@ -2029,8 +2020,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'loot_speaker_component', amount: 1, name: 'Speaker Component' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'loot_speaker_component', amount: 1 }
 		]
 	},
 	loot_fried_motherboard: {
@@ -2045,9 +2036,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 5, name: 'Plastic Parts' },
-			{ itemId: 'loot_electrical_components', amount: 2, name: 'Electrical Components' },
-			{ itemId: 'res_wires', amount: 5, name: 'Wires' }
+			{ itemId: 'res_plastic_parts', amount: 5 },
+			{ itemId: 'loot_electrical_components', amount: 2 },
+			{ itemId: 'res_wires', amount: 5 }
 		]
 	},
 	loot_frying_pan: {
@@ -2061,7 +2052,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 8, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 8 }]
 	},
 	loot_headphones: {
 		id: 'loot_headphones',
@@ -2075,8 +2066,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 7, name: 'Rubber Parts' },
-			{ itemId: 'loot_speaker_component', amount: 1, name: 'Speaker Component' }
+			{ itemId: 'res_rubber_parts', amount: 7 },
+			{ itemId: 'loot_speaker_component', amount: 1 }
 		]
 	},
 	loot_industrial_battery: {
@@ -2091,8 +2082,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into materials.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 7, name: 'Chemicals' },
-			{ itemId: 'loot_battery', amount: 2, name: 'Battery' }
+			{ itemId: 'loot_chemicals', amount: 7 },
+			{ itemId: 'loot_battery', amount: 2 }
 		]
 	},
 	loot_industrial_charger: {
@@ -2107,8 +2098,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 5, name: 'Metal Parts' },
-			{ itemId: 'loot_voltage_converter', amount: 1, name: 'Voltage Converter' }
+			{ itemId: 'res_metal_parts', amount: 5 },
+			{ itemId: 'loot_voltage_converter', amount: 1 }
 		]
 	},
 	loot_industrial_magnet: {
@@ -2123,8 +2114,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' },
-			{ itemId: 'loot_magnet', amount: 2, name: 'Magnet' }
+			{ itemId: 'res_metal_parts', amount: 4 },
+			{ itemId: 'loot_magnet', amount: 2 }
 		]
 	},
 	loot_motor: {
@@ -2139,8 +2130,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_oil', amount: 2, name: 'Oil' },
-			{ itemId: 'res_mechanical_components', amount: 2, name: 'Mechanical Components' }
+			{ itemId: 'loot_oil', amount: 2 },
+			{ itemId: 'res_mechanical_components', amount: 2 }
 		]
 	},
 	loot_polluted_air_filter: {
@@ -2155,8 +2146,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_fabric', amount: 6, name: 'Fabric' },
-			{ itemId: 'loot_oil', amount: 2, name: 'Oil' }
+			{ itemId: 'loot_fabric', amount: 6 },
+			{ itemId: 'loot_oil', amount: 2 }
 		]
 	},
 	loot_portable_tv: {
@@ -2171,8 +2162,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_battery', amount: 2, name: 'Battery' },
-			{ itemId: 'res_wires', amount: 6, name: 'Wires' }
+			{ itemId: 'loot_battery', amount: 2 },
+			{ itemId: 'res_wires', amount: 6 }
 		]
 	},
 	loot_power_bank: {
@@ -2187,8 +2178,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_battery', amount: 2, name: 'Battery' },
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' }
+			{ itemId: 'loot_battery', amount: 2 },
+			{ itemId: 'res_wires', amount: 2 }
 		]
 	},
 	loot_power_cable: {
@@ -2202,7 +2193,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
-		recycling: [{ itemId: 'res_wires', amount: 4, name: 'Wires' }]
+		recycling: [{ itemId: 'res_wires', amount: 4 }]
 	},
 	loot_projector: {
 		id: 'loot_projector',
@@ -2216,8 +2207,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_wires', amount: 2, name: 'Wires' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' }
+			{ itemId: 'res_wires', amount: 2 },
+			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 	loot_ruined_accordion: {
@@ -2232,8 +2223,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 18, name: 'Rubber Parts' },
-			{ itemId: 'res_steel_spring', amount: 3, name: 'Steel Spring' }
+			{ itemId: 'res_rubber_parts', amount: 18 },
+			{ itemId: 'res_steel_spring', amount: 3 }
 		]
 	},
 	loot_rusted_gear: {
@@ -2248,8 +2239,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' },
-			{ itemId: 'res_mechanical_components', amount: 2, name: 'Mechanical Components' }
+			{ itemId: 'res_metal_parts', amount: 4 },
+			{ itemId: 'res_mechanical_components', amount: 2 }
 		]
 	},
 	loot_rusted_medical_kit: {
@@ -2264,8 +2255,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into medical crafting materials.',
 		recycling: [
-			{ itemId: 'loot_syringe', amount: 2, name: 'Syringe' },
-			{ itemId: 'loot_antiseptic', amount: 1, name: 'Antiseptic' }
+			{ itemId: 'loot_syringe', amount: 2 },
+			{ itemId: 'loot_antiseptic', amount: 1 }
 		]
 	},
 	loot_rusted_tools: {
@@ -2280,8 +2271,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into metal parts.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 8, name: 'Metal Parts' },
-			{ itemId: 'res_steel_spring', amount: 1, name: 'Steel Spring' }
+			{ itemId: 'res_metal_parts', amount: 8 },
+			{ itemId: 'res_steel_spring', amount: 1 }
 		]
 	},
 	loot_torn_blanket: {
@@ -2295,7 +2286,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 3,
 		description: 'Can be recycled into fabric.',
-		recycling: [{ itemId: 'loot_fabric', amount: 12, name: 'Fabric' }]
+		recycling: [{ itemId: 'loot_fabric', amount: 12 }]
 	},
 	loot_turbo_pump: {
 		id: 'loot_turbo_pump',
@@ -2309,8 +2300,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_mechanical_components', amount: 1, name: 'Mechanical Components' },
-			{ itemId: 'loot_oil', amount: 3, name: 'Oil' }
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'loot_oil', amount: 3 }
 		]
 	},
 	loot_wasp_driver: {
@@ -2325,8 +2316,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be thrown, and will explode if shot.',
 		recycling: [
-			{ itemId: 'loot_arc_alloy', amount: 1, name: 'ARC Alloy' },
-			{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' }
+			{ itemId: 'loot_arc_alloy', amount: 1 },
+			{ itemId: 'loot_electrical_components', amount: 1 }
 		]
 	},
 	loot_water_filter: {
@@ -2341,8 +2332,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' },
-			{ itemId: 'loot_canister', amount: 3, name: 'Canister' }
+			{ itemId: 'res_rubber_parts', amount: 2 },
+			{ itemId: 'loot_canister', amount: 3 }
 		]
 	},
 	loot_water_pump: {
@@ -2357,8 +2348,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' },
-			{ itemId: 'loot_oil', amount: 2, name: 'Oil' }
+			{ itemId: 'res_metal_parts', amount: 4 },
+			{ itemId: 'loot_oil', amount: 2 }
 		]
 	},
 	loot_power_rod: {
@@ -2373,8 +2364,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Used to craft advanced equipment. Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'res_arc_circuitry', amount: 1, name: 'ARC Circuitry' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'res_arc_circuitry', amount: 1 }
 		]
 	},
 	loot_exodus_modules: {
@@ -2389,8 +2380,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Used to craft a wide range of items.',
 		recycling: [
-			{ itemId: 'loot_magnet', amount: 2, name: 'Magnet' },
-			{ itemId: 'res_processor', amount: 2, name: 'Processor' }
+			{ itemId: 'loot_magnet', amount: 2 },
+			{ itemId: 'res_processor', amount: 2 }
 		]
 	},
 	loot_leaper_pulse_unit: {
@@ -2408,9 +2399,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{
 				itemId: 'res_adv_mechanical_components',
 				amount: 1,
-				name: 'Advanced Mechanical Components'
 			},
-			{ itemId: 'loot_arc_alloy', amount: 3, name: 'ARC Alloy' }
+			{ itemId: 'loot_arc_alloy', amount: 3 }
 		]
 	},
 	loot_matriarch_reactor: {
@@ -2425,8 +2415,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Can be recycled into crafting materials.',
 		recycling: [
-			{ itemId: 'loot_power_rod', amount: 1, name: 'Power Rod' },
-			{ itemId: 'res_magnetic_accelerator', amount: 1, name: 'Magnetic Accelerator' }
+			{ itemId: 'loot_power_rod', amount: 1 },
+			{ itemId: 'res_magnetic_accelerator', amount: 1 }
 		]
 	},
 
@@ -2468,7 +2458,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 10,
 		description: 'A sun ripe apricot. Can be consumed for a small amount of stamina.',
-		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3, name: 'Assorted Seeds' }]
+		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3 }]
 	},
 	loot_olives: {
 		id: 'loot_olives',
@@ -2481,7 +2471,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 10,
 		description: 'Can be consumed for a small amount of stamina.',
-		recycling: [{ itemId: 'loot_assorted_seeds', amount: 2, name: 'Assorted Seeds' }]
+		recycling: [{ itemId: 'loot_assorted_seeds', amount: 2 }]
 	},
 	loot_prickly_pear: {
 		id: 'loot_prickly_pear',
@@ -2494,7 +2484,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 10,
 		description: 'Can be consumed for a small amount of stamina.',
-		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3, name: 'Assorted Seeds' }]
+		recycling: [{ itemId: 'loot_assorted_seeds', amount: 3 }]
 	},
 	loot_mushroom: {
 		id: 'loot_mushroom',
@@ -2644,7 +2634,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 250,
 		maxStack: 5,
 		description: 'A medical item that gradually restores health over time.',
-		recycling: [{ itemId: 'loot_fabric', amount: 2, name: 'Fabric' }]
+		recycling: [{ itemId: 'loot_fabric', amount: 2 }]
 	},
 	loot_adrenaline_shot: {
 		id: 'loot_adrenaline_shot',
@@ -2658,8 +2648,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Fully restores stamina and temporarily increases stamina regeneration.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'res_plastic_parts', amount: 1 }
 		]
 	},
 	loot_blue_light_stick: {
@@ -2673,7 +2663,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		maxStack: 5,
 		description: 'A throwable chemical light that illuminates the area.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 1 }]
 	},
 	loot_green_light_stick: {
 		id: 'loot_green_light_stick',
@@ -2686,7 +2676,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		maxStack: 5,
 		description: 'A throwable chemical light that illuminates the area.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 1 }]
 	},
 	loot_red_light_stick: {
 		id: 'loot_red_light_stick',
@@ -2699,7 +2689,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 150,
 		maxStack: 5,
 		description: 'A throwable chemical light that illuminates the area.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 1 }]
 	},
 	loot_firecracker: {
 		id: 'loot_firecracker',
@@ -2712,7 +2702,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 270,
 		maxStack: 5,
 		description: 'A device that sparks and pops in a pleasant manner.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 3 }]
 	},
 	loot_gas_grenade: {
 		id: 'loot_gas_grenade',
@@ -2726,8 +2716,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Creates a lingering toxic cloud on impact, draining stamina.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		]
 	},
 	loot_gas_mine: {
@@ -2742,8 +2732,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'A proximity-triggered mine that deploys a gas cloud.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'res_rubber_parts', amount: 1, name: 'Rubber Parts' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 1 }
 		]
 	},
 	loot_light_impact_grenade: {
@@ -2758,8 +2748,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Detonates on impact to create a small explosion.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'res_plastic_parts', amount: 1 }
 		]
 	},
 	loot_lil_smoke_grenade: {
@@ -2774,8 +2764,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Pops a thick but small smoke cloud on impact.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'res_plastic_parts', amount: 1 }
 		]
 	},
 	loot_door_blocker: {
@@ -2789,7 +2779,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 270,
 		maxStack: 3,
 		description: 'A locking mechanism that can be placed on large metal doors.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 2, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	loot_binoculars: {
 		id: 'loot_binoculars',
@@ -2803,8 +2793,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'A basic pair of binoculars with two levels of magnification.',
 		recycling: [
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' },
-			{ itemId: 'res_plastic_parts', amount: 4, name: 'Plastic Parts' }
+			{ itemId: 'res_rubber_parts', amount: 2 },
+			{ itemId: 'res_plastic_parts', amount: 4 }
 		]
 	},
 	loot_barricade_kit: {
@@ -2818,7 +2808,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 3,
 		description: 'A deployable cover that can block incoming damage.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' }]
+		recycling: [{ itemId: 'res_metal_parts', amount: 4 }]
 	},
 	loot_herbal_bandage: {
 		id: 'loot_herbal_bandage',
@@ -2832,8 +2822,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'An improvised medical item that gradually restores health.',
 		recycling: [
-			{ itemId: 'loot_assorted_seeds', amount: 2, name: 'Assorted Seeds' },
-			{ itemId: 'loot_fabric', amount: 5, name: 'Fabric' }
+			{ itemId: 'loot_assorted_seeds', amount: 2 },
+			{ itemId: 'loot_fabric', amount: 5 }
 		]
 	},
 	loot_lure_grenade: {
@@ -2847,7 +2837,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 3,
 		description: 'A noisy device that sticks to surfaces, distracting nearby ARC machines.',
-		recycling: [{ itemId: 'loot_speaker_component', amount: 1, name: 'Speaker Component' }]
+		recycling: [{ itemId: 'loot_speaker_component', amount: 1 }]
 	},
 	loot_pulse_mine: {
 		id: 'loot_pulse_mine',
@@ -2860,7 +2850,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 470,
 		maxStack: 3,
 		description: 'A proximity-triggered mine that knocks back anything within its radius.',
-		recycling: [{ itemId: 'loot_chemicals', amount: 6, name: 'Chemicals' }]
+		recycling: [{ itemId: 'loot_chemicals', amount: 6 }]
 	},
 	loot_recorder: {
 		id: 'loot_recorder',
@@ -2873,7 +2863,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 1,
 		description: 'A playable recorder used to attract ARC attention.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 10, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 10 }]
 	},
 	loot_seeker_grenade: {
 		id: 'loot_seeker_grenade',
@@ -2886,7 +2876,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 640,
 		maxStack: 5,
 		description: 'A homing grenade that targets a single nearby ARC.',
-		recycling: [{ itemId: 'loot_crude_explosives', amount: 1, name: 'Crude Explosives' }]
+		recycling: [{ itemId: 'loot_crude_explosives', amount: 1 }]
 	},
 	loot_shaker: {
 		id: 'loot_shaker',
@@ -2899,7 +2889,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1000,
 		maxStack: 1,
 		description: 'A rhythmic instrument used to attract ARC attention.',
-		recycling: [{ itemId: 'res_plastic_parts', amount: 10, name: 'Plastic Parts' }]
+		recycling: [{ itemId: 'res_plastic_parts', amount: 10 }]
 	},
 	loot_shield_recharger: {
 		id: 'loot_shield_recharger',
@@ -2912,7 +2902,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 520,
 		maxStack: 3,
 		description: 'A handheld repair kit that recharges a shield over time.',
-		recycling: [{ itemId: 'res_rubber_parts', amount: 4, name: 'Rubber Parts' }]
+		recycling: [{ itemId: 'res_rubber_parts', amount: 4 }]
 	},
 	loot_shrapnel_grenade: {
 		id: 'loot_shrapnel_grenade',
@@ -2926,8 +2916,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Bursts into razor-sharp fragments upon detonation.',
 		recycling: [
-			{ itemId: 'loot_crude_explosives', amount: 1, name: 'Crude Explosives' },
-			{ itemId: 'res_metal_parts', amount: 1, name: 'Metal Parts' }
+			{ itemId: 'loot_crude_explosives', amount: 1 },
+			{ itemId: 'res_metal_parts', amount: 1 }
 		]
 	},
 	loot_snap_blast_grenade: {
@@ -2942,8 +2932,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Sticks to surfaces, dealing explosive damage after a short delay.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 1, name: 'Chemicals' },
-			{ itemId: 'loot_magnet', amount: 1, name: 'Magnet' }
+			{ itemId: 'loot_chemicals', amount: 1 },
+			{ itemId: 'loot_magnet', amount: 1 }
 		]
 	},
 	loot_noise_maker: {
@@ -2984,8 +2974,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Detonates on impact, covering an area in fire.',
 		recycling: [
-			{ itemId: 'loot_oil', amount: 2, name: 'Oil' },
-			{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' }
+			{ itemId: 'loot_oil', amount: 2 },
+			{ itemId: 'res_metal_parts', amount: 4 }
 		]
 	},
 	loot_blaze_grenade_trap: {
@@ -3012,8 +3002,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Quickly revives downed Raiders and restores some health.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' },
-			{ itemId: 'loot_moss', amount: 1, name: 'Moss' }
+			{ itemId: 'res_plastic_parts', amount: 1 },
+			{ itemId: 'loot_moss', amount: 1 }
 		]
 	},
 	loot_heavy_fuze_grenade: {
@@ -3028,8 +3018,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Detonates after a delay, dealing explosive damage in its radius.',
 		recycling: [
-			{ itemId: 'loot_oil', amount: 1, name: 'Oil' },
-			{ itemId: 'res_rubber_parts', amount: 2, name: 'Rubber Parts' }
+			{ itemId: 'loot_oil', amount: 1 },
+			{ itemId: 'res_rubber_parts', amount: 2 }
 		]
 	},
 	loot_jolt_mine: {
@@ -3044,8 +3034,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'A proximity-triggered mine that stuns anything within its radius.',
 		recycling: [
-			{ itemId: 'loot_battery', amount: 1, name: 'Battery' },
-			{ itemId: 'res_plastic_parts', amount: 2, name: 'Plastic Parts' }
+			{ itemId: 'loot_battery', amount: 1 },
+			{ itemId: 'res_plastic_parts', amount: 2 }
 		]
 	},
 	loot_rope: {
@@ -3059,7 +3049,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 500,
 		maxStack: 5,
 		description: 'Used in crafting.',
-		recycling: [{ itemId: 'loot_fabric', amount: 5, name: 'Fabric' }]
+		recycling: [{ itemId: 'loot_fabric', amount: 5 }]
 	},
 	loot_smoke_grenade: {
 		id: 'loot_smoke_grenade',
@@ -3073,8 +3063,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Creates a lingering smoke cloud on impact.',
 		recycling: [
-			{ itemId: 'loot_chemicals', amount: 2, name: 'Chemicals' },
-			{ itemId: 'loot_canister', amount: 1, name: 'Canister' }
+			{ itemId: 'loot_chemicals', amount: 2 },
+			{ itemId: 'loot_canister', amount: 1 }
 		]
 	},
 	loot_sterilized_bandage: {
@@ -3089,8 +3079,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'Gradually restores a large amount of health over time.',
 		recycling: [
-			{ itemId: 'loot_fabric', amount: 1, name: 'Fabric' },
-			{ itemId: 'loot_antiseptic', amount: 1, name: 'Antiseptic' }
+			{ itemId: 'loot_fabric', amount: 1 },
+			{ itemId: 'loot_antiseptic', amount: 1 }
 		]
 	},
 	loot_surge_shield_recharger: {
@@ -3104,7 +3094,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 1200,
 		maxStack: 3,
 		description: 'A handheld kit that recharges a shield on use.',
-		recycling: [{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' }]
+		recycling: [{ itemId: 'loot_electrical_components', amount: 1 }]
 	},
 	loot_tagging_grenade: {
 		id: 'loot_tagging_grenade',
@@ -3118,8 +3108,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 5,
 		description: 'Tags Raiders and ARC enemies in an area, allowing brief tracking.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 1, name: 'Plastic Parts' },
-			{ itemId: 'loot_sensors', amount: 1, name: 'Sensors' }
+			{ itemId: 'res_plastic_parts', amount: 1 },
+			{ itemId: 'loot_sensors', amount: 1 }
 		]
 	},
 	loot_fireworks_box: {
@@ -3133,7 +3123,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 2000,
 		maxStack: 1,
 		description: 'A remotely triggered arrangement of dazzling fireworks.',
-		recycling: [{ itemId: 'loot_explosive_compound', amount: 1, name: 'Explosive Compound' }]
+		recycling: [{ itemId: 'loot_explosive_compound', amount: 1 }]
 	},
 	loot_showstopper_grenade: {
 		id: 'loot_showstopper_grenade',
@@ -3159,8 +3149,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Allows the user to conceal themselves from ARC.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'loot_speaker_component', amount: 1, name: 'Speaker Component' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'loot_speaker_component', amount: 1 }
 		]
 	},
 	loot_deadline: {
@@ -3175,8 +3165,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 3,
 		description: 'A mine that deals damage once the timer runs out.',
 		recycling: [
-			{ itemId: 'loot_explosive_compound', amount: 1, name: 'Explosive Compound' },
-			{ itemId: 'res_arc_circuitry', amount: 1, name: 'ARC Circuitry' }
+			{ itemId: 'loot_explosive_compound', amount: 1 },
+			{ itemId: 'res_arc_circuitry', amount: 1 }
 		]
 	},
 	loot_acoustic_guitar: {
@@ -3191,8 +3181,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Used to attract ARC attention, and impress other Raiders.',
 		recycling: [
-			{ itemId: 'res_wires', amount: 6, name: 'Wires' },
-			{ itemId: 'res_metal_parts', amount: 4, name: 'Metal Parts' }
+			{ itemId: 'res_wires', amount: 6 },
+			{ itemId: 'res_metal_parts', amount: 4 }
 		]
 	},
 	loot_snap_hook: {
@@ -3207,8 +3197,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Allows the user to scale structures and cover large distances.',
 		recycling: [
-			{ itemId: 'loot_power_rod', amount: 1, name: 'Power Rod' },
-			{ itemId: 'loot_rope', amount: 3, name: 'Rope' }
+			{ itemId: 'loot_power_rod', amount: 1 },
+			{ itemId: 'loot_rope', amount: 3 }
 		]
 	},
 
@@ -3315,8 +3305,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Supports stronger shields, but with limited backpack capacity.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_plastic_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	aug_looting_mk1: {
@@ -3331,8 +3321,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'More backpack slots and weight capacity, but low defensive capability.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_plastic_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	aug_tactical_mk1: {
@@ -3347,8 +3337,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'More Quick Use slots for more tactical choice.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3, name: 'Plastic Parts' },
-			{ itemId: 'res_rubber_parts', amount: 3, name: 'Rubber Parts' }
+			{ itemId: 'res_plastic_parts', amount: 3 },
+			{ itemId: 'res_rubber_parts', amount: 3 }
 		]
 	},
 	aug_combat_mk2: {
@@ -3363,8 +3353,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Restores 1 health every 5 seconds. Paused for 30s after taking damage.',
 		recycling: [
-			{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' },
-			{ itemId: 'loot_magnet', amount: 1, name: 'Magnet' }
+			{ itemId: 'loot_electrical_components', amount: 1 },
+			{ itemId: 'loot_magnet', amount: 1 }
 		]
 	},
 	aug_looting_mk2: {
@@ -3379,8 +3369,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Adds trinket slots. Automatically throws off attached Ticks after 1s.',
 		recycling: [
-			{ itemId: 'loot_magnet', amount: 1, name: 'Magnet' },
-			{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' }
+			{ itemId: 'loot_magnet', amount: 1 },
+			{ itemId: 'loot_electrical_components', amount: 1 }
 		]
 	},
 	aug_tactical_mk2: {
@@ -3395,8 +3385,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'More backpack space and extra utility slot. Deploys smoke on shield break.',
 		recycling: [
-			{ itemId: 'loot_electrical_components', amount: 1, name: 'Electrical Components' },
-			{ itemId: 'loot_magnet', amount: 1, name: 'Magnet' }
+			{ itemId: 'loot_electrical_components', amount: 1 },
+			{ itemId: 'loot_magnet', amount: 1 }
 		]
 	},
 	aug_combat_mk3_aggressive: {
@@ -3411,9 +3401,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Supports more shield types. Restores 2 health every 5 seconds.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' },
-			{ itemId: 'loot_electrical_components', amount: 2, name: 'Electrical Components' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'res_processor', amount: 1 },
+			{ itemId: 'loot_electrical_components', amount: 2 }
 		]
 	},
 	aug_looting_mk3_cautious: {
@@ -3428,8 +3418,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Upon shield break, automatically administers a weak Adrenaline Shot.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 	aug_looting_mk3_survivor: {
@@ -3444,8 +3434,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'While downed, health regenerates up to 75% of max downed health.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 	aug_tactical_mk3_healing: {
@@ -3460,8 +3450,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'When revived, releases a healing cloud that restores 20 health.',
 		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1, name: 'Advanced Electrical Components' },
-			{ itemId: 'res_processor', amount: 1, name: 'Processor' }
+			{ itemId: 'loot_adv_electrical', amount: 1 },
+			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 
@@ -3480,8 +3470,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Blocks a small portion of incoming damage without impacting mobility.',
 		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 4, name: 'Plastic Parts' },
-			{ itemId: 'loot_arc_alloy', amount: 1, name: 'ARC Alloy' }
+			{ itemId: 'res_plastic_parts', amount: 4 },
+			{ itemId: 'loot_arc_alloy', amount: 1 }
 		]
 	},
 	shield_medium: {
@@ -3495,7 +3485,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		price: 2000,
 		maxStack: 1,
 		description: 'Blocks a medium portion of incoming damage at a moderate cost to mobility.',
-		recycling: [{ itemId: 'res_arc_circuitry', amount: 1, name: 'ARC Circuitry' }]
+		recycling: [{ itemId: 'res_arc_circuitry', amount: 1 }]
 	},
 	shield_heavy: {
 		id: 'shield_heavy',
@@ -3509,8 +3499,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		description: 'Blocks a large portion of incoming damage, but significant cost to mobility.',
 		recycling: [
-			{ itemId: 'res_arc_circuitry', amount: 2, name: 'ARC Circuitry' },
-			{ itemId: 'loot_voltage_converter', amount: 1, name: 'Voltage Converter' }
+			{ itemId: 'res_arc_circuitry', amount: 2 },
+			{ itemId: 'loot_voltage_converter', amount: 1 }
 		]
 	},
 

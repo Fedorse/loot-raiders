@@ -7,7 +7,7 @@
 	const { gameLoop, track } = getGameContext();
 </script>
 
-{#snippet scanerMatch(itemId: string, duration: number)}
+{#snippet scannerMatch(itemId: string, duration: number)}
 	<div class="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-[7px]">
 		<Scanner
 			wipe
@@ -35,23 +35,23 @@
 		>
 			{#each track.queue as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
-				{@const isWeapon = item.def.type === 'weapon' && !!item.def.attachmentSlots?.length}
+				{@const showAsWeaponLayout = item.def.type === 'weapon' && !!item.def.attachmentSlots?.length}
 
 				<div
 					class="flex w-full justify-center"
 					class:track-shrink={item.matched}
-					style:--shrink-h="{isWeapon ? 120 : 96}px"
+					style:--shrink-h="{showAsWeaponLayout ? 120 : 96}px"
 					style:--shrink-dur="1s"
 					style:animation-play-state={gameLoop.status === 'paused' ? 'paused' : 'running'}
 				>
-					{#if isWeapon}
+					{#if showAsWeaponLayout}
 						<!-- Weapon with attachment slots -->
 						<div
 							class="flex h-[120px] w-52 flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
 						>
 							<div class="relative flex flex-col overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render scanerMatch(item.id, 1)}
+									{@render scannerMatch(item.id, 1)}
 								{/if}
 								<div class="relative flex h-16 items-center justify-center">
 									{@render itemImage(item.def, style)}
@@ -95,7 +95,7 @@
 						>
 							<div class="relative flex h-full w-full overflow-hidden rounded-[7px] bg-surface">
 								{#if item.matched}
-									{@render scanerMatch(item.id, 1)}
+									{@render scannerMatch(item.id, 1)}
 								{/if}
 								{@render itemImage(item.def, style)}
 								{#if item.count > 1 && !item.matched}

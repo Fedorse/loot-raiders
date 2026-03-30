@@ -67,7 +67,7 @@
 				<div class="relative h-full w-full" class:shine-effect={showShine}>
 					<ItemSlot
 						{slotState}
-						{selectedItem}
+						selected={selectedItem}
 						className="h-full w-full"
 						onmatched={() => inventory.removeMatch(itemUid)}
 					/>
@@ -166,7 +166,7 @@
 			linear-gradient(#fff 0 0) content-box,
 			linear-gradient(#fff 0 0);
 
-		/* cut centert */
+		/* cut center */
 		-webkit-mask-composite: xor;
 		mask-composite: exclude;
 	}

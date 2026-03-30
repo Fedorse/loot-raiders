@@ -36,7 +36,7 @@
 	});
 </script>
 
-{#if tooltipData && def && tooltipData.item}
+{#if tooltipData && def}
 	<div
 		bind:this={tooltipRef}
 		class="pointer-events-none fixed z-[100] flex w-[340px] flex-col"
@@ -52,7 +52,7 @@
 		<div class="flex flex-col rounded-tr-[6px] rounded-b-[6px] bg-modal text-modal-foreground">
 			<div class="flex flex-col px-5 py-3">
 				<!-- badge  -->
-				<div class=" mb-2 flex gap-0.5 text-xs font-bold text-black uppercase">
+				<div class="mb-2 flex gap-0.5 text-xs font-bold text-black uppercase">
 					<div class="px-1 {style?.bg} flex items-center rounded-l-xs">
 						<img src={def.categoryIcon} alt="category" class="size-5 object-contain brightness-0" />
 					</div>
@@ -153,35 +153,31 @@
 	{@const style = attDef ? getRarityStyleTooltip(attDef.rarity) : null}
 	{#if attDef && style}
 		<div class="aspect-square size-10 rounded-lg">
-			<div class="h-full w-full">
-				<div
-					class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
-				>
-					<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-surface">
-						<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] blur-xl {style.glow}"></div>
-						<div class="relative min-h-0 flex-1 items-center justify-center">
-							<img
-								src={attDef.image}
-								alt={attDef.name}
-								class="relative z-10 h-full w-full scale-105 object-contain"
-							/>
-						</div>
+			<div
+				class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.border}"
+			>
+				<div class="relative flex h-full w-full flex-col overflow-hidden rounded-lg bg-surface">
+					<div class="absolute bottom-0 left-0 z-0 h-[80%] w-[80%] blur-xl {style.glow}"></div>
+					<div class="relative min-h-0 flex-1 items-center justify-center">
+						<img
+							src={attDef.image}
+							alt={attDef.name}
+							class="relative z-10 h-full w-full scale-105 object-contain"
+						/>
 					</div>
 				</div>
 			</div>
 		</div>
 	{:else}
 		<div class="aspect-square size-10 rounded-lg">
-			<div class="h-full w-full">
-				<div
-					class="flex h-full w-full items-center justify-center rounded-lg border border-black/10 bg-black/5"
-				>
-					<img
-						src={placeholder}
-						alt="mod slot"
-						class="h-[90%] w-[90%] object-contain opacity-40 brightness-0"
-					/>
-				</div>
+			<div
+				class="flex h-full w-full items-center justify-center rounded-lg border border-black/10 bg-black/5"
+			>
+				<img
+					src={placeholder}
+					alt="mod slot"
+					class="h-[90%] w-[90%] object-contain opacity-40 brightness-0"
+				/>
 			</div>
 		</div>
 	{/if}
@@ -192,7 +188,7 @@
 
 	<div class="size-10">
 		<div
-			class=" flex size-10 h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.bg}"
+			class="flex size-10 h-full w-full flex-col overflow-hidden rounded-lg bg-linear-to-tr p-[1px] {style.bg}"
 		>
 			<div class="relative flex h-full w-full flex-col overflow-hidden rounded-[7px] bg-black/80">
 				<img src={resDef.image} alt="Loot" class="relative z-10 h-full w-full object-contain" />

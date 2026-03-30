@@ -50,7 +50,7 @@
 				</p>
 
 				<div class="flex min-h-[110px] flex-wrap gap-2.5 rounded bg-modal-secondary p-3">
-					{#each def.recycling as res (res.itemId)}
+					{#each resources as res (res.itemId)}
 						<ItemCard
 							item={{
 								uid: res.itemId,
@@ -64,7 +64,7 @@
 					{/each}
 
 					{#each attachments as att (att.uid)}
-						<ItemCard item={att} selected={false} className="h-[90px] w-[90px] " readonly={true} />
+						<ItemCard item={att} selected={false} className="h-[90px] w-[90px]" readonly={true} />
 					{/each}
 
 					{#if resources.length === 0 && attachments.length === 0}

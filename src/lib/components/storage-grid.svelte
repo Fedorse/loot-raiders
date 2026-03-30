@@ -8,10 +8,10 @@
 		class?: string;
 	};
 	let { storageId, class: className = '' }: Props = $props();
-	const config = getStorageConfig(storageId);
+	const config = $derived(getStorageConfig(storageId));
 </script>
 
-{#each Array.from({ length: config.size }, (__, i) => i) as index (index)}
+{#each { length: config.size } as _, index (index)}
 	<Slot
 		location={{ type: 'slot', storageId: config.name, index }}
 		placeholder={config.placeholder}

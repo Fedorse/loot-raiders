@@ -1,4 +1,4 @@
-//---- Enums ----
+// ---- Enums ----
 export type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' | 'underbarrel';
@@ -37,7 +37,7 @@ export interface InstanceItem {
 	match?: boolean;
 }
 
-//---- Item definition----
+// ---- Item definition ----
 export interface AttachmentSlotDef {
 	type: AttachmentType;
 	placeholder: string;
@@ -46,7 +46,6 @@ export interface AttachmentSlotDef {
 export interface RecyclingResult {
 	itemId: string;
 	amount: number;
-	name: string;
 }
 
 export interface ItemDefinition {
@@ -67,8 +66,9 @@ export interface ItemDefinition {
 
 	recycling?: RecyclingResult[];
 
-	// Weapon-specific
 	description?: string;
+
+	// Weapon-specific
 	weaponClass?: string;
 	ammoType?: string;
 	magazineSize?: number;
@@ -79,7 +79,7 @@ export interface ItemDefinition {
 	statBonuses?: string[];
 }
 
-// ----Storage config----
+// ---- Storage config ----
 
 export interface StorageConfig {
 	name: StorageId;

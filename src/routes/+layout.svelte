@@ -60,7 +60,7 @@
 	<img src="/assets/bg.webp" alt="bg" class="absolute inset-0 h-full w-full object-cover blur-sm" />
 	<div class="absolute inset-0 h-full w-full bg-black/90 object-cover"></div>
 
-	<div class="z-10 h-full w-full">
+	<div class="relative z-10 h-full w-full">
 		{@render children()}
 	</div>
 </main>

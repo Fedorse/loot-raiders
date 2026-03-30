@@ -9,17 +9,18 @@
 	type Props = {
 		slotState: SlotState;
 		className?: string;
-		selectedItem: boolean;
+		selected: boolean;
 		onmatched?: () => void;
 	};
 
-	let { slotState, className = '', selectedItem, onmatched }: Props = $props();
+	let { slotState, className = '', selected, onmatched }: Props = $props();
 
+	// Guaranteed non-null — parent only renders ItemSlot when slotState.item exists
 	const item = $derived(slotState.item!);
 	const location = $derived(slotState.location);
 
 	const def = $derived(getDef(item.defId));
-	const isWeapon = $derived(
+	const showAsWeaponCard = $derived(
 		def.type === 'weapon' && location.type === 'slot' && location.storageId === 'weapon'
 	);
 </script>
@@ -29,9 +30,9 @@
 	{@attach droppable(slotState)}
 	{@attach draggable(slotState)}
 >
-	{#if isWeapon}
+	{#if showAsWeaponCard}
 		<WeaponCard {item} {location} className="h-full w-full" {onmatched} />
 	{:else}
-		<ItemCard {item} selected={selectedItem} {location} className="h-full w-full" {onmatched} />
+		<ItemCard {item} {selected} {location} className="h-full w-full" {onmatched} />
 	{/if}
 </div>

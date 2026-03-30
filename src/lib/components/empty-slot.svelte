@@ -4,7 +4,7 @@
 
 	type Props = {
 		slotState: SlotState;
-		className: string;
+		className?: string;
 		placeholder?: string;
 	};
 
