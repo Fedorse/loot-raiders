@@ -24,7 +24,7 @@
 	);
 	const scanningItem = $derived(isLootBack && loot.scanning(itemUid));
 	const loading = $derived(isLootBack && loot.hidden(itemUid));
-	const showShine = $derived(isLootBack && loot.phase !== 'idle');
+	const showShine = $derived(loot.shineQueue.has(itemUid));
 
 	const isDraggingThisItem = $derived(interaction.isSource(location));
 
@@ -45,13 +45,19 @@
 	{:else}
 		<div
 			class="relative z-20 h-full w-full p-[3.5px]"
-			onpointerdown={(e) => {
-				if (e.button === 0 && !item) selection.clear();
+			onpointerdowncapture={(e) => {
+				if (e.button === 0) {
+					if (!item) selection.clear();
+					overlay.closeContextMenu();
+				}
 			}}
 			oncontextmenu={(e) => {
 				e.preventDefault();
 				if (e.ctrlKey) return;
-				if (slotState.item) overlay.openContextMenu(e.clientX, e.clientY, slotState);
+				if (slotState.item) {
+					overlay.openContextMenu(e.clientX, e.clientY, slotState);
+					selection.select(slotState.item.uid);
+				}
 			}}
 			onpointerenter={(e) => {
 				if (item && interaction.status === 'idle') {
@@ -64,7 +70,11 @@
 			}}
 		>
 			{#if item && !isDraggingThisItem}
-				<div class="relative h-full w-full" class:shine-effect={showShine}>
+				<div
+					class="relative h-full w-full"
+					class:shine-effect={showShine}
+					onanimationend={() => loot.clearShine(itemUid)}
+				>
 					<ItemSlot
 						{slotState}
 						selected={selectedItem}

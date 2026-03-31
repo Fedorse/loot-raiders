@@ -3,6 +3,7 @@ import { MOCK_ITEMS } from '$lib/config/mock-data';
 import type { Inventory } from './inventory.svelte';
 import type { ItemRarity, ItemDefinition, ItemType, InstanceItem } from '$lib/types';
 import { randInt } from '$lib/utils';
+import { SvelteSet } from 'svelte/reactivity';
 
 type ItemPool = Record<ItemType, Record<ItemRarity, ItemDefinition[]>>;
 
@@ -153,8 +154,8 @@ export class LootGenerator {
 	private inventory: Inventory;
 	phase = $state<LoadingStatus>('idle');
 	private lootQueue = $state<string[]>([]);
-	// -1 = idle sentinel; set to 0 when scanning starts in next()
 	private scanIndex = $state(-1);
+	shineQueue = new SvelteSet<string>();
 
 	constructor(inventory: Inventory) {
 		this.inventory = inventory;
@@ -162,6 +163,7 @@ export class LootGenerator {
 
 	next(): void {
 		this.inventory.clearStorage('lootBack');
+		this.shineQueue.clear();
 
 		const items: InstanceItem[] = MOCK_ITEMS.map((mock) =>
 			this.inventory.createItem(mock.defId, mock.count)
@@ -174,10 +176,16 @@ export class LootGenerator {
 	}
 
 	slotScanned(): void {
+		const uid = this.lootQueue[this.scanIndex];
+		if (uid) this.shineQueue.add(uid);
 		this.scanIndex++;
 		if (this.scanIndex >= this.lootQueue.length) {
 			this.phase = 'done';
 		}
+	}
+
+	clearShine(uid: string): void {
+		this.shineQueue.delete(uid);
 	}
 
 	scanning(uid: string): boolean {
