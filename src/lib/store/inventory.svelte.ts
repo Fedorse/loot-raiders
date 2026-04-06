@@ -3,15 +3,18 @@ import { getDef } from '$lib/config/items';
 import { getAttachmentSlotIndex } from '../inventory-validation';
 import { isEqualLocation } from '$lib/utils';
 import type { Selection } from './selection.svelte';
+import type { AudioManager } from './audio.svelte';
 
 import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } from '$lib/types';
 
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
 	private selection: Selection;
+	private audio: AudioManager;
 
-	constructor(selection: Selection) {
+	constructor(selection: Selection, audio: AudioManager) {
 		this.selection = selection;
+		this.audio = audio;
 	}
 
 	// ---- Read accessors ----
@@ -182,8 +185,6 @@ export class Inventory {
 		}
 	}
 
-	// ---- Domain operations: context actions ----
-
 	quickMove(loc: ItemLocation): boolean {
 		if (loc.type !== 'slot') return false;
 		const config = getStorageConfig(loc.storageId);
@@ -196,6 +197,7 @@ export class Inventory {
 		if (!item) return false;
 		this.removeItem(loc);
 		this.setItem(emptySlot, item);
+		this.audio.play('swap');
 		return true;
 	}
 
@@ -253,6 +255,7 @@ export class Inventory {
 				this.setItem(slot, this.createItem(result.itemId, result.amount * item.count));
 			}
 		}
+		this.audio.play('recycle');
 		return true;
 	}
 

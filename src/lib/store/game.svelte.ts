@@ -7,16 +7,18 @@ import { LootGenerator } from './loot.svelte';
 import { Selection } from './selection.svelte';
 import { GameLoop } from './game-loop.svelte';
 import { Track } from './track.svelte';
+import { AudioManager } from './audio.svelte';
 
 export class Game {
-	selection = new Selection();
-	inventory = new Inventory(this.selection);
+	audio = new AudioManager();
+	selection = new Selection(this.audio);
+	inventory = new Inventory(this.selection, this.audio);
 	overlay = new Overlay();
 	debug = new DebugStore();
-	interaction = new Interaction(this.inventory, this.overlay, this.selection);
-	loot = new LootGenerator(this.inventory);
+	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
+	loot = new LootGenerator(this.inventory, this.audio);
 	track = new Track();
-	gameLoop = new GameLoop(this.inventory, this.track);
+	gameLoop = new GameLoop(this.inventory, this.track, this.audio);
 }
 
 const GAME_KEY = Symbol('GAME');

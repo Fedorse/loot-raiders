@@ -3,6 +3,7 @@ import { isEqualLocation } from '$lib/utils';
 import type { Inventory } from './inventory.svelte';
 import type { Overlay } from './overlay.svelte';
 import type { Selection } from './selection.svelte';
+import type { AudioManager } from './audio.svelte';
 import { validateDrop, getDropActionType } from '$lib/inventory-validation';
 
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
@@ -16,6 +17,7 @@ export class Interaction {
 	private inventory!: Inventory;
 	private overlay!: Overlay;
 	private selection!: Selection;
+	private audio!: AudioManager;
 
 	status = $state<InteractionStatus>('idle');
 	dragState = $state<DragState | null>(null);
@@ -47,12 +49,11 @@ export class Interaction {
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
-	// ---- Pointer lifecycle ----
-
-	constructor(inventory: Inventory, overlay: Overlay, selection: Selection) {
+	constructor(inventory: Inventory, overlay: Overlay, selection: Selection, audio: AudioManager) {
 		this.inventory = inventory;
 		this.overlay = overlay;
 		this.selection = selection;
+		this.audio = audio;
 	}
 
 	startInteraction(slot: SlotState, e: PointerEvent, node: HTMLElement) {
@@ -99,8 +100,6 @@ export class Interaction {
 		window.removeEventListener('pointerup', this.handlePointerUp);
 	}
 
-	// ---- Drag lifecycle ----
-
 	private checkDragThreshold(e: PointerEvent) {
 		const dx = e.clientX - this.startPos.x;
 		const dy = e.clientY - this.startPos.y;
@@ -116,6 +115,7 @@ export class Interaction {
 		if (!this.pressedSlot?.item) return;
 		this.overlay.closeAll();
 		this.status = 'dragging';
+		this.audio.play('drag');
 		const rect = this.sourceElement!.getBoundingClientRect();
 
 		this.pointer = { x: e.clientX, y: e.clientY };
@@ -153,23 +153,27 @@ export class Interaction {
 		switch (this.dropAction) {
 			case 'move':
 				this.inventory.move(this.dragState, this.hoveredSlot.location);
+				this.audio.play('drop');
 				break;
 			case 'stack':
 				this.inventory.stack(this.dragState, this.hoveredSlot.location);
+				this.audio.play('drop');
 				break;
 			case 'swap':
 				this.inventory.swap(this.dragState, this.hoveredSlot.location);
+				this.audio.play('drop');
 				break;
 			case 'attach':
 				this.inventory.attach(this.dragState, this.hoveredSlot.location);
+				this.audio.play('attach');
+
 				break;
 			case 'delete':
 				this.inventory.removeItem(this.dragState.sourceLocation);
+				this.audio.play('drop');
 				break;
 		}
 	}
-
-	// ---- Click behavior ----
 
 	private handleClick(e: PointerEvent) {
 		if (!this.pressedSlot?.item) return;
@@ -199,8 +203,6 @@ export class Interaction {
 			this.lastClickUid = itemUid;
 		}
 	}
-
-	// ---- Hover / drop target ----
 
 	setHoveredSlot(slot: SlotState) {
 		this.hoveredSlot = slot;
@@ -253,8 +255,6 @@ export class Interaction {
 
 		return true;
 	}
-
-	// ---- Component queries ----
 
 	isSource(loc: ItemLocation): boolean {
 		if (this.status !== 'dragging' || !this.dragState) return false;

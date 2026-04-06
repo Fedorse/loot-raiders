@@ -1,4 +1,5 @@
 import type { Inventory } from './inventory.svelte';
+import type { AudioManager } from './audio.svelte';
 import type { Track } from './track.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
@@ -10,6 +11,7 @@ const INITIAL_SPEED = 30;
 
 export class GameLoop {
 	private inventory: Inventory;
+	private audio: AudioManager;
 	private rafId = 0;
 	private lastTime = 0;
 
@@ -19,12 +21,11 @@ export class GameLoop {
 	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
 
-	constructor(inventory: Inventory, track: Track) {
+	constructor(inventory: Inventory, track: Track, audio: AudioManager) {
+		this.audio = audio;
 		this.inventory = inventory;
 		this.track = track;
 	}
-
-	// ---- Lifecycle ----
 
 	start() {
 		cancelAnimationFrame(this.rafId);
@@ -34,6 +35,8 @@ export class GameLoop {
 		this.speed = INITIAL_SPEED;
 		this.status = 'playing';
 
+		this.audio.playBGM();
+
 		this.lastTime = performance.now();
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
@@ -41,12 +44,14 @@ export class GameLoop {
 	stop() {
 		cancelAnimationFrame(this.rafId);
 		this.status = 'over';
+		this.audio.duckBGM();
 	}
 
 	pause() {
 		if (this.status !== 'playing') return;
 		cancelAnimationFrame(this.rafId);
 		this.status = 'paused';
+		this.audio.duckBGM();
 	}
 
 	resume() {
@@ -54,6 +59,7 @@ export class GameLoop {
 		this.status = 'playing';
 		this.lastTime = performance.now();
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
+		this.audio.unduckBGM();
 	}
 
 	// ---- Tick / loop ----
@@ -83,8 +89,6 @@ export class GameLoop {
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
-	// ---- Match rules ----
-
 	private checkMatches() {
 		for (const trackItem of this.track.visibleItems) {
 			const available = this.inventory.countAvailable(trackItem.defId);
@@ -94,6 +98,7 @@ export class GameLoop {
 			this.track.markMatched(trackItem.id);
 			this.score += POINTS_PER_MATCH;
 			this.timeLeft += TIME_BONUS;
+			this.audio.play('match');
 		}
 	}
 }

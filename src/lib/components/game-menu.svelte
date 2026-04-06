@@ -2,7 +2,7 @@
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
 
-	const { gameLoop } = getGameContext();
+	const { gameLoop, audio } = getGameContext();
 </script>
 
 {#if gameLoop.status !== 'playing'}
@@ -15,7 +15,9 @@
 				<h1 class="text-4xl font-black tracking-tight text-white uppercase">Loot Raiders</h1>
 				<button
 					class="rounded-lg bg-white/10 px-8 py-3 text-sm font-bold text-white uppercase transition-colors hover:bg-white/20"
-					onclick={() => gameLoop.start()}
+					onclick={() => {
+						gameLoop.start();
+					}}
 				>
 					Start
 				</button>
@@ -25,13 +27,17 @@
 				<div class="flex gap-3">
 					<button
 						class="rounded-lg bg-white/10 px-6 py-3 text-sm font-bold text-white uppercase transition-colors hover:bg-white/20"
-						onclick={() => gameLoop.resume()}
+						onclick={() => {
+							gameLoop.resume();
+						}}
 					>
 						Resume
 					</button>
 					<button
 						class="rounded-lg bg-white/10 px-6 py-3 text-sm font-bold text-white/60 uppercase transition-colors hover:bg-white/20 hover:text-white"
-						onclick={() => gameLoop.start()}
+						onclick={() => {
+							gameLoop.start();
+						}}
 					>
 						Restart
 					</button>

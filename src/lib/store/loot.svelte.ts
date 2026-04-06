@@ -1,9 +1,11 @@
 import { ITEM_DB } from '$lib/config/items';
 import { MOCK_ITEMS } from '$lib/config/mock-data';
 import type { Inventory } from './inventory.svelte';
-import type { ItemRarity, ItemDefinition, ItemType, InstanceItem } from '$lib/types';
+import type { ItemRarity, ItemDefinition, ItemType, InstanceItem, ItemLocation } from '$lib/types';
 import { randInt } from '$lib/utils';
 import { SvelteSet } from 'svelte/reactivity';
+import type { AudioManager } from './audio.svelte';
+import { getDef } from '$lib/config/items';
 
 type ItemPool = Record<ItemType, Record<ItemRarity, ItemDefinition[]>>;
 
@@ -152,13 +154,15 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 
 export class LootGenerator {
 	private inventory: Inventory;
+	private audio: AudioManager;
 	phase = $state<LoadingStatus>('idle');
 	private lootQueue = $state<string[]>([]);
 	private scanIndex = $state(-1);
 	shineQueue = new SvelteSet<string>();
 
-	constructor(inventory: Inventory) {
+	constructor(inventory: Inventory, audio: AudioManager) {
 		this.inventory = inventory;
+		this.audio = audio;
 	}
 
 	next(): void {
@@ -178,6 +182,14 @@ export class LootGenerator {
 	slotScanned(): void {
 		const uid = this.lootQueue[this.scanIndex];
 		if (uid) this.shineQueue.add(uid);
+		const loc: ItemLocation = { type: 'slot', storageId: 'lootBack', index: this.scanIndex };
+		const item = this.inventory.getItem(loc);
+		if (item) {
+			const def = getDef(item.defId);
+			if (def.rarity === 'legendary' || def.rarity === 'epic') {
+				this.audio.play('rare_loot');
+			}
+		}
 		this.scanIndex++;
 		if (this.scanIndex >= this.lootQueue.length) {
 			this.phase = 'done';

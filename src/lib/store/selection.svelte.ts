@@ -1,7 +1,13 @@
 import { SvelteSet } from 'svelte/reactivity';
+import type { AudioManager } from './audio.svelte';
 
 export class Selection {
+	private audio: AudioManager;
 	ids = new SvelteSet<string>();
+
+	constructor(audio: AudioManager) {
+		this.audio = audio;
+	}
 
 	isSelected(uid: string): boolean {
 		return this.ids.has(uid);
@@ -10,6 +16,7 @@ export class Selection {
 	select(uid: string): void {
 		this.ids.clear();
 		this.ids.add(uid);
+		this.audio.play('selected');
 	}
 
 	toggle(uid: string): void {
