@@ -18,7 +18,14 @@ export class Game {
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	loot = new LootGenerator(this.inventory, this.audio);
 	track = new Track();
-	gameLoop = new GameLoop(this.inventory, this.track, this.audio);
+	gameLoop = new GameLoop(
+		this.inventory,
+		this.track,
+		this.audio,
+		this.selection,
+		this.overlay,
+		this.loot
+	);
 }
 
 const GAME_KEY = Symbol('GAME');

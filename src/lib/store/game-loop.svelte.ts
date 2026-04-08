@@ -1,6 +1,9 @@
 import type { Inventory } from './inventory.svelte';
 import type { AudioManager } from './audio.svelte';
 import type { Track } from './track.svelte';
+import type { LootGenerator } from './loot.svelte';
+import type { Selection } from './selection.svelte';
+import type { Overlay } from './overlay.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
@@ -12,6 +15,9 @@ const INITIAL_SPEED = 30;
 export class GameLoop {
 	private inventory: Inventory;
 	private audio: AudioManager;
+	private selection: Selection;
+	private overlay: Overlay;
+	private loot: LootGenerator;
 	private rafId = 0;
 	private lastTime = 0;
 
@@ -21,10 +27,20 @@ export class GameLoop {
 	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
 
-	constructor(inventory: Inventory, track: Track, audio: AudioManager) {
+	constructor(
+		inventory: Inventory,
+		track: Track,
+		audio: AudioManager,
+		selection: Selection,
+		overlay: Overlay,
+		loot: LootGenerator
+	) {
 		this.audio = audio;
 		this.inventory = inventory;
 		this.track = track;
+		this.selection = selection;
+		this.overlay = overlay;
+		this.loot = loot;
 	}
 
 	start() {
@@ -62,8 +78,6 @@ export class GameLoop {
 		this.audio.unduckBGM();
 	}
 
-	// ---- Tick / loop ----
-
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
@@ -100,5 +114,19 @@ export class GameLoop {
 			this.timeLeft += TIME_BONUS;
 			this.audio.play('match');
 		}
+	}
+	restart() {
+		cancelAnimationFrame(this.rafId);
+
+		this.selection.clear();
+		this.overlay.closeAll();
+		this.loot.reset();
+		this.inventory.clearStorage('backpack');
+		this.inventory.clearStorage('lootBack');
+		this.inventory.clearStorage('weapon');
+		this.inventory.clearStorage('augment');
+		this.inventory.clearStorage('shield');
+
+		this.start();
 	}
 }

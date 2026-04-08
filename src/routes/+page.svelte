@@ -25,6 +25,7 @@
 						<span class="text-[11px] font-semibold text-muted uppercase">Reroll Loot</span>
 					</div>
 				</div>
+
 				<div
 					class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs"
 				>
@@ -57,7 +58,9 @@
 			</div>
 		</div>
 
-		<Shortcuts />
+		{#if gameLoop.status === 'playing'}
+			<Shortcuts />
+		{/if}
 	</div>
 
 	<TrackItem />

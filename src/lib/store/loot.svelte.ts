@@ -209,6 +209,12 @@ export class LootGenerator {
 		const idx = this.lootQueue.indexOf(uid);
 		return idx >= 0 && idx > this.scanIndex;
 	}
+	reset() {
+		this.phase = 'idle';
+		this.scanIndex = -1;
+		this.lootQueue = [];
+		this.shineQueue.clear();
+	}
 }
 
 // next(): void {
