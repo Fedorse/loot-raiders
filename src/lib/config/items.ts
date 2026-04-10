@@ -96,7 +96,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 2,
+				amount: 2
 			},
 			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
@@ -124,7 +124,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
@@ -181,7 +181,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
@@ -263,7 +263,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 2,
+				amount: 2
 			},
 			{ itemId: 'res_light_gun_parts', amount: 2 }
 		],
@@ -322,7 +322,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 2,
+				amount: 2
 			},
 			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
@@ -402,7 +402,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
@@ -462,7 +462,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
@@ -494,7 +494,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'res_medium_gun_parts', amount: 2 }
 		],
@@ -503,26 +503,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
 			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.png' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.png' }
-		]
-	},
-	wpn_jupiter: {
-		id: 'wpn_jupiter',
-		name: 'Jupiter',
-		type: 'weapon',
-		rarity: 'legendary',
-		weight: 9,
-		price: 27500,
-		image: '/assets/ui/placeholder/placeholder_weapon.png',
-		categoryIcon: '/assets/ui/ammo_type_assets/energy_clip.png',
-		description: 'Exceptional damage output and accuracy, but slow handling. Cannot be upgraded.',
-		weaponClass: 'Sniper Rifle',
-		ammoType: 'Energy Clip',
-		magazineSize: 5,
-		firingMode: 'Bolt-Action',
-		armorPenetration: 'Very Strong',
-		recycling: [
-			{ itemId: 'res_magnetic_accelerator', amount: 2 },
-			{ itemId: 'res_complex_gun_parts', amount: 1 }
 		]
 	},
 
@@ -547,33 +527,13 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 2,
+				amount: 2
 			},
 			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.png' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.png' }
-		]
-	},
-	wpn_equalizer: {
-		id: 'wpn_equalizer',
-		name: 'Equalizer',
-		type: 'weapon',
-		rarity: 'legendary',
-		weight: 14,
-		price: 27500,
-		image: '/assets/ui/placeholder/placeholder_weapon.png',
-		categoryIcon: '/assets/ui/ammo_type_assets/energy_clip.png',
-		description: 'A high capacity experimental beam rifle. Cannot be upgraded.',
-		weaponClass: 'Special',
-		ammoType: 'Energy Clip',
-		magazineSize: 50,
-		firingMode: 'Fully-Automatic',
-		armorPenetration: 'Very Strong',
-		recycling: [
-			{ itemId: 'res_magnetic_accelerator', amount: 2 },
-			{ itemId: 'res_complex_gun_parts', amount: 1 }
 		]
 	},
 
@@ -589,7 +549,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 50,
 		weight: 0.5,
-		maxStack: 50,
+		maxStack: 20,
 		description: 'Used to craft a wide range of items.'
 	},
 	res_rubber_parts: {
@@ -601,7 +561,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 50,
 		weight: 0.5,
-		maxStack: 50,
+		maxStack: 20,
 		description: 'Used to craft a wide range of items.'
 	},
 	res_mechanical_components: {
@@ -613,8 +573,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 150,
 		weight: 0.5,
-		maxStack: 30,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
+		maxStack: 10,
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		recycling: [{ itemId: 'res_metal_parts', amount: 3 }]
 	},
 	res_simple_gun_parts: {
 		id: 'res_simple_gun_parts',
@@ -625,8 +586,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 200,
 		weight: 0.5,
-		maxStack: 30,
-		description: 'Used to craft weapons.'
+		maxStack: 10,
+		description: 'Used to craft weapons.',
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	res_adv_mechanical_components: {
 		id: 'res_adv_mechanical_components',
@@ -637,8 +599,12 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 400,
 		weight: 0.5,
-		maxStack: 20,
-		description: 'Used to craft advanced weapons. Can be recycled into crafting materials.'
+		maxStack: 5,
+		description: 'Used to craft advanced weapons. Can be recycled into crafting materials.',
+		recycling: [
+			{ itemId: 'res_steel_spring', amount: 1 },
+			{ itemId: 'res_mechanical_components', amount: 1 }
+		]
 	},
 	res_light_gun_parts: {
 		id: 'res_light_gun_parts',
@@ -649,8 +615,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 200,
 		weight: 0.5,
-		maxStack: 30,
-		description: 'Assorted spare parts used for pistols and SMGs.'
+		maxStack: 5,
+		description: 'Assorted spare parts used for pistols and SMGs.',
+		recycling: [{ itemId: 'res_simple_gun_parts', amount: 2 }]
 	},
 	res_medium_gun_parts: {
 		id: 'res_medium_gun_parts',
@@ -661,8 +628,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 200,
 		weight: 0.5,
-		maxStack: 30,
-		description: 'Assorted spare parts used for rifles.'
+		maxStack: 5,
+		description: 'Assorted spare parts used for rifles.',
+		recycling: [{ itemId: 'res_simple_gun_parts', amount: 2 }]
 	},
 	res_heavy_gun_parts: {
 		id: 'res_heavy_gun_parts',
@@ -673,8 +641,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 350,
 		weight: 0.5,
-		maxStack: 20,
-		description: 'Used to craft weapons.'
+		maxStack: 5,
+		description: 'Used to craft weapons.',
+		recycling: [{ itemId: 'res_simple_gun_parts', amount: 2 }]
 	},
 	res_complex_gun_parts: {
 		id: 'res_complex_gun_parts',
@@ -685,8 +654,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 600,
 		weight: 0.5,
-		maxStack: 15,
-		description: 'Used to craft advanced weapons.'
+		maxStack: 3,
+		description: 'Used to craft advanced weapons.',
+		recycling: [{ itemId: 'res_simple_gun_parts', amount: 2 }]
 	},
 	res_magnetic_accelerator: {
 		id: 'res_magnetic_accelerator',
@@ -697,8 +667,12 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 800,
 		weight: 1,
-		maxStack: 10,
-		description: 'Used to craft advanced weapons.'
+		maxStack: 3,
+		description: 'Used to craft advanced weapons.',
+		recycling: [
+			{ itemId: 'res_adv_mechanical_components', amount: 2 },
+			{ itemId: 'loot_arc_motion_core', amount: 1 }
+		]
 	},
 	res_plastic_parts: {
 		id: 'res_plastic_parts',
@@ -709,20 +683,21 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 50,
 		weight: 0.5,
-		maxStack: 50,
+		maxStack: 20,
 		description: 'Used to craft a wide range of items.'
 	},
 	res_wires: {
 		id: 'res_wires',
 		name: 'Wires',
 		type: 'loot',
-		rarity: 'common',
+		rarity: 'uncommon',
 		image: '/assets/items/CraftingMaterials/Wires.png',
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 50,
 		weight: 0.5,
-		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
+		maxStack: 15,
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		recycling: [{ itemId: 'res_rubber_parts', amount: 2 }]
 	},
 	res_mod_components: {
 		id: 'res_mod_components',
@@ -733,44 +708,51 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 500,
 		weight: 0.5,
-		maxStack: 20,
-		description: 'Used to craft weapon mods. Can be recycled into crafting materials.'
+		maxStack: 5,
+		description: 'Used to craft weapon mods. Can be recycled into crafting materials.',
+		recycling: [
+			{ itemId: 'res_mechanical_components', amount: 1 },
+			{ itemId: 'res_steel_spring', amount: 1 }
+		]
 	},
 	res_duct_tape: {
 		id: 'res_duct_tape',
 		name: 'Duct Tape',
 		type: 'loot',
-		rarity: 'common',
+		rarity: 'uncommon',
 		image: '/assets/items/CraftingMaterials/DuctTape.png',
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 75,
 		weight: 0.5,
-		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
+		maxStack: 15,
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		recycling: [{ itemId: 'loot_fabric', amount: 4 }]
 	},
 	res_steel_spring: {
 		id: 'res_steel_spring',
 		name: 'Steel Spring',
 		type: 'loot',
-		rarity: 'common',
+		rarity: 'uncommon',
 		image: '/assets/items/CraftingMaterials/SteelSpring.png',
 		categoryIcon: '/assets/ui/category_assets/basic_material.png',
 		price: 75,
 		weight: 0.5,
-		maxStack: 50,
-		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.'
+		maxStack: 15,
+		description: 'Used to craft a wide range of items. Can be recycled into crafting materials.',
+		recycling: [{ itemId: 'res_metal_parts', amount: 2 }]
 	},
 	res_processor: {
 		id: 'res_processor',
 		name: 'Processor',
 		type: 'loot',
-		rarity: 'uncommon',
+		rarity: 'rare',
 		image: '/assets/items/CraftingMaterials/Processor.png',
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 200,
 		weight: 0.5,
-		maxStack: 30,
-		description: 'Used in crafting.'
+		maxStack: 3,
+		description: 'Used in crafting.',
+		recycling: [{ itemId: 'res_plastic_parts', amount: 2 }]
 	},
 
 	// ──────────────────────────────────────
@@ -780,14 +762,14 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'res_arc_circuitry',
 		name: 'ARC Circuitry',
 		type: 'loot',
-		rarity: 'common',
+		rarity: 'rare',
 		image: '/assets/items/CraftingMaterials/ArcCircuitry.png',
 		categoryIcon: '/assets/ui/category_assets/recyclable.png',
 		price: 300,
 		weight: 1,
-		maxStack: 12,
+		maxStack: 5,
 		description: 'Obtained from ARC enemies or activities. Used to craft components.',
-		recycling: [{ itemId: 'res_metal_parts', amount: 10 }]
+		recycling: [{ itemId: 'loot_arc_alloy', amount: 5 }]
 	},
 	res_toaster: {
 		id: 'res_toaster',
@@ -811,8 +793,12 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/refined_material.png',
 		price: 500,
 		weight: 0.5,
-		maxStack: 15,
-		description: 'Can be recycled into crafting materials or used to upgrade the Gear Bench.'
+		maxStack: 3,
+		description: 'Can be recycled into crafting materials or used to upgrade the Gear Bench.',
+		recycling: [
+			{ itemId: 'res_adv_mechanical_components', amount: 2 },
+			{ itemId: 'loot_arc_alloy', amount: 3 }
+		]
 	},
 	loot_cat_bed: {
 		id: 'loot_cat_bed',
@@ -823,7 +809,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/misc.png',
 		price: 150,
 		weight: 1,
-		maxStack: 5,
+		maxStack: 3,
 		description: 'At least a tiny bit more comfortable than your face.'
 	},
 
@@ -1432,27 +1418,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{ itemId: 'res_mod_components', amount: 1 },
 			{ itemId: 'res_duct_tape', amount: 2 }
-		]
-	},
-
-	// ──────────────────────────────────────
-	// ATTACHMENTS — TECH MOD
-	// ──────────────────────────────────────
-	att_anvil_splitter: {
-		id: 'att_anvil_splitter',
-		name: 'Anvil Splitter',
-		type: 'attachment',
-		attachmentKind: 'grip',
-		rarity: 'legendary',
-		image: '/assets/ui/placeholder/placeholder_weapon.png',
-		categoryIcon: '/assets/ui/mod_slot_assets/tech_mod.png',
-		weight: 0.5,
-		price: 7000,
-		description: 'Adds projectiles but reduces per-projectile damage.',
-		statBonuses: ['+3 Projectiles Per Shot', '70% Reduced Projectile Damage'],
-		recycling: [
-			{ itemId: 'res_mod_components', amount: 1 },
-			{ itemId: 'res_processor', amount: 1 }
 		]
 	},
 
@@ -2398,7 +2363,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{
 				itemId: 'res_adv_mechanical_components',
-				amount: 1,
+				amount: 1
 			},
 			{ itemId: 'loot_arc_alloy', amount: 3 }
 		]
@@ -2935,32 +2900,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'loot_chemicals', amount: 1 },
 			{ itemId: 'loot_magnet', amount: 1 }
 		]
-	},
-	loot_noise_maker: {
-		id: 'loot_noise_maker',
-		name: 'Noise Maker',
-		type: 'loot',
-		rarity: 'uncommon',
-		image: '/assets/items/QuickUse/NoiseMaker.png',
-		categoryIcon: '/assets/ui/category_assets/quick_use.png',
-		weight: 0.2,
-		price: 500,
-		maxStack: 5,
-		description:
-			'A deployable proximity sensor that sounds an alarm when enemy raiders are detected.'
-	},
-	loot_raider_flare: {
-		id: 'loot_raider_flare',
-		name: 'Raider Flare',
-		type: 'loot',
-		rarity: 'uncommon',
-		image: '/assets/items/QuickUse/RaiderFlare.png',
-		categoryIcon: '/assets/ui/category_assets/quick_use.png',
-		weight: 0.2,
-		price: 500,
-		maxStack: 5,
-		description:
-			'A deployable device that, when manually triggered, launches a Raider Distress Flare.'
 	},
 	loot_blaze_grenade: {
 		id: 'loot_blaze_grenade',
