@@ -6,8 +6,8 @@ import { DebugStore } from './debug.svelte';
 import { LootGenerator } from './loot.svelte';
 import { Selection } from './selection.svelte';
 import { GameLoop } from './game-loop.svelte';
-import { Track } from './track.svelte';
 import { AudioManager } from './audio.svelte';
+import { Quest } from './quest.svelte';
 
 export class Game {
 	audio = new AudioManager();
@@ -17,14 +17,14 @@ export class Game {
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	loot = new LootGenerator(this.inventory, this.audio);
-	track = new Track();
+	quest = new Quest(this.inventory, this.audio);
 	gameLoop = new GameLoop(
 		this.inventory,
-		this.track,
 		this.audio,
 		this.selection,
 		this.overlay,
-		this.loot
+		this.loot,
+		this.quest
 	);
 }
 

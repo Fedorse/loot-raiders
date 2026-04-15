@@ -3,7 +3,7 @@ import { SOUNDS, type SoundKey } from '$lib/config/sounds';
 
 export class AudioManager {
 	volume = $state(2);
-	muted = $state(false);
+	muted = $state(true);
 	private howls = new Map<SoundKey, Howl>();
 	private bgm: Howl | null = null;
 

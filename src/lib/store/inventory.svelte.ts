@@ -7,10 +7,47 @@ import type { AudioManager } from './audio.svelte';
 
 import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } from '$lib/types';
 
+const EQUIP_STORAGES: StorageId[] = ['backpack', 'weapon', 'augment', 'shield'];
+const MAX_WEIGHT = 60;
+
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
 	private selection: Selection;
 	private audio: AudioManager;
+
+	maxWeight = MAX_WEIGHT;
+
+	totalExtract = $derived.by(() => {
+		let sum = 0;
+		for (const slot of this.items) {
+			if (slot.location.type !== 'slot') continue;
+			if (!EQUIP_STORAGES.includes(slot.location.storageId)) continue;
+			const def = getDef(slot.item.defId);
+			sum += def.price * slot.item.count;
+			if (slot.item.attachments) {
+				for (const att of slot.item.attachments) {
+					if (att) sum += getDef(att.defId).price;
+				}
+			}
+		}
+		return sum;
+	});
+
+	totalWeight = $derived.by(() => {
+		let sum = 0;
+		for (const slot of this.items) {
+			if (slot.location.type !== 'slot') continue;
+			if (!EQUIP_STORAGES.includes(slot.location.storageId)) continue;
+			const def = getDef(slot.item.defId);
+			sum += def.weight * slot.item.count;
+			if (slot.item.attachments) {
+				for (const att of slot.item.attachments) {
+					if (att) sum += getDef(att.defId).weight;
+				}
+			}
+		}
+		return sum;
+	});
 
 	constructor(selection: Selection, audio: AudioManager) {
 		this.selection = selection;
@@ -259,7 +296,7 @@ export class Inventory {
 		return true;
 	}
 
-	// ---- Domain operations: match (called by GameLoop / track-item) ----
+	// ---- Domain operations: match (called by Quest / quest-bar) ----
 
 	// Sets match=true even on partial consumption — this is intentional:
 	// the flag triggers the UI scan animation while count may still be > 0

@@ -18,7 +18,7 @@ SvelteKit 2 with Svelte 5, TypeScript (strict), TailwindCSS 4, Vite 7. Deployed 
 
 ## Architecture
 
-Loot Raiders is a timed inventory game: players manage drag-and-drop inventory (weapons with attachments, loot, augments, shields) while a scrolling track of items must be matched from inventory for points. Includes loot generation with scanning animations, item recycling, and rarity tiers.
+Loot Raiders is a timed inventory game: players manage drag-and-drop inventory (weapons with attachments, loot, augments, shields) while completing quests that require collecting specific items. Includes auto-timed loot generation with scanning animations, item recycling, rarity tiers, extract value and weight tracking.
 
 ### Layered structure under `src/lib/`
 
@@ -31,17 +31,18 @@ Loot Raiders is a timed inventory game: players manage drag-and-drop inventory (
   - `stages.ts` — Game stage configurations.
 - **`store/`** — Svelte 5 runes-based state management (9 files):
   - `game.svelte.ts` — `Game` class: root coordinator. Instantiates all subsystems. Distributed via Svelte context (`initGame`/`getGameContext` with Symbol key).
-  - `inventory.svelte.ts` — `Inventory` class: `$state<OccupiedSlot[]>` items, `$derived` per-storage filters. CRUD: move, stack, swap, attach, quickMove, splitStack, recycleItem. Match system: countAvailable, consumeMatched, removeMatch.
+  - `inventory.svelte.ts` — `Inventory` class: `$state<OccupiedSlot[]>` items, `$derived` per-storage filters. CRUD: move, stack, swap, attach, quickMove, splitStack, recycleItem. Match system: countAvailable, consumeMatched, removeMatch. Derived: `totalExtract` (sum of item prices), `totalWeight` (sum of item weights), `maxWeight`.
   - `interaction.svelte.ts` — `Interaction` class: drag-drop state (pointer, offset, dragState, hoveredSlot, status), drop validation via pure functions, pointer event lifecycle, split detection (Alt/Meta), double-click quick-move.
   - `inventory-validation.ts` — Pure validation: `isAllowedInLocation`, `canStackItems`, `canAttachToWeapon`, `getDropActionType`, `validateDrop`. Drop actions: move/stack/attach/swap/delete/invalid.
   - `selection.svelte.ts` — `Selection` class: `SvelteSet<string>` for multi-select tracking. Methods: select, toggle, deselect, clear.
   - `overlay.svelte.ts` — `Overlay` class: context menu, tooltip, recycle modal state and positioning. Exclusivity rules (tooltip hidden when menu/modal open).
-  - `loot.svelte.ts` — `LootGenerator` class: generates loot with profiles (type/rarity weights, attachment chance), drives scanning animation (phase: idle/loading/done).
-  - `game-loop.svelte.ts` — `GameLoop` class: RAF-based game loop. Timer (300s), score (+10 per match, +3s bonus), status (idle/playing/paused/over). Checks track matches against inventory.
-  - `track.svelte.ts` — `Track` class: scrolling queue of TrackItem objects. Visibility culling via `$derived.by`, match marking, auto-extend.
+  - `loot.svelte.ts` — `LootGenerator` class: generates loot with profiles (type/rarity weights, attachment chance), drives scanning animation (phase: idle/loading/done). Auto-timer: `cooldown` (10s) with `tick(dt)` for auto-opening, Space for manual open.
+  - `game-loop.svelte.ts` — `GameLoop` class: RAF-based game loop. Timer (300s), score, status (idle/playing/paused/over). Ticks loot cooldown and quest matching.
+  - `quest.svelte.ts` — `Quest` class: quest items with `checkMatches()` against inventory. Awards +10 score and +3s per completed quest. Tracks `completed`/`total`/`allCompleted`.
   - `debug.svelte.ts` — `DebugStore`: toggle debug panel visibility.
 - **`actions/`** — `actions.ts`: Svelte action directives — `droppable` (drop target), `draggable` (drag source), `clickOutside` (dismiss handler).
 - **`components/`** — 18 Svelte components (see Component Tree below).
+  - `quest-bar.svelte` — Quest panel: 5 quest items with progress badges, progress bars, completion overlay (green checkmark + "DONE").
 
 ### Key data model
 
@@ -68,7 +69,7 @@ Custom pointer-event-based implementation (no external DnD library at runtime). 
 │   │       ├── EmptySlot
 │   │       └── Scanner (loading animation)
 │   ├── DropZone (trash)
-│   ├── TrackItem (animated match queue)
+│   ├── QuestBar (quest items with progress)
 │   └── Shortcuts
 ├── DragLayer (ghost following pointer)
 ├── ContextMenu (quick move, split, remove, recycle)
@@ -80,11 +81,11 @@ Custom pointer-event-based implementation (no external DnD library at runtime). 
 
 ### State flow
 
-Components access state via `getGameContext()` → `Game` → subsystems. Drag-drop: Svelte actions → `Interaction` → validation → `Inventory` mutations. Game loop: `GameLoop.tick()` → `Track.movement()` → match check → `Inventory.consumeMatched()`. Loot: `LootGenerator.next()` → fill lootBack → scanning animation.
+Components access state via `getGameContext()` → `Game` → subsystems. Drag-drop: Svelte actions → `Interaction` → validation → `Inventory` mutations. Game loop: `GameLoop.tick()` → `LootGenerator.tick()` (auto-open cooldown) → `Quest.checkMatches()` → `Inventory.consumeMatched()`. Loot: `LootGenerator.next()` → fill lootBack → scanning animation (auto every 10s or manual via Space).
 
 ### Routes
 
-Single-page app: `+layout.svelte` initializes game context and renders global overlays, `+page.svelte` renders the inventory UI (storage grids, track, drop zone).
+Single-page app: `+layout.svelte` initializes game context and renders global overlays, `+page.svelte` renders the inventory UI (storage grids, quest bar, drop zone).
 
 ## Code Style
 

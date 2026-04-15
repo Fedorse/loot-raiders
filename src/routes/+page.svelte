@@ -2,11 +2,11 @@
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
-	import TrackItem from '$lib/components/track-item.svelte';
+	import QuestBar from '$lib/components/quest-bar.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import { formatTime } from '$lib/utils';
 
-	const { gameLoop } = getGameContext();
+	const { gameLoop, inventory, loot } = getGameContext();
 </script>
 
 <div class="flex h-full items-center justify-center gap-6">
@@ -16,13 +16,28 @@
 				<div
 					class="flex h-9 items-center gap-4 rounded-t-xl bg-background/50 px-5 backdrop-blur-md"
 				>
-					<div class="flex items-center gap-2">
+					<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase"
+						>Loot Drop</span
+					>
+
+					<div class="h-3 w-[1px] bg-white/20"></div>
+
+					<div class="flex items-center gap-1.5">
+						<span class="text-[11px] text-muted uppercase">Next</span>
+						<span class="font-mono text-xs font-black text-cyan-400 tabular-nums">
+							{Math.ceil(loot.cooldown)}s
+						</span>
+					</div>
+
+					<div class="h-3 w-[1px] bg-white/20"></div>
+
+					<div class="flex items-center gap-1.5">
 						<kbd
 							class="inline-flex min-w-11 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-1 text-[11px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
 						>
 							Space
 						</kbd>
-						<span class="text-[11px] font-semibold text-muted uppercase">Reroll Loot</span>
+						<span class="text-[11px] font-semibold text-muted uppercase">Open Now</span>
 					</div>
 				</div>
 
@@ -63,11 +78,14 @@
 		{/if}
 	</div>
 
-	<TrackItem />
+	<div class="self-start pt-4">
+		<QuestBar />
+	</div>
 </div>
 
 {#snippet scoreTimeTab()}
 	{#if gameLoop.status !== 'idle'}
+		{@const weightPct = Math.min(100, (inventory.totalWeight / inventory.maxWeight) * 100)}
 		<div class="flex h-9 items-center gap-4 rounded-t-xl bg-background/50 px-5 backdrop-blur-md">
 			<span
 				class="font-mono text-xs font-bold tracking-widest {gameLoop.timeLeft < 10
@@ -81,9 +99,30 @@
 
 			<div class="flex items-center gap-2">
 				<img src="/assets/ui/Coins.png" alt="coins" class="size-3.5 object-contain" />
-				<span class="text-[11px] font-black tracking-tighter text-white/90 uppercase">
-					SCORE: {gameLoop.score}
+				<span class="text-[11px] text-muted uppercase">Extract</span>
+				<span class="text-[11px] font-black text-yellow-400 tabular-nums">
+					{inventory.totalExtract.toLocaleString()}
 				</span>
+			</div>
+
+			<div class="h-3 w-[1px] bg-white/20"></div>
+
+			<div class="flex items-center gap-2">
+				<span class="text-[11px] text-muted uppercase">Weight</span>
+				<span class="flex items-baseline gap-px font-mono tabular-nums">
+					<span class="text-xs font-black text-white">{Math.round(inventory.totalWeight)}</span>
+					<span class="text-[10px] font-bold text-white/40">/ {inventory.maxWeight}</span>
+				</span>
+				<div class="h-2 w-16 overflow-hidden rounded-full bg-white/10">
+					<div
+						class="h-full rounded-full transition-all {weightPct > 90
+							? 'bg-red-400'
+							: weightPct > 70
+								? 'bg-yellow-400'
+								: 'bg-cyan-400'}"
+						style="width: {weightPct}%"
+					></div>
+				</div>
 			</div>
 		</div>
 	{/if}

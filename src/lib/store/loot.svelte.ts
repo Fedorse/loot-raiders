@@ -41,25 +41,6 @@ export const STANDARD_CACHE_PROFILE: LootProfile = {
 	getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
 };
 
-export const TRACK_PROFILE: LootProfile = {
-	typeWeights: { loot: 70, attachment: 5, weapon: 15, shield: 8, augment: 5 },
-	typeCaps: { weapon: 15, shield: 8, augment: 5 },
-	rarityWeights: { common: 40, uncommon: 30, rare: 20, epic: 8, legendary: 2 },
-	attachmentChance: 0.2,
-	getStackRange: (def) => {
-		if (def.categoryIcon.includes('material.png')) {
-			const boost: Record<ItemRarity, [number, number]> = {
-				common: [3, 20],
-				uncommon: [2, 6],
-				rare: [1, 4],
-				epic: [1, 2],
-				legendary: [1, 1]
-			};
-			return boost[def.rarity];
-		}
-		return DEFAULT_STACK_RANGES[def.rarity];
-	}
-};
 
 // ---- Generation functions ----
 
@@ -152,6 +133,8 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 	return result;
 }
 
+const LOOT_COOLDOWN = 10;
+
 export class LootGenerator {
 	private inventory: Inventory;
 	private audio: AudioManager;
@@ -159,13 +142,23 @@ export class LootGenerator {
 	private lootQueue = $state<string[]>([]);
 	private scanIndex = $state(-1);
 	shineQueue = new SvelteSet<string>();
+	cooldown = $state(LOOT_COOLDOWN);
 
 	constructor(inventory: Inventory, audio: AudioManager) {
 		this.inventory = inventory;
 		this.audio = audio;
 	}
 
+	tick(dt: number): void {
+		if (this.phase === 'loading') return;
+		this.cooldown -= dt;
+		if (this.cooldown <= 0) {
+			this.next();
+		}
+	}
+
 	next(): void {
+		this.cooldown = LOOT_COOLDOWN;
 		this.inventory.clearStorage('lootBack');
 		this.shineQueue.clear();
 

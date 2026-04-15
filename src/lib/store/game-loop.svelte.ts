@@ -1,16 +1,13 @@
 import type { Inventory } from './inventory.svelte';
 import type { AudioManager } from './audio.svelte';
-import type { Track } from './track.svelte';
 import type { LootGenerator } from './loot.svelte';
 import type { Selection } from './selection.svelte';
 import type { Overlay } from './overlay.svelte';
+import type { Quest } from './quest.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
-const POINTS_PER_MATCH = 10;
-const TIME_BONUS = 3;
 const INITIAL_TIME = 300;
-const INITIAL_SPEED = 30;
 
 export class GameLoop {
 	private inventory: Inventory;
@@ -18,37 +15,35 @@ export class GameLoop {
 	private selection: Selection;
 	private overlay: Overlay;
 	private loot: LootGenerator;
+	private quest: Quest;
 	private rafId = 0;
 	private lastTime = 0;
 
-	track: Track;
 	score = $state(0);
 	timeLeft = $state(INITIAL_TIME);
-	speed = $state(INITIAL_SPEED);
 	status = $state<GameStatus>('idle');
 
 	constructor(
 		inventory: Inventory,
-		track: Track,
 		audio: AudioManager,
 		selection: Selection,
 		overlay: Overlay,
-		loot: LootGenerator
+		loot: LootGenerator,
+		quest: Quest
 	) {
 		this.audio = audio;
 		this.inventory = inventory;
-		this.track = track;
 		this.selection = selection;
 		this.overlay = overlay;
 		this.loot = loot;
+		this.quest = quest;
 	}
 
 	start() {
 		cancelAnimationFrame(this.rafId);
-		this.track.reset();
+		this.quest.reset();
 		this.score = 0;
 		this.timeLeft = INITIAL_TIME;
-		this.speed = INITIAL_SPEED;
 		this.status = 'playing';
 
 		this.audio.playBGM();
@@ -90,37 +85,22 @@ export class GameLoop {
 			return;
 		}
 
-		this.track.movement(dt, this.speed);
+		this.loot.tick(dt);
 
-		// Game over: every track item has been matched
-		if (this.track.allMatched) {
-			this.stop();
-			return;
-		}
-
-		this.checkMatches();
+		const { score, timeBonus } = this.quest.checkMatches();
+		this.score += score;
+		this.timeLeft += timeBonus;
 
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
-	private checkMatches() {
-		for (const trackItem of this.track.visibleItems) {
-			const available = this.inventory.countAvailable(trackItem.defId);
-			if (available < trackItem.count) continue;
-
-			this.inventory.consumeMatched(trackItem.defId, trackItem.count);
-			this.track.markMatched(trackItem.id);
-			this.score += POINTS_PER_MATCH;
-			this.timeLeft += TIME_BONUS;
-			this.audio.play('match');
-		}
-	}
 	restart() {
 		cancelAnimationFrame(this.rafId);
 
 		this.selection.clear();
 		this.overlay.closeAll();
 		this.loot.reset();
+		this.quest.reset();
 		this.inventory.clearStorage('backpack');
 		this.inventory.clearStorage('lootBack');
 		this.inventory.clearStorage('weapon');
