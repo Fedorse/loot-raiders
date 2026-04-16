@@ -7,8 +7,6 @@ import type { Quest } from './quest.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
 
-const INITIAL_TIME = 300;
-
 export class GameLoop {
 	private inventory: Inventory;
 	private audio: AudioManager;
@@ -20,8 +18,9 @@ export class GameLoop {
 	private lastTime = 0;
 
 	score = $state(0);
-	timeLeft = $state(INITIAL_TIME);
+	timeLeft = $state(0);
 	status = $state<GameStatus>('idle');
+	gameOverReason = $state<'victory' | 'defeat' | null>(null);
 
 	constructor(
 		inventory: Inventory,
@@ -43,9 +42,11 @@ export class GameLoop {
 		cancelAnimationFrame(this.rafId);
 		this.quest.reset();
 		this.score = 0;
-		this.timeLeft = INITIAL_TIME;
-		this.status = 'playing';
+		this.gameOverReason = null;
 
+		this.timeLeft = this.quest.stageDef.timeLimit;
+
+		this.status = 'playing';
 		this.audio.playBGM();
 
 		this.lastTime = performance.now();
@@ -77,25 +78,31 @@ export class GameLoop {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
 
-		// Game over: timer expired
 		this.timeLeft -= dt;
 		if (this.timeLeft <= 0) {
 			this.timeLeft = 0;
+			this.gameOverReason = this.quest.allStagesCompleted ? 'victory' : 'defeat';
 			this.stop();
 			return;
 		}
 
 		this.loot.tick(dt);
 
-		const { score, timeBonus } = this.quest.checkMatches();
-		this.score += score;
-		this.timeLeft += timeBonus;
+		this.score += this.quest.checkMatches();
+
+		if (this.quest.stageCompleted && !this.quest.allStagesCompleted) {
+			const nextStage = this.quest.advanceStage();
+			if (nextStage) {
+				this.timeLeft += nextStage.timeLimit;
+			}
+		}
 
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
 	restart() {
 		cancelAnimationFrame(this.rafId);
+		this.gameOverReason = null;
 
 		this.selection.clear();
 		this.overlay.closeAll();

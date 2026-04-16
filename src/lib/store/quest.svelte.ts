@@ -1,4 +1,6 @@
 import { ITEM_DB } from '$lib/config/items';
+import { STAGES } from '$lib/config/stages';
+import type { StageDef } from '$lib/config/stages';
 import type { Inventory } from './inventory.svelte';
 import type { AudioManager } from './audio.svelte';
 import type { ItemDefinition } from '$lib/types';
@@ -11,49 +13,57 @@ export interface QuestItem {
 	matched: boolean;
 }
 
-const MOCK_QUESTS: { defId: string; count: number }[] = [
-	{ defId: 'res_arc_circuitry', count: 2 },
-	{ defId: 'loot_chemicals', count: 1 },
-	{ defId: 'loot_battery', count: 3 },
-	{ defId: 'res_metal_parts', count: 2 },
-	{ defId: 'wpn_tempest', count: 1 }
-];
-
 const POINTS_PER_QUEST = 10;
-const TIME_BONUS = 3;
 
 export class Quest {
 	private inventory: Inventory;
 	private audio: AudioManager;
 
 	items = $state<QuestItem[]>([]);
+	currentStage = $state(0);
 
+	stageDef = $derived(STAGES[this.currentStage]);
 	completed = $derived(this.items.filter((i) => i.matched).length);
 	total = $derived(this.items.length);
-	allCompleted = $derived(this.items.length > 0 && this.items.every((i) => i.matched));
+	stageCompleted = $derived(this.items.length > 0 && this.items.every((i) => i.matched));
+	allStagesCompleted = $derived(
+		this.currentStage >= STAGES.length - 1 && this.stageCompleted
+	);
 
 	constructor(inventory: Inventory, audio: AudioManager) {
 		this.inventory = inventory;
 		this.audio = audio;
 	}
 
-	reset() {
-		this.items = MOCK_QUESTS.map((m) => ({
+	loadStage(index: number) {
+		this.currentStage = index;
+		const stage = STAGES[index];
+		this.items = stage.quests.map((q) => ({
 			id: crypto.randomUUID(),
-			defId: m.defId,
-			count: m.count,
-			def: ITEM_DB[m.defId],
+			defId: q.defId,
+			count: q.count,
+			def: ITEM_DB[q.defId],
 			matched: false
 		}));
+	}
+
+	advanceStage(): StageDef | null {
+		const next = this.currentStage + 1;
+		if (next >= STAGES.length) return null;
+		this.loadStage(next);
+		return STAGES[next];
+	}
+
+	reset() {
+		this.loadStage(0);
 	}
 
 	getCollected(defId: string): number {
 		return this.inventory.countAvailable(defId);
 	}
 
-	checkMatches(): { score: number; timeBonus: number } {
+	checkMatches(): number {
 		let score = 0;
-		let timeBonus = 0;
 
 		for (const quest of this.items) {
 			if (quest.matched) continue;
@@ -63,10 +73,9 @@ export class Quest {
 			this.inventory.consumeMatched(quest.defId, quest.count);
 			quest.matched = true;
 			score += POINTS_PER_QUEST;
-			timeBonus += TIME_BONUS;
 			this.audio.play('match');
 		}
 
-		return { score, timeBonus };
+		return score;
 	}
 }

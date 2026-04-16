@@ -3,7 +3,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import AudioSettings from './audio-settings.svelte';
 
-	const { gameLoop, audio } = getGameContext();
+	const { gameLoop, audio, quest } = getGameContext();
 
 	const BTN =
 		'group flex w-full min-w-[320px] items-center justify-center  rounded-md border border-[#2a2f4c] bg-[#0c101c]/80  py-4  transition-all hover:bg-[#1a2133] active:scale-[0.98]';
@@ -41,11 +41,19 @@
 					<AudioSettings />
 				</div>
 			{:else if gameLoop.status === 'over'}
-				<h1 class="text-3xl font-black tracking-tight text-white uppercase">Game Over</h1>
+				{#if gameLoop.gameOverReason === 'victory'}
+					<h1 class="text-3xl font-black tracking-tight text-emerald-400 uppercase">Victory</h1>
+					<p class="text-sm text-emerald-300/60">All stages completed</p>
+				{:else}
+					<h1 class="text-3xl font-black tracking-tight text-red-400 uppercase">Defeated</h1>
+					<p class="text-sm text-red-300/60">
+						Time ran out — Stage {quest.currentStage + 1}
+					</p>
+				{/if}
 				<div class="text-4xl font-bold text-white">{gameLoop.score} pts</div>
 
 				<div class="flex flex-col gap-2">
-					{@render menuButton('Retry', () => gameLoop.start())}
+					{@render menuButton('Retry', () => gameLoop.restart())}
 					<AudioSettings />
 				</div>
 			{/if}

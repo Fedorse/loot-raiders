@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getRarityStyle } from '$lib/config/rarity';
+	import { STAGES } from '$lib/config/stages';
 	import type { ItemDefinition, RarityStyle } from '$lib/types';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import type { QuestItem } from '$lib/store/quest.svelte';
@@ -21,8 +22,12 @@
 {#snippet progressBadge(item: QuestItem)}
 	{@const collected = Math.min(item.count, quest.getCollected(item.defId))}
 	<div
-		class="absolute top-0 right-0 z-30 flex min-w-11 items-center justify-center rounded-bl-md border-b border-l px-2 py-1 {item.matched ? 'bg-emerald-900/60' : 'bg-black/40'}"
-		style="border-color: color-mix(in srgb, var(--rarity-{item.def.rarity}) 50%, transparent); box-shadow: 0 0 10px color-mix(in srgb, var(--rarity-{item.def.rarity}) 50%, transparent)"
+		class="absolute top-0 right-0 z-30 flex min-w-11 items-center justify-center rounded-bl-md border-b border-l px-2 py-1 {item.matched
+			? 'bg-emerald-900/60'
+			: 'bg-black/40'}"
+		style="border-color: color-mix(in srgb, var(--rarity-{item.def
+			.rarity}) 50%, transparent); box-shadow: 0 0 10px color-mix(in srgb, var(--rarity-{item.def
+			.rarity}) 50%, transparent)"
 	>
 		<span class="flex items-baseline gap-px font-mono leading-none tabular-nums">
 			<span
@@ -69,22 +74,38 @@
 	</div>
 {/snippet}
 
-<div class="relative z-10 flex w-56 flex-col rounded-lg border border-muted/20">
+<div class="relative z-10 flex w-56 flex-col rounded-lg">
 	{#if gameLoop.status !== 'idle'}
-		<div
-			class="flex h-9 items-center justify-between rounded-t-xl bg-background/50 px-5 backdrop-blur-md"
-		>
-			<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase">Quest</span>
-			<span class="flex items-baseline gap-px font-mono tabular-nums">
-				<span
-					class="text-xs font-black"
-					class:text-emerald-400={quest.allCompleted}
-					class:text-white={!quest.allCompleted}
+		<div class="flex flex-col gap-1.5 rounded-t-xl bg-background/50 px-5 py-2 backdrop-blur-md">
+			<div class="flex items-center justify-between">
+				<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase"
+					>Stage {quest.currentStage + 1}</span
 				>
-					{quest.completed}
+				<span class="flex items-baseline gap-px font-mono tabular-nums">
+					<span
+						class="text-xs font-black"
+						class:text-emerald-400={quest.stageCompleted}
+						class:text-white={!quest.stageCompleted}
+					>
+						{quest.completed}
+					</span>
+					<span class="text-[10px] font-bold text-white/40">/{quest.total}</span>
 				</span>
-				<span class="text-[10px] font-bold text-white/40">/{quest.total}</span>
-			</span>
+			</div>
+			<div class="flex items-center justify-between">
+				<span class="text-[10px] font-medium text-white/50">{quest.stageDef.name}</span>
+				<div class="flex gap-1">
+					{#each STAGES as _, i (i)}
+						<div
+							class="size-1.5 rounded-full {i < quest.currentStage
+								? 'bg-emerald-400'
+								: i === quest.currentStage
+									? 'bg-cyan-400'
+									: 'bg-white/20'}"
+						></div>
+					{/each}
+				</div>
+			</div>
 		</div>
 
 		<div class="flex flex-col gap-2 overflow-hidden rounded-b-lg bg-background/50 px-3 py-4">

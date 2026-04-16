@@ -16,8 +16,8 @@ export class Game {
 	overlay = new Overlay();
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
-	loot = new LootGenerator(this.inventory, this.audio);
 	quest = new Quest(this.inventory, this.audio);
+	loot = new LootGenerator(this.inventory, this.audio, this.quest);
 	gameLoop = new GameLoop(
 		this.inventory,
 		this.audio,

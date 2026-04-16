@@ -1,6 +1,6 @@
 import { ITEM_DB } from '$lib/config/items';
-import { MOCK_ITEMS } from '$lib/config/mock-data';
 import type { Inventory } from './inventory.svelte';
+import type { Quest } from './quest.svelte';
 import type { ItemRarity, ItemDefinition, ItemType, InstanceItem, ItemLocation } from '$lib/types';
 import { randInt } from '$lib/utils';
 import { SvelteSet } from 'svelte/reactivity';
@@ -19,7 +19,7 @@ export interface LootProfile {
 	getStackRange: (def: ItemDefinition) => [number, number];
 }
 
-export interface RawLootItem {
+interface RawLootItem {
 	def: ItemDefinition;
 	count: number;
 	attachments: (ItemDefinition | null)[] | null;
@@ -33,17 +33,6 @@ export const DEFAULT_STACK_RANGES: Record<ItemRarity, [number, number]> = {
 	legendary: [1, 1]
 };
 
-export const STANDARD_CACHE_PROFILE: LootProfile = {
-	typeWeights: { loot: 75, attachment: 5, weapon: 8, shield: 2, augment: 3 },
-	typeCaps: { weapon: 2, augment: 1, shield: 1 },
-	rarityWeights: { common: 40, uncommon: 30, rare: 20, epic: 8, legendary: 2 },
-	attachmentChance: 0,
-	getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
-};
-
-
-// ---- Generation functions ----
-
 function buildItemPool(): ItemPool {
 	const pool = {} as ItemPool;
 	for (const type of ['loot', 'weapon', 'augment', 'shield', 'attachment'] as ItemType[]) {
@@ -55,9 +44,9 @@ function buildItemPool(): ItemPool {
 	return pool;
 }
 
-export const itemPool = buildItemPool();
+const itemPool = buildItemPool();
 
-export function weightedRoll<T extends string>(weights: Record<T, number>): T {
+function weightedRoll<T extends string>(weights: Record<T, number>): T {
 	const entries = Object.entries(weights) as [T, number][];
 	const total = entries.reduce((sum, [, w]) => sum + w, 0);
 	let roll = Math.random() * total;
@@ -68,7 +57,7 @@ export function weightedRoll<T extends string>(weights: Record<T, number>): T {
 	return entries[0][0];
 }
 
-export function pickRandom<T>(arr: T[]): T {
+function pickRandom<T>(arr: T[]): T {
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
@@ -110,7 +99,7 @@ function rollAttachmentsForWeapon(
 	});
 }
 
-export function generateLootItems(profile: LootProfile, count: number): RawLootItem[] {
+function generateLootItems(profile: LootProfile, count: number): RawLootItem[] {
 	const typeCounts: Record<string, number> = {};
 	const result: RawLootItem[] = [];
 
@@ -133,20 +122,20 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 	return result;
 }
 
-const LOOT_COOLDOWN = 10;
-
 export class LootGenerator {
 	private inventory: Inventory;
 	private audio: AudioManager;
+	private quest: Quest;
 	phase = $state<LoadingStatus>('idle');
 	private lootQueue = $state<string[]>([]);
 	private scanIndex = $state(-1);
 	shineQueue = new SvelteSet<string>();
-	cooldown = $state(LOOT_COOLDOWN);
+	cooldown = $state(0);
 
-	constructor(inventory: Inventory, audio: AudioManager) {
+	constructor(inventory: Inventory, audio: AudioManager, quest: Quest) {
 		this.inventory = inventory;
 		this.audio = audio;
+		this.quest = quest;
 	}
 
 	tick(dt: number): void {
@@ -157,14 +146,49 @@ export class LootGenerator {
 		}
 	}
 
+	private generateQuestItems(): InstanceItem[] {
+		const unmatched = this.quest.items.filter((q) => !q.matched);
+		if (unmatched.length === 0) return [];
+
+		const picks = unmatched.length === 1 ? [unmatched[0]] : [];
+		if (unmatched.length > 1) {
+			const shuffled = [...unmatched].sort(() => Math.random() - 0.5);
+			picks.push(shuffled[0], shuffled[1]);
+		}
+
+		return picks.map((q) => {
+			const def = ITEM_DB[q.defId];
+			const count =
+				def.maxStack && def.maxStack > 1 ? randInt(1, Math.min(q.count, def.maxStack)) : 1;
+			return this.inventory.createItem(q.defId, count);
+		});
+	}
+
 	next(): void {
-		this.cooldown = LOOT_COOLDOWN;
+		const { lootCooldown, lootProfile } = this.quest.stageDef;
+		this.cooldown = lootCooldown;
 		this.inventory.clearStorage('lootBack');
 		this.shineQueue.clear();
 
-		const items: InstanceItem[] = MOCK_ITEMS.map((mock) =>
-			this.inventory.createItem(mock.defId, mock.count)
-		);
+		const questItems = this.generateQuestItems();
+		const randomCount = randInt(4, 16) - questItems.length;
+		const rawItems = generateLootItems(lootProfile, randomCount);
+
+		const items: InstanceItem[] = rawItems.map((raw) => {
+			const item = this.inventory.createItem(raw.def.id, raw.count);
+			if (raw.attachments && item.attachments) {
+				item.attachments = raw.attachments.map((attDef) =>
+					attDef ? this.inventory.createItem(attDef.id, 1) : null
+				);
+			}
+			return item;
+		});
+
+		// Insert quest items at random positions
+		for (const qi of questItems) {
+			const pos = randInt(0, items.length);
+			items.splice(pos, 0, qi);
+		}
 
 		this.inventory.fillStorage('lootBack', items);
 		this.lootQueue = items.map((i) => i.uid);
@@ -209,24 +233,3 @@ export class LootGenerator {
 		this.shineQueue.clear();
 	}
 }
-
-// next(): void {
-// 	this.inventory.clearStorage('lootBack');
-// 	const count = randInt(4, 16);
-// 	const rawItems = generateLootItems(STANDARD_CACHE_PROFILE, count);
-//
-// 	const items: InstanceItem[] = rawItems.map((raw) => {
-// 		const item = this.inventory.createItem(raw.def.id, raw.count);
-// 		if (raw.attachments && item.attachments) {
-// 			item.attachments = raw.attachments.map((attDef) =>
-// 				attDef ? this.inventory.createItem(attDef.id, 1) : null
-// 			);
-// 		}
-// 		return item;
-// 	});
-//
-// 	this.inventory.fillStorage('lootBack', items);
-// 	this.lootQueue = items.map((i) => i.uid);
-// 	this.scanIndex = 0;
-// 	this.phase = 'loading';
-// }
