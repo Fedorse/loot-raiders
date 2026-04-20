@@ -45,7 +45,7 @@
 		<div
 			class="flex h-8 w-fit items-center gap-2 rounded-t-[6px] bg-modal-secondary px-4 font-bold text-modal-foreground"
 		>
-			<img src="/assets/ui/icon-actions.png" alt="category" class="size-5 object-contain" />
+			<img src="/assets/ui/icon-actions.png" alt="actions" class="size-5 object-contain" />
 			<span class="text-[13px] tracking-widest uppercase">Actions</span>
 		</div>
 

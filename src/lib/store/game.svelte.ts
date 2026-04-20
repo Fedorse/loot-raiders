@@ -8,12 +8,14 @@ import { Selection } from './selection.svelte';
 import { GameLoop } from './game-loop.svelte';
 import { AudioManager } from './audio.svelte';
 import { Quest } from './quest.svelte';
+import { Augment } from './augment.svelte';
 
 export class Game {
 	audio = new AudioManager();
 	selection = new Selection(this.audio);
 	inventory = new Inventory(this.selection, this.audio);
 	overlay = new Overlay();
+	augment = new Augment(this.inventory, this.overlay);
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	quest = new Quest(this.inventory, this.audio);

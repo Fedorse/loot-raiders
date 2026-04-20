@@ -3,6 +3,7 @@
 	import ContextMenu from '$lib/components/context-menu.svelte';
 	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
+	import AugmentPanel from '$lib/components/augment-panel.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
 	import { initGame } from '$lib/store/game.svelte';
@@ -69,5 +70,6 @@
 <ContextMenu />
 <TooltipOverlay />
 <RecycleModal />
+<AugmentPanel />
 <DebugPanel />
 <GameMenu />

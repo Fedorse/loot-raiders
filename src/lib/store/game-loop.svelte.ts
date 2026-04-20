@@ -44,6 +44,9 @@ export class GameLoop {
 		this.score = 0;
 		this.gameOverReason = null;
 
+		const augItem = this.inventory.createItem('aug_free_loadout', 1);
+		this.inventory.fillStorage('augment', [augItem]);
+
 		this.timeLeft = this.quest.stageDef.timeLimit;
 
 		this.status = 'playing';

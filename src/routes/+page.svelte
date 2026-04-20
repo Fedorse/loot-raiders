@@ -6,10 +6,10 @@
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import { formatTime } from '$lib/utils';
 
-	const { gameLoop, inventory, loot } = getGameContext();
+	const { gameLoop, inventory, loot, selection } = getGameContext();
 </script>
 
-<div class="flex h-full items-center justify-center gap-6">
+<div class="flex h-full items-center justify-center gap-6" onpointerdown={() => selection.clear()}>
 	<div class="flex h-full flex-col gap-6 pt-4">
 		<div class="flex items-start justify-center gap-4">
 			<div class="z-10 flex flex-col items-start">

@@ -19,6 +19,7 @@
 	const selectedItem = $derived(selection.isSelected(itemUid));
 	const slotState = $derived({ location, item });
 
+	const isAugmentSlot = $derived(location.type === 'slot' && location.storageId === 'augment');
 	const isLootBack = $derived(
 		location.type === 'slot' && location.storageId === 'lootBack' && !!item
 	);
@@ -47,12 +48,20 @@
 			class="relative z-20 h-full w-full p-[3.5px]"
 			onpointerdowncapture={(e) => {
 				if (e.button === 0) {
+					if (isAugmentSlot && item) {
+						e.stopPropagation();
+						const rect = e.currentTarget.getBoundingClientRect();
+						overlay.openAugmentUpgrade(rect.right, rect.top);
+						return;
+					}
+					overlay.closeAugmentUpgrade();
 					if (!item) selection.clear();
 					overlay.closeContextMenu();
 				}
 			}}
 			oncontextmenu={(e) => {
 				e.preventDefault();
+				if (isAugmentSlot) return;
 				if (e.ctrlKey) return;
 				if (slotState.item) {
 					overlay.openContextMenu(e.clientX, e.clientY, slotState);
@@ -60,6 +69,7 @@
 				}
 			}}
 			onpointerenter={(e) => {
+				if (isAugmentSlot) return;
 				if (item && interaction.status === 'idle') {
 					const rect = e.currentTarget.getBoundingClientRect();
 					overlay.showTooltip(rect.right, rect.top, item);

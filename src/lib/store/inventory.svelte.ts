@@ -1,5 +1,6 @@
 import { getStorageConfig } from '$lib/config/storages';
 import { getDef } from '$lib/config/items';
+import { getAugmentBonusSlots } from '$lib/config/augments';
 import { getAttachmentSlotIndex } from '../inventory-validation';
 import { isEqualLocation } from '$lib/utils';
 import type { Selection } from './selection.svelte';
@@ -12,6 +13,12 @@ const MAX_WEIGHT = 60;
 
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
+
+	bonusBackpackSlots = $derived.by(() => {
+		const augItem = this.getItem({ type: 'slot', storageId: 'augment', index: 0 });
+		if (!augItem) return 0;
+		return getAugmentBonusSlots(augItem.defId);
+	});
 	private selection: Selection;
 	private audio: AudioManager;
 
@@ -68,10 +75,16 @@ export class Inventory {
 		return parentSlot.item.attachments[loc.attachIndex] ?? null;
 	}
 
-	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
+	getStorageSize(storageId: StorageId): number {
 		const config = getStorageConfig(storageId);
-		if (!config) return null;
-		for (let i = 0; i < config.size; i++) {
+		if (!config) return 0;
+		if (storageId === 'backpack') return config.size + this.bonusBackpackSlots;
+		return config.size;
+	}
+
+	getFirstEmptySlot(storageId: StorageId): ItemLocation | null {
+		const size = this.getStorageSize(storageId);
+		for (let i = 0; i < size; i++) {
 			const loc: ItemLocation = { type: 'slot', storageId, index: i };
 			if (!this.getItem(loc)) return loc;
 		}
@@ -91,10 +104,9 @@ export class Inventory {
 	}
 
 	#countEmptySlots(storageId: StorageId): number {
-		const config = getStorageConfig(storageId);
-		if (!config) return 0;
+		const size = this.getStorageSize(storageId);
 		let count = 0;
-		for (let i = 0; i < config.size; i++) {
+		for (let i = 0; i < size; i++) {
 			if (!this.getItem({ type: 'slot', storageId, index: i })) count++;
 		}
 		return count;
@@ -333,6 +345,26 @@ export class Inventory {
 			this.items.splice(idx, 1);
 		} else {
 			this.items[idx].item.match = false;
+		}
+	}
+
+	consumeItems(defId: string, count: number): void {
+		let remaining = count;
+		for (let i = this.items.length - 1; i >= 0; i--) {
+			if (remaining <= 0) break;
+			const slot = this.items[i];
+			if (slot.location.type !== 'slot') continue;
+			if (slot.location.storageId === 'lootBack') continue;
+			if (slot.item.defId !== defId) continue;
+
+			if (slot.item.count <= remaining) {
+				remaining -= slot.item.count;
+				this.selection.deselect(slot.item.uid);
+				this.items.splice(i, 1);
+			} else {
+				slot.item.count -= remaining;
+				remaining = 0;
+			}
 		}
 	}
 

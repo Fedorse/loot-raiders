@@ -19,7 +19,7 @@ export const STAGES: StageDef[] = [
 	{
 		id: 1,
 		name: 'Scavenger Run',
-		timeLimit: 90,
+		timeLimit: 900,
 		lootCooldown: 10,
 		quests: [
 			{ defId: 'loot_chemicals', count: 2 },
