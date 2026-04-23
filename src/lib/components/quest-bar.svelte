@@ -45,16 +45,18 @@
 {#snippet progressBar(item: QuestItem)}
 	{@const collected = Math.min(item.count, quest.getCollected(item.defId))}
 	{@const pct = item.matched ? 100 : (collected / item.count) * 100}
-	<div class="absolute inset-x-0 bottom-0 z-20 h-1 bg-white/5">
-		<div
-			class="h-full transition-all duration-300 {item.matched
-				? 'bg-emerald-400'
-				: pct > 0
-					? 'bg-cyan-400'
-					: ''}"
-			style="width: {pct}%"
-		></div>
-	</div>
+	{#if collected}
+		<div class="absolute inset-x-0 bottom-0 z-20 h-1 bg-white/5">
+			<div
+				class="h-full transition-all duration-300 {item.matched
+					? 'bg-emerald-400'
+					: pct > 0
+						? 'bg-cyan-400'
+						: ''}"
+				style="width: {pct}%"
+			></div>
+		</div>
+	{/if}
 {/snippet}
 
 {#snippet matchedOverlay()}

@@ -1,3 +1,4 @@
+import { getDef } from '$lib/config/items';
 import type { Inventory } from './inventory.svelte';
 import type { AudioManager } from './audio.svelte';
 import type { LootGenerator } from './loot.svelte';
@@ -16,11 +17,13 @@ export class GameLoop {
 	private quest: Quest;
 	private rafId = 0;
 	private lastTime = 0;
+	private appliedShieldRarities = new Set<string>();
 
 	score = $state(0);
 	timeLeft = $state(0);
 	status = $state<GameStatus>('idle');
 	gameOverReason = $state<'victory' | 'defeat' | null>(null);
+	shieldTimeBonus = $state(0);
 
 	constructor(
 		inventory: Inventory,
@@ -80,6 +83,21 @@ export class GameLoop {
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
+		const shield = this.inventory.getItem({
+			type: 'slot',
+			storageId: 'shield',
+			index: 0
+		});
+		if (shield) {
+			const def = getDef(shield.defId);
+			if (!this.appliedShieldRarities.has(def.rarity)) {
+				const bonus = def.timeBonus ?? 0;
+				this.timeLeft += bonus;
+				this.shieldTimeBonus = bonus;
+				this.appliedShieldRarities.add(def.rarity);
+				this.audio.play('sheild');
+			}
+		}
 
 		this.timeLeft -= dt;
 		if (this.timeLeft <= 0) {
@@ -116,6 +134,7 @@ export class GameLoop {
 		this.inventory.clearStorage('weapon');
 		this.inventory.clearStorage('augment');
 		this.inventory.clearStorage('shield');
+		this.appliedShieldRarities.clear();
 
 		this.start();
 	}

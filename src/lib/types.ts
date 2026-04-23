@@ -60,12 +60,12 @@ export interface ItemDefinition {
 
 	weight: number;
 	price: number;
+	timeBonus?: number;
 	maxStack?: number;
 
 	attachmentSlots?: AttachmentSlotDef[];
 
 	recycling?: RecyclingResult[];
-
 	description?: string;
 
 	// Weapon-specific

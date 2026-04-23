@@ -1,5 +1,6 @@
 import { getDef } from '$lib/config/items';
 import { getAllowedTypes } from '$lib/config/storages';
+import { RARITY_ORDER } from './config/rarity';
 import type { InstanceItem, ItemLocation, DragState, SlotState } from '$lib/types';
 
 export type DropActionType = 'move' | 'stack' | 'attach' | 'swap' | 'delete' | 'invalid';
@@ -14,7 +15,16 @@ export const isAllowedInLocation = (
 	if (loc.type === 'slot') {
 		const itemDef = getDef(item.defId);
 		const allowedTypes = getAllowedTypes(loc.storageId);
-		return allowedTypes.includes(itemDef.type);
+		if (!allowedTypes.includes(itemDef.type)) return false;
+
+		if (loc.storageId === 'shield') {
+			const augItem = resolve({ type: 'slot', storageId: 'augment', index: 0 });
+			if (!augItem) return false;
+			const augRarity = getDef(augItem.defId).rarity;
+			return RARITY_ORDER[itemDef.rarity] <= RARITY_ORDER[augRarity];
+		}
+
+		return true;
 	}
 	// attachment location: check weapon's slot definition
 	const parent = resolve(loc.parentLocation);

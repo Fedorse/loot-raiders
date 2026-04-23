@@ -814,31 +814,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 	},
 
 	// ──────────────────────────────────────
-	// EQUIPMENT
-	// ──────────────────────────────────────
-	eqp_tactical_mk1: {
-		id: 'eqp_tactical_mk1',
-		name: 'Tactical Mk1',
-		type: 'augment',
-		rarity: 'uncommon',
-		weight: 2,
-		price: 300,
-		image: '/assets/items/Augments/TacticalMK1.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png'
-	},
-	eqp_light_shield: {
-		id: 'eqp_light_shield',
-		name: 'Light Shield',
-		type: 'shield',
-		rarity: 'uncommon',
-		image: '/assets/items/Shields/LightShield.png',
-		categoryIcon: '/assets/ui/category_assets/shield.png',
-		weight: 5,
-		price: 400,
-		recycling: [{ itemId: 'res_metal_parts', amount: 5 }]
-	},
-
-	// ──────────────────────────────────────
 	// ATTACHMENTS — UNDERBARREL
 	// ──────────────────────────────────────
 	att_angled_grip_1: {
@@ -3406,6 +3381,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.png',
 		weight: 5,
 		price: 640,
+		timeBonus: 20,
 		maxStack: 1,
 		description: 'Blocks a small portion of incoming damage without impacting mobility.',
 		recycling: [
@@ -3422,6 +3398,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.png',
 		weight: 7,
 		price: 2000,
+		timeBonus: 35,
+
 		maxStack: 1,
 		description: 'Blocks a medium portion of incoming damage at a moderate cost to mobility.',
 		recycling: [{ itemId: 'res_arc_circuitry', amount: 1 }]
@@ -3435,6 +3413,8 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.png',
 		weight: 9,
 		price: 5500,
+		timeBonus: 50,
+
 		maxStack: 1,
 		description: 'Blocks a large portion of incoming damage, but significant cost to mobility.',
 		recycling: [

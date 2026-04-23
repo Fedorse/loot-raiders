@@ -5,6 +5,7 @@
 	import QuestBar from '$lib/components/quest-bar.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import { formatTime } from '$lib/utils';
+	import UpgradeBar from '$lib/components/upgrade-bar.svelte';
 
 	const { gameLoop, inventory, loot, selection } = getGameContext();
 </script>
@@ -42,7 +43,7 @@
 				</div>
 
 				<div
-					class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-12 backdrop-blur-xs"
+					class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-4 backdrop-blur-xs"
 				>
 					<div class="grid grid-cols-4">
 						<StorageGrid storageId="lootBack" class="aspect-square h-24 w-24" />
@@ -53,7 +54,9 @@
 
 			<div class="z-10 flex flex-col items-end">
 				{@render scoreTimeTab()}
-				<div class="flex flex-col gap-4 rounded-lg bg-background/50 p-4 backdrop-blur-xs">
+				<div
+					class="flex flex-col gap-4 rounded-t-xl rounded-b-none bg-background/50 p-4 backdrop-blur-xs"
+				>
 					<div class="flex h-full w-full justify-center gap-8">
 						<div class="flex flex-col gap-4">
 							<div class="flex gap-4">
@@ -70,6 +73,7 @@
 						</div>
 					</div>
 				</div>
+				<UpgradeBar />
 			</div>
 		</div>
 
@@ -88,11 +92,20 @@
 		{@const weightPct = Math.min(100, (inventory.totalWeight / inventory.maxWeight) * 100)}
 		<div class="flex h-9 items-center gap-4 rounded-t-xl bg-background/50 px-5 backdrop-blur-md">
 			<span
-				class="font-mono text-xs font-bold tracking-widest {gameLoop.timeLeft < 10
+				class="relative inline-block font-mono text-xs font-bold tracking-widest transition-colors duration-300 {gameLoop.timeLeft <
+				10
 					? 'text-red-400'
-					: 'text-white/90'}"
+					: 'text-white/90'} {gameLoop.shieldTimeBonus > 0 ? 'time-flash' : ''}"
 			>
 				{formatTime(gameLoop.timeLeft)}
+				{#if gameLoop.shieldTimeBonus > 0}
+					<span
+						class="bonus-popup pointer-events-none absolute -top-3 -right-6 font-mono text-xs font-black text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+						onanimationend={() => (gameLoop.shieldTimeBonus = 0)}
+					>
+						+{gameLoop.shieldTimeBonus}s
+					</span>
+				{/if}
 			</span>
 
 			<div class="h-3 w-[1px] bg-white/20"></div>
@@ -130,4 +143,51 @@
 
 <style>
 	@reference "tailwindcss";
+
+	.bonus-popup {
+		animation: popup-bounce 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+	}
+
+	@keyframes popup-bounce {
+		0% {
+			opacity: 0;
+			transform: translateY(8px) scale(0.5);
+			filter: blur(4px);
+		}
+		15% {
+			opacity: 1;
+			transform: translateY(0) scale(1.2);
+			filter: blur(0);
+		}
+		25% {
+			transform: translateY(0) scale(1);
+		}
+		70% {
+			opacity: 1;
+			transform: translateY(-4px) scale(1);
+			filter: blur(0);
+		}
+		100% {
+			opacity: 0;
+			transform: translateY(-16px) scale(0.8);
+			filter: blur(2px);
+		}
+	}
+
+	.time-flash {
+		animation: text-glow-flash 1.2s ease-out forwards;
+	}
+
+	@keyframes text-glow-flash {
+		0%,
+		20% {
+			color: var(--color-emerald-400);
+			text-shadow: 0 0 10px var(--color-emerald-500);
+			transform: scale(1.1);
+		}
+		100% {
+			text-shadow: none;
+			transform: scale(1);
+		}
+	}
 </style>

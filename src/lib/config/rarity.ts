@@ -61,6 +61,14 @@ const TOOLTIP_OVERRIDES: Partial<Record<ItemRarity, Partial<RarityStyle>>> = {
 	}
 };
 
+export const RARITY_ORDER: Record<ItemRarity, number> = {
+	common: 0,
+	uncommon: 1,
+	rare: 2,
+	epic: 3,
+	legendary: 4
+};
+
 export const getRarityStyle = (rarity: ItemRarity): RarityStyle => {
 	return RARITY_STYLES[rarity];
 };

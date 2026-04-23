@@ -4,7 +4,7 @@ export const STORAGE_CONFIGS: Record<StorageId, StorageConfig> = {
 	lootBack: {
 		name: 'lootBack',
 		size: 16,
-		allowedTypes: ['loot', 'attachment', 'weapon', 'augment'],
+		allowedTypes: ['loot', 'attachment', 'weapon', 'augment', 'shield'],
 		quickMoveTarget: 'backpack'
 	},
 	augment: {
