@@ -29,7 +29,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'loot_bandage', count: 1 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 85, attachment: 2, weapon: 5, shield: 80, augment: 1 },
+			typeWeights: { loot: 85, attachment: 2, weapon: 5, shield: 1, augment: 1 },
 			typeCaps: { weapon: 1, augment: 1, shield: 1 },
 			rarityWeights: { common: 55, uncommon: 30, rare: 12, epic: 3, legendary: 0 },
 			attachmentChance: 0,

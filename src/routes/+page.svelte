@@ -11,11 +11,11 @@
 </script>
 
 <div class="flex h-full items-center justify-center gap-6" onpointerdown={() => selection.clear()}>
-	<div class="flex h-full flex-col gap-6 pt-4">
+	<div class="flex h-full flex-col gap-6 pt-10">
 		<div class="flex items-start justify-center gap-4">
 			<div class="z-10 flex flex-col items-start">
 				<div
-					class="flex h-9 items-center gap-4 rounded-t-xl bg-background/50 px-5 backdrop-blur-md"
+					class="flex h-9 items-center gap-4 rounded-t-lg bg-background/50 px-5 backdrop-blur-md"
 				>
 					<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase"
 						>Loot Drop</span
@@ -34,7 +34,7 @@
 
 					<div class="flex items-center gap-1.5">
 						<kbd
-							class="inline-flex min-w-11 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-1 text-[11px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
+							class="inline-flex min-w-8 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-0.5 text-[11px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
 						>
 							Space
 						</kbd>
@@ -43,7 +43,7 @@
 				</div>
 
 				<div
-					class="z-10 flex flex-col gap-4 rounded-lg bg-background/50 px-4 pt-4 pb-4 backdrop-blur-xs"
+					class="z-10 flex flex-col gap-4 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 px-4 pt-4 pb-4 backdrop-blur-md"
 				>
 					<div class="grid grid-cols-4">
 						<StorageGrid storageId="lootBack" class="aspect-square h-24 w-24" />
@@ -55,7 +55,7 @@
 			<div class="z-10 flex flex-col items-end">
 				{@render scoreTimeTab()}
 				<div
-					class="flex flex-col gap-4 rounded-t-xl rounded-b-none bg-background/50 p-4 backdrop-blur-xs"
+					class="flex flex-col gap-4 rounded-tl-lg rounded-b-none bg-background/50 p-4 backdrop-blur-md"
 				>
 					<div class="flex h-full w-full justify-center gap-8">
 						<div class="flex flex-col gap-4">
@@ -82,7 +82,7 @@
 		{/if}
 	</div>
 
-	<div class="self-start pt-4">
+	<div class="self-start pt-10">
 		<QuestBar />
 	</div>
 </div>
@@ -90,7 +90,7 @@
 {#snippet scoreTimeTab()}
 	{#if gameLoop.status !== 'idle'}
 		{@const weightPct = Math.min(100, (inventory.totalWeight / inventory.maxWeight) * 100)}
-		<div class="flex h-9 items-center gap-4 rounded-t-xl bg-background/50 px-5 backdrop-blur-md">
+		<div class="flex h-9 items-center gap-4 rounded-t-lg bg-background/50 px-5 backdrop-blur-md">
 			<span
 				class="relative inline-block font-mono text-xs font-bold tracking-widest transition-colors duration-300 {gameLoop.timeLeft <
 				10

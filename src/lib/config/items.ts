@@ -3421,59 +3421,59 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'res_arc_circuitry', amount: 2 },
 			{ itemId: 'loot_voltage_converter', amount: 1 }
 		]
-	},
+	}
 
 	// ──────────────────────────────────────
 	// KEYS
 	// ──────────────────────────────────────
-	key_blue_gate_cellar: {
-		id: 'key_blue_gate_cellar',
-		name: 'Blue Gate Cellar Key',
-		type: 'loot',
-		rarity: 'rare',
-		image: '/assets/items/Keys/BlueGateCellarKey.png',
-		categoryIcon: '/assets/ui/category_assets/key.png',
-		weight: 0.1,
-		price: 100,
-		maxStack: 1,
-		description: 'Unlocks certain cellar doors near the Blue Gate.'
-	},
-	key_blue_gate_confiscation: {
-		id: 'key_blue_gate_confiscation',
-		name: 'Blue Gate Confiscation Room Key',
-		type: 'loot',
-		rarity: 'epic',
-		image: '/assets/items/Keys/BlueGateConfiscationKey.png',
-		categoryIcon: '/assets/ui/category_assets/key.png',
-		weight: 0.1,
-		price: 100,
-		maxStack: 1,
-		description: 'Unlocks a door to the confiscated foods area within the Blue Gate tunnels.'
-	},
-	key_buried_city_hospital: {
-		id: 'key_buried_city_hospital',
-		name: 'Buried City Hospital Key',
-		type: 'loot',
-		rarity: 'rare',
-		image: '/assets/items/Keys/BuriedCityHospitalKey.png',
-		categoryIcon: '/assets/ui/category_assets/key.png',
-		weight: 0.1,
-		price: 100,
-		maxStack: 1,
-		description: 'Opens a locked room in the Hospital in Buried City.'
-	},
-	key_raider_hatch: {
-		id: 'key_raider_hatch',
-		name: 'Raider Hatch Key',
-		type: 'loot',
-		rarity: 'rare',
-		image: '/assets/items/Keys/RaiderHatchKey.png',
-		categoryIcon: '/assets/ui/category_assets/key.png',
-		weight: 0.1,
-		price: 100,
-		maxStack: 1,
-		description: 'Used to open Raider Hatches to get out of sticky situations Topside.'
-	}
+	// key_blue_gate_cellar: {
+	// 	id: 'key_blue_gate_cellar',
+	// 	name: 'Blue Gate Cellar Key',
+	// 	type: 'loot',
+	// 	rarity: 'rare',
+	// 	image: '/assets/items/Keys/BlueGateCellarKey.png',
+	// 	categoryIcon: '/assets/ui/category_assets/key.png',
+	// 	weight: 0.1,
+	// 	price: 100,
+	// 	maxStack: 1,
+	// 	description: 'Unlocks certain cellar doors near the Blue Gate.'
+	// },
+	// key_blue_gate_confiscation: {
+	// 	id: 'key_blue_gate_confiscation',
+	// 	name: 'Blue Gate Confiscation Room Key',
+	// 	type: 'loot',
+	// 	rarity: 'epic',
+	// 	image: '/assets/items/Keys/BlueGateConfiscationKey.png',
+	// 	categoryIcon: '/assets/ui/category_assets/key.png',
+	// 	weight: 0.1,
+	// 	price: 100,
+	// 	maxStack: 1,
+	// 	description: 'Unlocks a door to the confiscated foods area within the Blue Gate tunnels.'
+	// },
+	// key_buried_city_hospital: {
+	// 	id: 'key_buried_city_hospital',
+	// 	name: 'Buried City Hospital Key',
+	// 	type: 'loot',
+	// 	rarity: 'rare',
+	// 	image: '/assets/items/Keys/BuriedCityHospitalKey.png',
+	// 	categoryIcon: '/assets/ui/category_assets/key.png',
+	// 	weight: 0.1,
+	// 	price: 100,
+	// 	maxStack: 1,
+	// 	description: 'Opens a locked room in the Hospital in Buried City.'
+	// },
+	// key_raider_hatch: {
+	// 	id: 'key_raider_hatch',
+	// 	name: 'Raider Hatch Key',
+	// 	type: 'loot',
+	// 	rarity: 'rare',
+	// 	image: '/assets/items/Keys/RaiderHatchKey.png',
+	// 	categoryIcon: '/assets/ui/category_assets/key.png',
+	// 	weight: 0.1,
+	// 	price: 100,
+	// 	maxStack: 1,
+	// 	description: 'Used to open Raider Hatches to get out of sticky situations Topside.'
+	// }
 };
 
 export const getDef = (defId: string): ItemDefinition => {
