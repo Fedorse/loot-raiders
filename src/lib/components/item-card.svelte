@@ -3,6 +3,8 @@
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import Scanner from './scanner.svelte';
+	import UpgradeIcon from '$lib/ui-icon/upgrade.svelte';
+	import ArrowUpgradeIcon from '$lib/ui-icon/arrow-upgrade.svelte';
 	import type { InstanceItem, ItemLocation } from '$lib/types';
 
 	type Props = {
@@ -16,7 +18,9 @@
 
 	let { item, location, className = 'h-20 w-20', selected, readonly, onmatched }: Props = $props();
 
-	const { interaction, gameLoop } = getGameContext();
+	const { interaction, gameLoop, augment } = getGameContext();
+
+	const ROMAN = ['I', 'II', 'III', 'IV', 'V'] as const;
 
 	const def = $derived(getDef(item.defId));
 	const style = $derived(getRarityStyle(def.rarity));
@@ -24,6 +28,8 @@
 	const displayCount = $derived(
 		location ? interaction.getDisplayCount(item, location) : item.count
 	);
+	const isAugment = $derived(def.type === 'augment');
+	const augInfo = $derived(isAugment ? augment.info : null);
 </script>
 
 <div class="{className} group">
@@ -88,14 +94,37 @@
 					class="size-4 object-contain opacity-50"
 				/>
 			{/if}
+		{:else if augInfo && !augInfo.isMaxLevel}
+			<div class="flex items-center gap-1 font-mono text-[9px] font-black tracking-wider">
+				<img src={def.categoryIcon} alt="category" class="size-4 object-contain opacity-50" />
+				<span class="text-white/30">{ROMAN[augInfo.level]}</span>
+				<ArrowUpgradeIcon />
+				<span class="text-cyan-400">{ROMAN[augInfo.level + 1]}</span>
+			</div>
+			<div class="flex items-center gap-1">
+				<button
+					title="Upgrade"
+					disabled={!augInfo.canAfford}
+					onpointerdowncapture={(e) => e.stopPropagation()}
+					onclick={(e) => {
+						e.stopPropagation();
+						augment.doUpgrade();
+					}}
+					class="flex items-center gap-0.5 rounded px-0.5 font-mono text-[8px] font-black uppercase transition-colors
+						{augInfo.canAfford
+						? 'cursor-pointer text-cyan-400 hover:bg-cyan-500/20 active:scale-90'
+						: 'cursor-not-allowed text-white/40'}"
+				>
+					<UpgradeIcon />
+					UP
+				</button>
+			</div>
 		{:else}
 			<div class="text-white/70">
 				<img src={def.categoryIcon} alt="category" class="size-4 object-contain" />
 			</div>
 			{#if displayCount > 1}
-				<div
-					class="flex items-center gap-0.5 text-xs leading-none font-medium text-white"
-				>
+				<div class="flex items-center gap-0.5 text-xs leading-none font-medium text-white">
 					<span class="text-[9px]">x</span>
 					<span class="font-sans text-xs tracking-[-0.05em]">
 						{displayCount}

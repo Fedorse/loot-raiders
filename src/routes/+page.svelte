@@ -5,7 +5,6 @@
 	import QuestBar from '$lib/components/quest-bar.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import { formatTime } from '$lib/utils';
-	import UpgradeBar from '$lib/components/upgrade-bar.svelte';
 
 	const { gameLoop, inventory, loot, selection } = getGameContext();
 </script>
@@ -55,7 +54,7 @@
 			<div class="z-10 flex flex-col items-end">
 				{@render scoreTimeTab()}
 				<div
-					class="flex flex-col gap-4 rounded-tl-lg rounded-b-none bg-background/50 p-4 backdrop-blur-md"
+					class="flex flex-col gap-4 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 p-4 backdrop-blur-md"
 				>
 					<div class="flex h-full w-full justify-center gap-8">
 						<div class="flex flex-col gap-4">
@@ -73,7 +72,6 @@
 						</div>
 					</div>
 				</div>
-				<UpgradeBar />
 			</div>
 		</div>
 

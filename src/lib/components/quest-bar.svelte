@@ -76,41 +76,30 @@
 	</div>
 {/snippet}
 
-<div class="relative z-10 flex w-56 flex-col rounded-lg">
+<div class="relative z-10 flex w-56 flex-col rounded-t-lg rounded-b-none">
 	{#if gameLoop.status !== 'idle'}
 		<div class="flex flex-col gap-1.5 rounded-t-xl bg-background/50 px-5 py-2 backdrop-blur-md">
 			<div class="flex items-center justify-between">
-				<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase"
-					>Stage {quest.currentStage + 1}</span
-				>
-				<span class="flex items-baseline gap-px font-mono tabular-nums">
-					<span
-						class="text-xs font-black"
-						class:text-emerald-400={quest.stageCompleted}
-						class:text-white={!quest.stageCompleted}
-					>
-						{quest.completed}
-					</span>
-					<span class="text-[10px] font-bold text-white/40">/{quest.total}</span>
-				</span>
+				<span class="text-[10px] font-medium text-white/50 uppercase">{quest.stageDef.name}</span>
 			</div>
-			<div class="flex items-center justify-between">
-				<span class="text-[10px] font-medium text-white/50">{quest.stageDef.name}</span>
-				<div class="flex gap-1">
-					{#each STAGES as _, i (i)}
+			<div class="mt-0.5 flex w-full gap-1">
+				{#each STAGES as _, i (i)}
+					<div
+						class="h-1 flex-1 overflow-hidden rounded-full bg-black/20 shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)] ring-1 ring-white/5"
+					>
 						<div
-							class="size-1.5 rounded-full {i < quest.currentStage
-								? 'bg-emerald-400'
+							class="h-full w-full transition-all duration-500 {i < quest.currentStage
+								? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]'
 								: i === quest.currentStage
-									? 'bg-cyan-400'
+									? 'animate-pulse bg-cyan-400 shadow-[0_0_8px_rgba(34,211,238,0.5)]'
 									: 'bg-white/20'}"
 						></div>
-					{/each}
-				</div>
+					</div>
+				{/each}
 			</div>
 		</div>
 
-		<div class="flex flex-col gap-2 overflow-hidden rounded-b-lg bg-background/50 px-3 py-4">
+		<div class="flex flex-col gap-2 overflow-hidden bg-background/50 px-3 py-4 backdrop-blur-md">
 			{#each quest.items as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
 				{@const showAsWeaponLayout =
@@ -168,6 +157,26 @@
 					{/if}
 				</div>
 			{/each}
+		</div>
+		<div
+			class="flex items-center justify-between rounded-b-lg bg-background/50 px-5 py-2 backdrop-blur-md"
+		>
+			<span class="text-[10px] font-medium text-white/50 uppercase">
+				Stage {quest.currentStage + 1}
+			</span>
+			<div class="flex items-center gap-1.5">
+				<span class="text-[9px] font-medium tracking-wider text-white/20 uppercase">Progress</span>
+				<span class="flex items-baseline gap-px font-mono tabular-nums">
+					<span
+						class="text-[10px] font-bold transition-colors duration-300 {quest.stageCompleted
+							? 'text-emerald-500/80 drop-shadow-[0_0_2px_rgba(16,185,129,0.5)]'
+							: 'text-white/40'}"
+					>
+						{quest.completed}
+					</span>
+					<span class="text-[9px] font-bold text-white/20">/{quest.total}</span>
+				</span>
+			</div>
 		</div>
 	{/if}
 </div>
