@@ -16,14 +16,12 @@
 				<div
 					class="flex h-9 items-center gap-4 rounded-t-lg bg-background/50 px-5 backdrop-blur-md"
 				>
-					<span class="text-[11px] font-semibold tracking-wider text-white/90 uppercase"
-						>Loot Drop</span
-					>
+					<span class="text-[10px] font-semibold tracking-wider uppercase">Loot Drop</span>
 
 					<div class="h-3 w-[1px] bg-white/20"></div>
 
 					<div class="flex items-center gap-1.5">
-						<span class="text-[11px] text-muted uppercase">Next</span>
+						<span class="text-[9px] font-semibold tracking-wider text-muted uppercase">Next</span>
 						<span class="font-mono text-xs font-black text-cyan-400 tabular-nums">
 							{Math.ceil(loot.cooldown)}s
 						</span>
@@ -33,11 +31,13 @@
 
 					<div class="flex items-center gap-1.5">
 						<kbd
-							class="inline-flex min-w-8 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-0.5 text-[11px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
+							class="inline-flex min-w-8 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-0.5 text-[9px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
 						>
 							Space
 						</kbd>
-						<span class="text-[11px] font-semibold text-muted uppercase">Open Now</span>
+						<span class="text-[9px] font-semibold tracking-wider text-muted uppercase"
+							>Open Now</span
+						>
 					</div>
 				</div>
 
@@ -108,31 +108,44 @@
 
 			<div class="h-3 w-[1px] bg-white/20"></div>
 
-			<div class="flex items-center gap-2">
-				<img src="/assets/ui/Coins.png" alt="coins" class="size-3.5 object-contain" />
-				<span class="text-[11px] text-muted uppercase">Extract</span>
-				<span class="text-[11px] font-black text-yellow-400 tabular-nums">
-					{inventory.totalExtract.toLocaleString()}
-				</span>
-			</div>
+			<div class="flex items-center gap-2 rounded py-1">
+				<span class="text-[9px] font-semibold tracking-wider text-muted uppercase">Extract</span>
 
+				<div class="flex items-center gap-1.5">
+					<img src="/assets/ui/Coins.png" alt="coins" class="size-3.5 object-contain" />
+					<span class="font-mono text-xs font-black tabular-nums">
+						{inventory.totalExtract.toLocaleString()}
+					</span>
+				</div>
+			</div>
 			<div class="h-3 w-[1px] bg-white/20"></div>
 
 			<div class="flex items-center gap-2">
-				<span class="text-[11px] text-muted uppercase">Weight</span>
-				<span class="flex items-baseline gap-px font-mono tabular-nums">
-					<span class="text-xs font-black text-white">{Math.round(inventory.totalWeight)}</span>
-					<span class="text-[10px] font-bold text-white/40">/ {inventory.maxWeight}</span>
-				</span>
-				<div class="h-2 w-16 overflow-hidden rounded-full bg-white/10">
+				<div
+					class="relative flex items-center gap-1.5 overflow-hidden rounded bg-black/40 px-2.5 py-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
+				>
 					<div
-						class="h-full rounded-full transition-all {weightPct > 90
-							? 'bg-red-400'
+						class="absolute top-0 left-0 h-full transition-all duration-300 {weightPct > 90
+							? 'bg-red-500/30'
 							: weightPct > 70
-								? 'bg-yellow-400'
-								: 'bg-cyan-400'}"
+								? 'bg-yellow-400/30'
+								: 'bg-cyan-400/50'}"
 						style="width: {weightPct}%"
 					></div>
+
+					<img src="/assets/ui/placeholder/weight.png" alt="coins" class="size-3 object-contain" />
+
+					<span class="relative z-10 flex items-baseline gap-1.5 font-mono tabular-nums">
+						<span
+							class="text-xs font-black transition-colors duration-300 {weightPct > 90
+								? 'text-red-400 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]'
+								: 'text-white'}"
+						>
+							{Math.round(inventory.totalWeight)}
+						</span>
+						<span class="text-[10px] font-black text-white/20">/</span>
+						<span class="text-[10px] font-bold text-white/50">{inventory.maxWeight}</span>
+					</span>
 				</div>
 			</div>
 		</div>

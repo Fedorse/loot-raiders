@@ -9,7 +9,6 @@ import type { AudioManager } from './audio.svelte';
 import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } from '$lib/types';
 
 const EQUIP_STORAGES: StorageId[] = ['backpack', 'weapon', 'augment', 'shield'];
-const MAX_WEIGHT = 60;
 
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
@@ -22,7 +21,11 @@ export class Inventory {
 	private selection: Selection;
 	private audio: AudioManager;
 
-	maxWeight = MAX_WEIGHT;
+	maxWeight = $derived.by(() => {
+		const augItem = this.getItem({ type: 'slot', storageId: 'augment', index: 0 });
+		if (!augItem) return 25;
+		return getDef(augItem.defId).maxCarryWeight ?? 25;
+	});
 
 	totalExtract = $derived.by(() => {
 		let sum = 0;

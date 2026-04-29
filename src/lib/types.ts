@@ -62,6 +62,7 @@ export interface ItemDefinition {
 	price: number;
 	timeBonus?: number;
 	maxStack?: number;
+	maxCarryWeight?: number;
 
 	attachmentSlots?: AttachmentSlotDef[];
 

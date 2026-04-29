@@ -47,3 +47,4 @@ export function getAugmentBonusSlots(defId: string): number {
 	const level = getAugmentLevel(defId);
 	return AUGMENT_UPGRADES.slice(0, level).reduce((sum, u) => sum + u.bonusSlots, 0);
 }
+

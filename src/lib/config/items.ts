@@ -3205,6 +3205,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 100,
 		maxStack: 1,
+		maxCarryWeight: 25,
 		description: 'Basic augment for rookie Raiders.'
 	},
 	aug_combat_mk1: {
@@ -3217,6 +3218,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 640,
 		maxStack: 1,
+		maxCarryWeight: 35,
 		description: 'Supports stronger shields, but with limited backpack capacity.',
 		recycling: [
 			{ itemId: 'res_plastic_parts', amount: 3 },
@@ -3233,6 +3235,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 640,
 		maxStack: 1,
+		maxCarryWeight: 35,
 		description: 'More backpack slots and weight capacity, but low defensive capability.',
 		recycling: [
 			{ itemId: 'res_plastic_parts', amount: 3 },
@@ -3249,6 +3252,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 640,
 		maxStack: 1,
+		maxCarryWeight: 35,
 		description: 'More Quick Use slots for more tactical choice.',
 		recycling: [
 			{ itemId: 'res_plastic_parts', amount: 3 },
@@ -3265,6 +3269,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 2000,
 		maxStack: 1,
+		maxCarryWeight: 50,
 		description: 'Restores 1 health every 5 seconds. Paused for 30s after taking damage.',
 		recycling: [
 			{ itemId: 'loot_electrical_components', amount: 1 },
@@ -3281,6 +3286,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 2000,
 		maxStack: 1,
+		maxCarryWeight: 50,
 		description: 'Adds trinket slots. Automatically throws off attached Ticks after 1s.',
 		recycling: [
 			{ itemId: 'loot_magnet', amount: 1 },
@@ -3297,6 +3303,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 2000,
 		maxStack: 1,
+		maxCarryWeight: 50,
 		description: 'More backpack space and extra utility slot. Deploys smoke on shield break.',
 		recycling: [
 			{ itemId: 'loot_electrical_components', amount: 1 },
@@ -3313,6 +3320,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 5000,
 		maxStack: 1,
+		maxCarryWeight: 60,
 		description: 'Supports more shield types. Restores 2 health every 5 seconds.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },
@@ -3330,6 +3338,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 5000,
 		maxStack: 1,
+		maxCarryWeight: 60,
 		description: 'Upon shield break, automatically administers a weak Adrenaline Shot.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },
@@ -3346,6 +3355,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 5000,
 		maxStack: 1,
+		maxCarryWeight: 60,
 		description: 'While downed, health regenerates up to 75% of max downed health.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },
@@ -3362,6 +3372,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 5000,
 		maxStack: 1,
+		maxCarryWeight: 60,
 		description: 'When revived, releases a healing cloud that restores 20 health.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },

@@ -161,11 +161,11 @@
 		<div
 			class="flex items-center justify-between rounded-b-lg bg-background/50 px-5 py-2 backdrop-blur-md"
 		>
-			<span class="text-[10px] font-medium text-white/50 uppercase">
+			<span class="text-[10px] font-medium text-white/80 uppercase">
 				Stage {quest.currentStage + 1}
 			</span>
 			<div class="flex items-center gap-1.5">
-				<span class="text-[9px] font-medium tracking-wider text-white/20 uppercase">Progress</span>
+				<span class="text-[9px] font-medium tracking-wider text-muted uppercase">Progress</span>
 				<span class="flex items-baseline gap-px font-mono tabular-nums">
 					<span
 						class="text-[10px] font-bold transition-colors duration-300 {quest.stageCompleted
@@ -174,7 +174,7 @@
 					>
 						{quest.completed}
 					</span>
-					<span class="text-[9px] font-bold text-white/20">/{quest.total}</span>
+					<span class="text-[9px] font-bold text-muted">/{quest.total}</span>
 				</span>
 			</div>
 		</div>
