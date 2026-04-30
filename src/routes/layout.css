@@ -60,6 +60,10 @@
 }
 
 @theme inline {
+	/* Breakpoints */
+	--breakpoint-2xl: 1440px;
+
+
 	/* Surface */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);

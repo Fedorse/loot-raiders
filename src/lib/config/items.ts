@@ -3208,23 +3208,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxCarryWeight: 25,
 		description: 'Basic augment for rookie Raiders.'
 	},
-	aug_combat_mk1: {
-		id: 'aug_combat_mk1',
-		name: 'Combat Mk. 1',
-		type: 'augment',
-		rarity: 'uncommon',
-		image: '/assets/items/Augments/CombatMK1.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 640,
-		maxStack: 1,
-		maxCarryWeight: 35,
-		description: 'Supports stronger shields, but with limited backpack capacity.',
-		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3 },
-			{ itemId: 'res_rubber_parts', amount: 3 }
-		]
-	},
 	aug_looting_mk1: {
 		id: 'aug_looting_mk1',
 		name: 'Looting Mk. 1',
@@ -3240,40 +3223,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		recycling: [
 			{ itemId: 'res_plastic_parts', amount: 3 },
 			{ itemId: 'res_rubber_parts', amount: 3 }
-		]
-	},
-	aug_tactical_mk1: {
-		id: 'aug_tactical_mk1',
-		name: 'Tactical Mk. 1',
-		type: 'augment',
-		rarity: 'uncommon',
-		image: '/assets/items/Augments/TacticalMK1.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 640,
-		maxStack: 1,
-		maxCarryWeight: 35,
-		description: 'More Quick Use slots for more tactical choice.',
-		recycling: [
-			{ itemId: 'res_plastic_parts', amount: 3 },
-			{ itemId: 'res_rubber_parts', amount: 3 }
-		]
-	},
-	aug_combat_mk2: {
-		id: 'aug_combat_mk2',
-		name: 'Combat Mk. 2',
-		type: 'augment',
-		rarity: 'rare',
-		image: '/assets/items/Augments/CombatMK2.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 2000,
-		maxStack: 1,
-		maxCarryWeight: 50,
-		description: 'Restores 1 health every 5 seconds. Paused for 30s after taking damage.',
-		recycling: [
-			{ itemId: 'loot_electrical_components', amount: 1 },
-			{ itemId: 'loot_magnet', amount: 1 }
 		]
 	},
 	aug_looting_mk2: {
@@ -3293,41 +3242,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'loot_electrical_components', amount: 1 }
 		]
 	},
-	aug_tactical_mk2: {
-		id: 'aug_tactical_mk2',
-		name: 'Tactical Mk. 2',
-		type: 'augment',
-		rarity: 'rare',
-		image: '/assets/items/Augments/TacticalMK2.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 2000,
-		maxStack: 1,
-		maxCarryWeight: 50,
-		description: 'More backpack space and extra utility slot. Deploys smoke on shield break.',
-		recycling: [
-			{ itemId: 'loot_electrical_components', amount: 1 },
-			{ itemId: 'loot_magnet', amount: 1 }
-		]
-	},
-	aug_combat_mk3_aggressive: {
-		id: 'aug_combat_mk3_aggressive',
-		name: 'Combat Mk. 3 (Aggressive)',
-		type: 'augment',
-		rarity: 'epic',
-		image: '/assets/items/Augments/CombatMK3Aggressive.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 5000,
-		maxStack: 1,
-		maxCarryWeight: 60,
-		description: 'Supports more shield types. Restores 2 health every 5 seconds.',
-		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1 },
-			{ itemId: 'res_processor', amount: 1 },
-			{ itemId: 'loot_electrical_components', amount: 2 }
-		]
-	},
 	aug_looting_mk3_cautious: {
 		id: 'aug_looting_mk3_cautious',
 		name: 'Looting Mk. 3 (Cautious)',
@@ -3340,40 +3254,6 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		maxStack: 1,
 		maxCarryWeight: 60,
 		description: 'Upon shield break, automatically administers a weak Adrenaline Shot.',
-		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1 },
-			{ itemId: 'res_processor', amount: 1 }
-		]
-	},
-	aug_looting_mk3_survivor: {
-		id: 'aug_looting_mk3_survivor',
-		name: 'Looting Mk. 3 (Survivor)',
-		type: 'augment',
-		rarity: 'epic',
-		image: '/assets/items/Augments/LootingMk3Survivor.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 5000,
-		maxStack: 1,
-		maxCarryWeight: 60,
-		description: 'While downed, health regenerates up to 75% of max downed health.',
-		recycling: [
-			{ itemId: 'loot_adv_electrical', amount: 1 },
-			{ itemId: 'res_processor', amount: 1 }
-		]
-	},
-	aug_tactical_mk3_healing: {
-		id: 'aug_tactical_mk3_healing',
-		name: 'Tactical Mk. 3 (Healing)',
-		type: 'augment',
-		rarity: 'epic',
-		image: '/assets/items/Augments/TacticalMK3Healing.png',
-		categoryIcon: '/assets/ui/category_assets/augment.png',
-		weight: 1,
-		price: 5000,
-		maxStack: 1,
-		maxCarryWeight: 60,
-		description: 'When revived, releases a healing cloud that restores 20 health.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },
 			{ itemId: 'res_processor', amount: 1 }

@@ -9,43 +9,60 @@
 	const { gameLoop, inventory, loot, selection } = getGameContext();
 </script>
 
-<div class="flex h-full items-center justify-center gap-6" onpointerdown={() => selection.clear()}>
-	<div class="flex h-full flex-col gap-6 pt-10">
-		<div class="flex items-start justify-center gap-4">
+<div
+	class="flex h-full items-center justify-center gap-1.5 md:gap-2 lg:gap-4 xl:gap-5 2xl:gap-10"
+	onpointerdown={() => selection.clear()}
+>
+	<div
+		class="flex h-full flex-col gap-1.5 pt-3 md:gap-2 md:pt-4 lg:gap-10 lg:pt-6 xl:gap-14 xl:pt-12 2xl:gap-18 2xl:pt-16"
+	>
+		<div class="flex items-start justify-center gap-1.5 md:gap-2 lg:gap-4 xl:gap-5 2xl:gap-10">
 			<div class="z-10 flex flex-col items-start">
 				<div
-					class="flex h-9 items-center gap-4 rounded-t-lg bg-background/50 px-5 backdrop-blur-md"
+					class="flex h-7 items-center gap-2.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:h-9 xl:gap-4 xl:px-5 2xl:h-10 2xl:gap-5 2xl:px-6"
 				>
-					<span class="text-[10px] font-semibold tracking-wider uppercase">Loot Drop</span>
+					<span
+						class="text-[8px] font-semibold tracking-wider uppercase xl:text-[10px] 2xl:text-[11px]"
+						>Loot Drop</span
+					>
 
-					<div class="h-3 w-[1px] bg-white/20"></div>
+					{@render divider()}
 
-					<div class="flex items-center gap-1.5">
-						<span class="text-[9px] font-semibold tracking-wider text-muted uppercase">Next</span>
-						<span class="font-mono text-xs font-black text-cyan-400 tabular-nums">
+					<div class="flex items-center gap-1 xl:gap-1.5">
+						<span
+							class="text-[7px] font-semibold tracking-wider text-muted uppercase xl:text-[9px] 2xl:text-[10px]"
+							>Next</span
+						>
+						<span
+							class="font-mono text-[10px] font-black text-cyan-400 tabular-nums xl:text-xs 2xl:text-[13px]"
+						>
 							{Math.ceil(loot.cooldown)}s
 						</span>
 					</div>
 
-					<div class="h-3 w-[1px] bg-white/20"></div>
+					{@render divider()}
 
-					<div class="flex items-center gap-1.5">
+					<div class="flex items-center gap-1 xl:gap-1.5">
 						<kbd
-							class="inline-flex min-w-8 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-0.5 text-[9px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
+							class="inline-flex min-w-6 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-1.5 py-0.5 text-[7px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)] xl:min-w-8 xl:px-2 xl:text-[9px] 2xl:text-[10px]"
 						>
 							Space
 						</kbd>
-						<span class="text-[9px] font-semibold tracking-wider text-muted uppercase"
+						<span
+							class="text-[7px] font-semibold tracking-wider text-muted uppercase xl:text-[9px] 2xl:text-[10px]"
 							>Open Now</span
 						>
 					</div>
 				</div>
 
 				<div
-					class="z-10 flex flex-col gap-4 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 px-4 pt-4 pb-4 backdrop-blur-md"
+					class="z-10 flex flex-col gap-1.5 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 p-1.5 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-4 xl:p-4 2xl:gap-5 2xl:p-5"
 				>
 					<div class="grid grid-cols-4">
-						<StorageGrid storageId="lootBack" class="aspect-square h-24 w-24" />
+						<StorageGrid
+							storageId="lootBack"
+							class="aspect-square h-14 w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 2xl:h-28 2xl:w-28"
+						/>
 					</div>
 					<DropZone />
 				</div>
@@ -54,20 +71,34 @@
 			<div class="z-10 flex flex-col items-end">
 				{@render scoreTimeTab()}
 				<div
-					class="flex flex-col gap-4 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 p-4 backdrop-blur-md"
+					class="flex flex-col gap-1.5 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 p-1.5 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-4 xl:p-4 2xl:gap-5 2xl:p-5"
 				>
-					<div class="flex h-full w-full justify-center gap-8">
-						<div class="flex flex-col gap-4">
-							<div class="flex gap-4">
-								<StorageGrid storageId="augment" class="h-24 w-[140px]" />
-								<StorageGrid storageId="shield" class="h-24 w-[140px]" />
+					<div
+						class="flex h-full w-full justify-center gap-1.5 md:gap-2 lg:gap-4 xl:gap-8 2xl:gap-10"
+					>
+						<div class="flex flex-col gap-1.5 md:gap-2 lg:gap-3 xl:gap-4 2xl:gap-5">
+							<div class="flex gap-1.5 md:gap-2 lg:gap-3 xl:gap-4 2xl:gap-5">
+								<StorageGrid
+									storageId="augment"
+									class="h-14 w-20 md:h-16 md:w-24 lg:h-20 lg:w-[112px] xl:h-24 xl:w-[140px] 2xl:h-28 2xl:w-[160px]"
+								/>
+								<StorageGrid
+									storageId="shield"
+									class="h-14 w-20 md:h-16 md:w-24 lg:h-20 lg:w-[112px] xl:h-24 xl:w-[140px] 2xl:h-28 2xl:w-[160px]"
+								/>
 							</div>
-							<StorageGrid storageId="weapon" class="h-48 w-[295px]" />
+							<StorageGrid
+								storageId="weapon"
+								class="h-28 w-40 md:h-32 md:w-48 lg:h-40 lg:w-[240px] xl:h-48 xl:w-[295px] 2xl:h-52 2xl:w-[340px]"
+							/>
 						</div>
 
-						<div class="flex flex-col gap-4">
+						<div class="flex flex-col gap-1.5 md:gap-2 lg:gap-3 xl:gap-4 2xl:gap-5">
 							<div class="grid grid-cols-4">
-								<StorageGrid storageId="backpack" class="aspect-square h-24 w-24" />
+								<StorageGrid
+									storageId="backpack"
+									class="aspect-square h-14 w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 2xl:h-28 2xl:w-28"
+								/>
 							</div>
 						</div>
 					</div>
@@ -80,17 +111,23 @@
 		{/if}
 	</div>
 
-	<div class="self-start pt-10">
+	<div class="self-start pt-3 md:pt-4 lg:pt-6 xl:pt-12 2xl:pt-16">
 		<QuestBar />
 	</div>
 </div>
 
+{#snippet divider()}
+	<div class="h-2.5 w-[1px] bg-white/20 xl:h-3 2xl:h-3.5"></div>
+{/snippet}
+
 {#snippet scoreTimeTab()}
 	{#if gameLoop.status !== 'idle'}
 		{@const weightPct = Math.min(100, (inventory.totalWeight / inventory.maxWeight) * 100)}
-		<div class="flex h-9 items-center gap-4 rounded-t-lg bg-background/50 px-5 backdrop-blur-md">
+		<div
+			class="flex h-7 items-center gap-2.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:h-9 xl:gap-4 xl:px-5 2xl:h-10 2xl:gap-5 2xl:px-6"
+		>
 			<span
-				class="relative inline-block font-mono text-xs font-bold tracking-widest transition-colors duration-300 {gameLoop.timeLeft <
+				class="relative inline-block font-mono text-[10px] font-bold tracking-widest transition-colors duration-300 xl:text-xs 2xl:text-[13px] {gameLoop.timeLeft <
 				10
 					? 'text-red-400'
 					: 'text-white/90'} {gameLoop.shieldTimeBonus > 0 ? 'time-flash' : ''}"
@@ -98,7 +135,7 @@
 				{formatTime(gameLoop.timeLeft)}
 				{#if gameLoop.shieldTimeBonus > 0}
 					<span
-						class="bonus-popup pointer-events-none absolute -top-3 -right-6 font-mono text-xs font-black text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.8)]"
+						class="bonus-popup pointer-events-none absolute -top-3 -right-6 font-mono text-[10px] font-black text-emerald-400 drop-shadow-[0_0_6px_rgba(52,211,153,0.8)] xl:text-xs"
 						onanimationend={() => (gameLoop.shieldTimeBonus = 0)}
 					>
 						+{gameLoop.shieldTimeBonus}s
@@ -106,23 +143,30 @@
 				{/if}
 			</span>
 
-			<div class="h-3 w-[1px] bg-white/20"></div>
+			{@render divider()}
 
-			<div class="flex items-center gap-2 rounded py-1">
-				<span class="text-[9px] font-semibold tracking-wider text-muted uppercase">Extract</span>
+			<div class="flex items-center gap-1.5 rounded py-1 xl:gap-2">
+				<span
+					class="text-[7px] font-semibold tracking-wider text-muted uppercase xl:text-[9px] 2xl:text-[10px]"
+					>Extract</span
+				>
 
-				<div class="flex items-center gap-1.5">
-					<img src="/assets/ui/Coins.png" alt="coins" class="size-3.5 object-contain" />
-					<span class="font-mono text-xs font-black tabular-nums">
+				<div class="flex items-center gap-1 xl:gap-1.5">
+					<img
+						src="/assets/ui/Coins.png"
+						alt="coins"
+						class="size-3 object-contain xl:size-3.5 2xl:size-4"
+					/>
+					<span class="font-mono text-[10px] font-black tabular-nums xl:text-xs 2xl:text-[13px]">
 						{inventory.totalExtract.toLocaleString()}
 					</span>
 				</div>
 			</div>
-			<div class="h-3 w-[1px] bg-white/20"></div>
+			{@render divider()}
 
-			<div class="flex items-center gap-2">
+			<div class="flex items-center gap-1.5 xl:gap-2">
 				<div
-					class="relative flex items-center gap-1.5 overflow-hidden rounded bg-black/40 px-2.5 py-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
+					class="relative flex items-center gap-1 overflow-hidden rounded bg-black/40 px-2 py-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.5)] ring-1 ring-white/10 xl:gap-1.5 xl:px-2.5"
 				>
 					<div
 						class="absolute top-0 left-0 h-full transition-all duration-300 {weightPct > 90
@@ -133,18 +177,26 @@
 						style="width: {weightPct}%"
 					></div>
 
-					<img src="/assets/ui/placeholder/weight.png" alt="coins" class="size-3 object-contain" />
+					<img
+						src="/assets/ui/placeholder/weight.png"
+						alt="weight"
+						class="size-2.5 object-contain xl:size-3 2xl:size-3.5"
+					/>
 
-					<span class="relative z-10 flex items-baseline gap-1.5 font-mono tabular-nums">
+					<span class="relative z-10 flex items-baseline gap-1 font-mono tabular-nums">
 						<span
-							class="text-xs font-black transition-colors duration-300 {weightPct > 90
+							class="text-[10px] font-black transition-colors duration-300 xl:text-xs 2xl:text-[13px] {weightPct >
+							90
 								? 'text-red-400 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]'
 								: 'text-white'}"
 						>
 							{Math.round(inventory.totalWeight)}
 						</span>
-						<span class="text-[10px] font-black text-white/20">/</span>
-						<span class="text-[10px] font-bold text-white/50">{inventory.maxWeight}</span>
+						<span class="text-[8px] font-black text-white/20 xl:text-[10px] 2xl:text-[11px]">/</span
+						>
+						<span class="text-[8px] font-bold text-white/50 xl:text-[10px] 2xl:text-[11px]"
+							>{inventory.maxWeight}</span
+						>
 					</span>
 				</div>
 			</div>
