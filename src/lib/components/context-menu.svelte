@@ -20,19 +20,19 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		{@attach clickOutside(close)}
-		class="fixed z-[100] flex w-48 flex-col rounded-sm border border-modal-border bg-modal py-1.5 shadow-xl"
+		class="fixed z-[100] flex w-32 flex-col rounded-sm border border-modal-border bg-modal py-1 shadow-xl md:w-36 md:py-1.5 lg:w-40 xl:w-44 2xl:w-48 3xl:w-56"
 		style="top: {menuData.y}px; left: {menuData.x}px;"
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div
-			class="border-b border-modal-border px-3 pt-1 pb-2 text-xs font-bold tracking-wider text-muted uppercase"
+			class="border-b border-modal-border px-2 pt-0.5 pb-1.5 text-[9px] font-bold tracking-wider text-muted uppercase md:px-2.5 md:pt-1 md:pb-2 md:text-[10px] lg:px-3 lg:text-[11px] 2xl:text-xs 3xl:text-[13px] 3xl:px-3.5"
 		>
 			{def.name}
 		</div>
 
 		{#if moveTargetId}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
 				onclick={() => {
 					inventory.quickMove(menuData.slot.location);
 					close();
@@ -44,7 +44,7 @@
 
 		{#if def.maxStack && menuData.slot.item.count > 1}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
 				onclick={() => {
 					inventory.splitStack(menuData.slot.location);
 					close();
@@ -54,10 +54,10 @@
 			</button>
 		{/if}
 
-		<div class="my-0.5 border-t border-modal-border"></div>
+		<div class="my-0.5 border-t border-modal-border md:my-1"></div>
 
 		<button
-			class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent"
+			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
 			onclick={() => {
 				inventory.removeItem(menuData.slot.location);
 				close();
@@ -68,7 +68,7 @@
 
 		{#if def.recycling?.length}
 			<button
-				class="flex w-full px-3 py-1.5 text-left text-sm font-medium text-modal-foreground hover:bg-accent-alt"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
 				onclick={() => {
 					overlay.openRecycleModal(menuData.slot.item, menuData.slot.location);
 					close();

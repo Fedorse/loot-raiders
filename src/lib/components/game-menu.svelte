@@ -6,7 +6,7 @@
 	const { gameLoop, audio, quest } = getGameContext();
 
 	const BTN =
-		'group flex w-full min-w-[320px] items-center justify-center  rounded-md border border-[#2a2f4c] bg-[#0c101c]/80  py-4  transition-all hover:bg-[#1a2133] active:scale-[0.98]';
+		'group flex w-full min-w-[200px] items-center justify-center rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 py-2.5 transition-all hover:bg-[#1a2133] active:scale-[0.98] md:min-w-[240px] md:py-3 lg:min-w-[280px] lg:py-3.5 2xl:min-w-[320px] 2xl:py-4 3xl:min-w-[380px] 3xl:py-5';
 </script>
 
 {#snippet menuButton(label: string, onclick: () => void)}
@@ -17,7 +17,7 @@
 			onclick();
 		}}
 	>
-		<span class="text-md font-semibold tracking-wider text-white/80 group-hover:text-white">
+		<span class="text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 2xl:text-md 3xl:text-lg">
 			{label}
 		</span>
 	</button>
@@ -28,7 +28,7 @@
 		class="fixed inset-0 z-[10] flex items-center justify-center bg-black/70 backdrop-blur-xs"
 		transition:fade={{ duration: 150 }}
 	>
-		<div class="flex flex-col items-center gap-8" transition:scale={{ duration: 200, start: 0.5 }}>
+		<div class="flex flex-col items-center gap-4 md:gap-5 lg:gap-6 2xl:gap-8 3xl:gap-10" transition:scale={{ duration: 200, start: 0.5 }}>
 			{#if gameLoop.status === 'idle'}
 				<div class="flex flex-col gap-2">
 					{@render menuButton('Play', () => gameLoop.start())}
@@ -42,15 +42,15 @@
 				</div>
 			{:else if gameLoop.status === 'over'}
 				{#if gameLoop.gameOverReason === 'victory'}
-					<h1 class="text-3xl font-black tracking-tight text-emerald-400 uppercase">Victory</h1>
-					<p class="text-sm text-emerald-300/60">All stages completed</p>
+					<h1 class="text-xl font-black tracking-tight md:text-2xl 2xl:text-3xl 3xl:text-4xl text-emerald-400 uppercase">Victory</h1>
+					<p class="text-[10px] text-emerald-300/60 md:text-xs 2xl:text-sm 3xl:text-base">All stages completed</p>
 				{:else}
-					<h1 class="text-3xl font-black tracking-tight text-red-400 uppercase">Defeated</h1>
-					<p class="text-sm text-red-300/60">
+					<h1 class="text-xl font-black tracking-tight md:text-2xl 2xl:text-3xl 3xl:text-4xl text-red-400 uppercase">Defeated</h1>
+					<p class="text-[10px] text-red-300/60 md:text-xs 2xl:text-sm 3xl:text-base">
 						Time ran out — Stage {quest.currentStage + 1}
 					</p>
 				{/if}
-				<div class="text-4xl font-bold text-white">{gameLoop.score} pts</div>
+				<div class="text-2xl font-bold text-white md:text-3xl 2xl:text-4xl 3xl:text-5xl">{gameLoop.score} pts</div>
 
 				<div class="flex flex-col gap-2">
 					{@render menuButton('Retry', () => gameLoop.restart())}
@@ -60,18 +60,18 @@
 		</div>
 
 		{#if gameLoop.status !== 'idle'}
-			<div class="text-md absolute bottom-24 left-6 flex gap-8 font-bold text-muted">
-				<div class="flex items-center gap-2">
+			<div class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10">
+				<div class="flex items-center gap-1.5 md:gap-2">
 					<kbd
-						class="inline-flex min-w-11 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-2 py-1 text-xs font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)]"
+						class="inline-flex min-w-7 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-1.5 py-0.5 text-[7px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)] md:min-w-8 md:px-2 md:py-1 md:text-[8px] lg:min-w-9 lg:text-[9px] xl:text-[10px] 2xl:min-w-11 2xl:text-xs 3xl:min-w-12 3xl:text-[13px]"
 					>
 						esc
 					</kbd>
-					<span class="text-xs font-semibold text-muted uppercase">Resume</span>
+					<span class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]">Resume</span>
 				</div>
-				<div class="flex items-center gap-2">
-					<img src="/assets/ui/icon-actions.png" alt="category" class="size-5 object-contain" />
-					<span class="text-xs font-semibold text-muted uppercase">SELECT</span>
+				<div class="flex items-center gap-1.5 md:gap-2">
+					<img src="/assets/ui/icon-actions.png" alt="category" class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6" />
+					<span class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]">SELECT</span>
 				</div>
 			</div>
 		{/if}

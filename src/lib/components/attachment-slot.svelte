@@ -29,7 +29,7 @@
 
 {#if attachment && def && style && !isDraggingThisItem}
 	<div
-		class="relative z-20 aspect-square size-10 rounded-lg"
+		class="relative z-20 aspect-square size-6 rounded-lg md:size-7 lg:size-8 2xl:size-10 3xl:size-12"
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
 		{@attach draggable(slotState)}
@@ -58,7 +58,7 @@
 	</div>
 {:else}
 	<div
-		class="relative z-20 aspect-square size-10 rounded-lg"
+		class="relative z-20 aspect-square size-6 rounded-lg md:size-7 lg:size-8 2xl:size-10 3xl:size-12"
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
 		onpointerenter={() => (isHovered = true)}

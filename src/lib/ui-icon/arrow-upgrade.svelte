@@ -1,5 +1,9 @@
+<script lang="ts">
+	let { class: className = 'size-2' }: { class?: string } = $props();
+</script>
+
 <svg
-	class="size-2 text-cyan-500/50"
+	class="{className} text-cyan-500/50"
 	viewBox="0 0 24 24"
 	fill="none"
 	stroke="currentColor"

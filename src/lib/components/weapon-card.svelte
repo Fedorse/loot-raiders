@@ -47,7 +47,7 @@
 					class="max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
 				/>
 			</div>
-			<div class="weapon-card__slots z-20 mb-1 flex shrink-0 items-center justify-center gap-1">
+			<div class="weapon-card__slots z-20 mb-0.5 flex shrink-0 items-center justify-center gap-0.5 lg:mb-1 lg:gap-1 3xl:gap-1.5">
 				{#each def.attachmentSlots ?? [] as slotDef, index (index)}
 					<AttachmentSlot
 						parentLocation={location}
@@ -77,10 +77,10 @@
 
 {#snippet footer()}
 	<div
-		class=" z-10 flex h-8 w-full items-center justify-between rounded-b-[8px] bg-black pr-2 pl-0.5"
+		class="z-10 flex h-5 w-full items-center justify-between rounded-b-[8px] bg-black pr-1 pl-0.5 md:h-6 lg:h-7 2xl:h-8 2xl:pr-2 3xl:h-9"
 	>
 		<div class="flex h-full items-center justify-center gap-0.5">
-			<img src={def.categoryIcon} alt="ammo" class="size-9 object-contain" />
+			<img src={def.categoryIcon} alt="ammo" class="size-5 object-contain md:size-6 lg:size-7 2xl:size-9 3xl:size-10" />
 		</div>
 	</div>
 {/snippet}
