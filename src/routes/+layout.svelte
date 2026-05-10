@@ -6,6 +6,7 @@
 	import AugmentPanel from '$lib/components/augment-panel.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
+	import PortraitBlocker from '$lib/components/portrait-blocker.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 
 	import './layout.css';
@@ -73,3 +74,4 @@
 <AugmentPanel />
 <DebugPanel />
 <GameMenu />
+<PortraitBlocker />

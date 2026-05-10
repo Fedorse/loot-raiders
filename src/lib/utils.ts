@@ -23,6 +23,15 @@ export function randInt(min: number, max: number): number {
 	return min + Math.floor(Math.random() * (max - min + 1));
 }
 
+export function uuid(): string {
+	if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+		return crypto.randomUUID();
+	}
+	return '10000000-1000-4000-8000-100000000000'.replace(/[018]/g, (c) =>
+		(+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (+c / 4)))).toString(16)
+	);
+}
+
 export const formatTime = (seconds: number) => {
 	const mins = Math.floor(Math.ceil(seconds) / 60);
 	const secs = Math.ceil(seconds) % 60;

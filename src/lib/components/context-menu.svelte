@@ -25,14 +25,14 @@
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div
-			class="border-b border-modal-border px-2 pt-0.5 pb-1.5 text-[9px] font-bold tracking-wider text-muted uppercase md:px-2.5 md:pt-1 md:pb-2 md:text-[10px] lg:px-3 lg:text-[11px] 2xl:text-xs 3xl:text-[13px] 3xl:px-3.5"
+			class="border-b border-modal-border px-2 pt-0.5 pb-1.5 text-[9px] font-bold tracking-wider text-muted uppercase md:px-2.5 md:pt-1 md:pb-2 md:text-[10px] lg:px-3 lg:text-[11px] 2xl:text-xs 3xl:px-3.5 3xl:text-[13px]"
 		>
 			{def.name}
 		</div>
 
 		{#if moveTargetId}
 			<button
-				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				onclick={() => {
 					inventory.quickMove(menuData.slot.location);
 					close();
@@ -44,7 +44,7 @@
 
 		{#if def.maxStack && menuData.slot.item.count > 1}
 			<button
-				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				onclick={() => {
 					inventory.splitStack(menuData.slot.location);
 					close();
@@ -57,18 +57,18 @@
 		<div class="my-0.5 border-t border-modal-border md:my-1"></div>
 
 		<button
-			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
+			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 			onclick={() => {
 				inventory.removeItem(menuData.slot.location);
 				close();
 			}}
 		>
-			Remove
+			Drop
 		</button>
 
 		{#if def.recycling?.length}
 			<button
-				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:text-sm 3xl:px-3.5"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				onclick={() => {
 					overlay.openRecycleModal(menuData.slot.item, menuData.slot.location);
 					close();

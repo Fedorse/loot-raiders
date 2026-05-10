@@ -17,7 +17,9 @@
 			onclick();
 		}}
 	>
-		<span class="text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 2xl:text-md 3xl:text-lg">
+		<span
+			class="2xl:text-md text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 3xl:text-lg"
+		>
 			{label}
 		</span>
 	</button>
@@ -28,50 +30,85 @@
 		class="fixed inset-0 z-[10] flex items-center justify-center bg-black/70 backdrop-blur-xs"
 		transition:fade={{ duration: 150 }}
 	>
-		<div class="flex flex-col items-center gap-4 md:gap-5 lg:gap-6 2xl:gap-8 3xl:gap-10" transition:scale={{ duration: 200, start: 0.5 }}>
+		<div
+			class="flex flex-col items-center gap-4 md:gap-5 lg:gap-6 2xl:gap-8 3xl:gap-10"
+			transition:scale={{ duration: 200, start: 0.5 }}
+		>
 			{#if gameLoop.status === 'idle'}
 				<div class="flex flex-col gap-2">
-					{@render menuButton('Play', () => gameLoop.start())}
+					{@render menuButton('Play', () => {
+						gameLoop.start();
+					})}
 					<AudioSettings />
 				</div>
 			{:else if gameLoop.status === 'paused'}
 				<div class="flex flex-col gap-2">
-					{@render menuButton('Resume', () => gameLoop.resume())}
-					{@render menuButton('Restart', () => gameLoop.restart())}
+					{@render menuButton('Resume', () => {
+						gameLoop.resume();
+					})}
+					{@render menuButton('Restart', () => {
+						gameLoop.restart();
+					})}
 					<AudioSettings />
 				</div>
 			{:else if gameLoop.status === 'over'}
 				{#if gameLoop.gameOverReason === 'victory'}
-					<h1 class="text-xl font-black tracking-tight md:text-2xl 2xl:text-3xl 3xl:text-4xl text-emerald-400 uppercase">Victory</h1>
-					<p class="text-[10px] text-emerald-300/60 md:text-xs 2xl:text-sm 3xl:text-base">All stages completed</p>
+					<h1
+						class="text-xl font-black tracking-tight text-emerald-400 uppercase md:text-2xl 2xl:text-3xl 3xl:text-4xl"
+					>
+						Victory
+					</h1>
+					<p class="text-[10px] text-emerald-300/60 md:text-xs 2xl:text-sm 3xl:text-base">
+						All stages completed
+					</p>
 				{:else}
-					<h1 class="text-xl font-black tracking-tight md:text-2xl 2xl:text-3xl 3xl:text-4xl text-red-400 uppercase">Defeated</h1>
+					<h1
+						class="text-xl font-black tracking-tight text-red-400 uppercase md:text-2xl 2xl:text-3xl 3xl:text-4xl"
+					>
+						Defeated
+					</h1>
 					<p class="text-[10px] text-red-300/60 md:text-xs 2xl:text-sm 3xl:text-base">
 						Time ran out — Stage {quest.currentStage + 1}
 					</p>
 				{/if}
-				<div class="text-2xl font-bold text-white md:text-3xl 2xl:text-4xl 3xl:text-5xl">{gameLoop.score} pts</div>
+				<div class="text-2xl font-bold text-white md:text-3xl 2xl:text-4xl 3xl:text-5xl">
+					{gameLoop.score} pts
+				</div>
 
 				<div class="flex flex-col gap-2">
-					{@render menuButton('Retry', () => gameLoop.restart())}
+					{@render menuButton('Retry', () => {
+						gameLoop.restart();
+					})}
 					<AudioSettings />
 				</div>
 			{/if}
 		</div>
 
 		{#if gameLoop.status !== 'idle'}
-			<div class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10">
+			<div
+				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10"
+			>
 				<div class="flex items-center gap-1.5 md:gap-2">
 					<kbd
 						class="inline-flex min-w-7 items-center justify-center rounded-md bg-gradient-to-b from-kbd-from via-kbd-via to-kbd-to px-1.5 py-0.5 text-[7px] font-semibold text-kbd-text uppercase shadow-[0_1px_0_0_rgba(255,255,255,0.15)_inset,0_1px_2px_rgba(0,0,0,0.2)] md:min-w-8 md:px-2 md:py-1 md:text-[8px] lg:min-w-9 lg:text-[9px] xl:text-[10px] 2xl:min-w-11 2xl:text-xs 3xl:min-w-12 3xl:text-[13px]"
 					>
 						esc
 					</kbd>
-					<span class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]">Resume</span>
+					<span
+						class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]"
+						>Resume</span
+					>
 				</div>
 				<div class="flex items-center gap-1.5 md:gap-2">
-					<img src="/assets/ui/icon-actions.png" alt="category" class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6" />
-					<span class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]">SELECT</span>
+					<img
+						src="/assets/ui/icon-actions.png"
+						alt="category"
+						class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6"
+					/>
+					<span
+						class="text-[7px] font-semibold text-muted uppercase md:text-[8px] lg:text-[9px] xl:text-[10px] 2xl:text-xs 3xl:text-[13px]"
+						>SELECT</span
+					>
 				</div>
 			</div>
 		{/if}

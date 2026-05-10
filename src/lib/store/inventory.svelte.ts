@@ -2,7 +2,7 @@ import { getStorageConfig } from '$lib/config/storages';
 import { getDef } from '$lib/config/items';
 import { getAugmentBonusSlots } from '$lib/config/augments';
 import { getAttachmentSlotIndex } from '../inventory-validation';
-import { isEqualLocation } from '$lib/utils';
+import { isEqualLocation, uuid } from '$lib/utils';
 import type { Selection } from './selection.svelte';
 import type { AudioManager } from './audio.svelte';
 
@@ -394,7 +394,7 @@ export class Inventory {
 	createItem(defId: string, count = 1): InstanceItem {
 		const def = getDef(defId);
 		const item: InstanceItem = {
-			uid: crypto.randomUUID(),
+			uid: uuid(),
 			defId,
 			count
 		};

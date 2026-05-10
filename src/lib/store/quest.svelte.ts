@@ -1,4 +1,5 @@
 import { ITEM_DB } from '$lib/config/items';
+import { uuid } from '$lib/utils';
 import { STAGES } from '$lib/config/stages';
 import type { StageDef } from '$lib/config/stages';
 import type { Inventory } from './inventory.svelte';
@@ -39,7 +40,7 @@ export class Quest {
 		this.currentStage = index;
 		const stage = STAGES[index];
 		this.items = stage.quests.map((q) => ({
-			id: crypto.randomUUID(),
+			id: uuid(),
 			defId: q.defId,
 			count: q.count,
 			def: ITEM_DB[q.defId],

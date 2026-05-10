@@ -119,6 +119,11 @@
 	--color-rarity-gradient-end: var(--rarity-gradient-end);
 }
 
+html,
+body {
+	background-color: var(--background);
+}
+
 body.dragging-weapon [data-slot-type='attachment'] {
 	pointer-events: none !important;
 }

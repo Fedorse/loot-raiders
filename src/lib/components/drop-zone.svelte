@@ -12,7 +12,7 @@
 	const isHovered = $derived(isDragging && interaction.isHovered(trashLocation));
 </script>
 
-<div class="relative w-full p-[6px]" {@attach droppable(trashSlotState)}>
+<div class="relative w-full" {@attach droppable(trashSlotState)}>
 	<div
 		class="pointer-events-none absolute inset-0 rounded-[9px] border-2 transition-colors duration-150
 		{isHovered
@@ -23,13 +23,16 @@
 	></div>
 
 	<div
-		class="relative flex min-h-20 w-full flex-col items-center justify-center gap-1 rounded-lg border border-white/20 transition-all duration-150 md:min-h-24 md:gap-1.5 lg:min-h-32 lg:gap-2 xl:min-h-36 2xl:min-h-40 3xl:min-h-44 3xl:gap-2.5"
+		class="relative flex min-h-14 w-full flex-col items-center justify-center gap-1 rounded-lg border border-white/20 transition-all duration-150 md:min-h-24 md:gap-1.5 lg:min-h-32 lg:gap-2 xl:min-h-36 2xl:min-h-40 3xl:min-h-44 3xl:gap-2.5"
 	>
 		<img
 			src="assets/ui/drop.png"
 			alt="Drop Item"
-			class="size-6 object-contain transition-all duration-150 md:size-8 lg:size-10 2xl:size-12 3xl:size-14"
+			class="size-5 object-contain transition-all duration-150 md:size-8 lg:size-10 2xl:size-12 3xl:size-14"
 		/>
-		<span class="font-sans text-[8px] text-white uppercase md:text-[9px] lg:text-[10px] xl:text-[11px] 2xl:text-sm 3xl:text-[15px]">drop item</span>
+		<span
+			class="font-sans text-[8px] text-white uppercase md:text-[9px] lg:text-[10px] xl:text-[11px] 2xl:text-sm 3xl:text-[15px]"
+			>drop item</span
+		>
 	</div>
 </div>
