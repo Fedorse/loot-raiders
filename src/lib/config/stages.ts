@@ -29,7 +29,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'loot_bandage', count: 1 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 85, attachment: 2, weapon: 5, shield: 1, augment: 1 },
+			typeWeights: { loot: 85, attachment: 2, weapon: 5, shield: 1, augment: 0 },
 			typeCaps: { weapon: 1, augment: 1, shield: 1 },
 			rarityWeights: { common: 55, uncommon: 30, rare: 12, epic: 3, legendary: 0 },
 			attachmentChance: 0,
@@ -49,7 +49,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'res_arc_circuitry', count: 2 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 75, attachment: 5, weapon: 8, shield: 2, augment: 2 },
+			typeWeights: { loot: 75, attachment: 5, weapon: 8, shield: 2, augment: 0 },
 			typeCaps: { weapon: 2, augment: 1, shield: 1 },
 			rarityWeights: { common: 40, uncommon: 35, rare: 18, epic: 6, legendary: 1 },
 			attachmentChance: 0.1,
@@ -69,7 +69,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'res_mechanical_components', count: 3 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 55, attachment: 10, weapon: 18, shield: 3, augment: 4 },
+			typeWeights: { loot: 55, attachment: 10, weapon: 18, shield: 3, augment: 0 },
 			typeCaps: { weapon: 3, augment: 1, shield: 1 },
 			rarityWeights: { common: 30, uncommon: 35, rare: 25, epic: 8, legendary: 2 },
 			attachmentChance: 0.25,
@@ -89,7 +89,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'loot_voltage_converter', count: 1 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 50, attachment: 12, weapon: 18, shield: 5, augment: 5 },
+			typeWeights: { loot: 50, attachment: 12, weapon: 18, shield: 5, augment: 0 },
 			typeCaps: { weapon: 3, augment: 1, shield: 1 },
 			rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
 			attachmentChance: 0.4,
@@ -109,7 +109,7 @@ export const STAGES: StageDef[] = [
 			{ defId: 'loot_leaper_pulse_unit', count: 1 }
 		],
 		lootProfile: {
-			typeWeights: { loot: 40, attachment: 15, weapon: 22, shield: 8, augment: 8 },
+			typeWeights: { loot: 40, attachment: 15, weapon: 22, shield: 8, augment: 0 },
 			typeCaps: { weapon: 3, augment: 1, shield: 1 },
 			rarityWeights: { common: 10, uncommon: 20, rare: 30, epic: 25, legendary: 15 },
 			attachmentChance: 0.5,

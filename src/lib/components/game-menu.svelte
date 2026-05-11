@@ -2,6 +2,7 @@
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import AudioSettings from './audio-settings.svelte';
+	import FullscreenButton from './fullscreen-button.svelte';
 
 	const { gameLoop, audio, quest } = getGameContext();
 
@@ -84,9 +85,17 @@
 			{/if}
 		</div>
 
+		<div
+			class="absolute right-4 bottom-12 hidden md:right-5 md:bottom-16 md:flex 2xl:right-6 2xl:bottom-24 3xl:right-8 3xl:bottom-28"
+			transition:fade={{ duration: 300, delay: 150 }}
+		>
+			<FullscreenButton />
+		</div>
+
 		{#if gameLoop.status !== 'idle'}
 			<div
 				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10"
+				transition:fade|global={{ duration: 300, delay: 150 }}
 			>
 				<div class="flex items-center gap-1.5 md:gap-2">
 					<kbd

@@ -117,12 +117,14 @@
 			<QuestSidebar />
 		</div>
 
-		<div class="hidden w-full items-center md:flex">
-			{#if gameLoop.status === 'playing'}
-				<Shortcuts />
-			{/if}
+		<div
+			class="hidden w-full items-center transition-opacity md:flex {gameLoop.status === 'playing'
+				? 'opacity-100'
+				: 'pointer-events-none opacity-0'}"
+		>
+			<Shortcuts />
 			<div class="ml-auto">
-				<FullscreenButton />
+				<FullscreenButton bindKey={gameLoop.status === 'playing'} />
 			</div>
 		</div>
 	</div>

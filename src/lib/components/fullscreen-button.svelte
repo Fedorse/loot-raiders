@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
 
+	let { bindKey = true }: { bindKey?: boolean } = $props();
+
 	const { audio } = getGameContext();
 
 	let isFullscreen = $state(false);
@@ -13,6 +15,7 @@
 	});
 
 	$effect(() => {
+		if (!bindKey) return;
 		const onKey = (e: KeyboardEvent) => {
 			if (e.key !== 'f' && e.key !== 'F') return;
 			const tag = (e.target as HTMLElement)?.tagName;

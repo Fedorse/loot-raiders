@@ -1,11 +1,19 @@
 import { ITEM_DB } from '$lib/config/items';
 import type { Inventory } from './inventory.svelte';
 import type { Quest } from './quest.svelte';
+import type { Overlay } from './overlay.svelte';
+import type { Interaction } from './interaction.svelte';
 import type { ItemRarity, ItemDefinition, ItemType, InstanceItem, ItemLocation } from '$lib/types';
 import { randInt } from '$lib/utils';
 import { SvelteSet } from 'svelte/reactivity';
 import type { AudioManager } from './audio.svelte';
 import { getDef } from '$lib/config/items';
+
+function isInLootBack(loc: ItemLocation): boolean {
+	if (loc.type === 'slot') return loc.storageId === 'lootBack';
+	if (loc.type === 'attachment') return isInLootBack(loc.parentLocation);
+	return false;
+}
 
 type ItemPool = Record<ItemType, Record<ItemRarity, ItemDefinition[]>>;
 
@@ -126,16 +134,26 @@ export class LootGenerator {
 	private inventory: Inventory;
 	private audio: AudioManager;
 	private quest: Quest;
+	private overlay: Overlay;
+	private interaction: Interaction;
 	phase = $state<LoadingStatus>('idle');
 	private lootQueue = $state<string[]>([]);
 	private scanIndex = $state(-1);
 	shineQueue = new SvelteSet<string>();
 	cooldown = $state(0);
 
-	constructor(inventory: Inventory, audio: AudioManager, quest: Quest) {
+	constructor(
+		inventory: Inventory,
+		audio: AudioManager,
+		quest: Quest,
+		overlay: Overlay,
+		interaction: Interaction
+	) {
 		this.inventory = inventory;
 		this.audio = audio;
 		this.quest = quest;
+		this.overlay = overlay;
+		this.interaction = interaction;
 	}
 
 	tick(dt: number): void {
@@ -165,6 +183,16 @@ export class LootGenerator {
 	}
 
 	next(): void {
+		const modal = this.overlay.recycleModal;
+		if (modal && isInLootBack(modal.location)) {
+			this.overlay.closeRecycleModal();
+		}
+
+		const drag = this.interaction.dragState;
+		if (drag && isInLootBack(drag.sourceLocation)) {
+			this.interaction.cancel();
+		}
+
 		const { lootCooldown, lootProfile } = this.quest.stageDef;
 		this.cooldown = lootCooldown;
 		this.inventory.clearStorage('lootBack');

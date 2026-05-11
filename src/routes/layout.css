@@ -122,6 +122,26 @@
 html,
 body {
 	background-color: var(--background);
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+input,
+textarea,
+[contenteditable] {
+	-webkit-user-select: text;
+	user-select: text;
+}
+
+html,
+body,
+body * {
+	cursor: url('/cursor.svg') 5 5, default !important;
+}
+
+body.is-dragging,
+body.is-dragging * {
+	cursor: url('/cursor-drag.svg') 5 5, default !important;
 }
 
 body.dragging-weapon [data-slot-type='attachment'] {

@@ -19,7 +19,7 @@ export class Game {
 	debug = new DebugStore();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	quest = new Quest(this.inventory, this.audio);
-	loot = new LootGenerator(this.inventory, this.audio, this.quest);
+	loot = new LootGenerator(this.inventory, this.audio, this.quest, this.overlay, this.interaction);
 	gameLoop = new GameLoop(
 		this.inventory,
 		this.audio,

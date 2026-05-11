@@ -100,6 +100,11 @@ export class Interaction {
 		window.removeEventListener('pointerup', this.handlePointerUp);
 	}
 
+	cancel() {
+		if (this.status === 'idle') return;
+		this.reset();
+	}
+
 	private checkDragThreshold(e: PointerEvent) {
 		const dx = e.clientX - this.startPos.x;
 		const dy = e.clientY - this.startPos.y;

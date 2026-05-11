@@ -14,7 +14,7 @@
 
 <div class="relative w-full" {@attach droppable(trashSlotState)}>
 	<div
-		class="pointer-events-none absolute inset-0 rounded-[9px] border-2 transition-colors duration-150
+		class="pointer-events-none absolute -inset-1 rounded-xl border-2 transition-colors duration-150
 		{isHovered
 			? 'border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.2)]'
 			: isDragging

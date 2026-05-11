@@ -22,13 +22,16 @@
 
 	$effect(() => {
 		const type = interaction.dragType;
+		if (type) {
+			document.body.classList.add('is-dragging');
+		}
 		if (type === 'weapon') {
 			document.body.classList.add('dragging-weapon');
 		} else if (type === 'attachment') {
 			document.body.classList.add('dragging-attachment');
 		}
 		return () => {
-			document.body.classList.remove('dragging-weapon', 'dragging-attachment');
+			document.body.classList.remove('is-dragging', 'dragging-weapon', 'dragging-attachment');
 		};
 	});
 </script>
