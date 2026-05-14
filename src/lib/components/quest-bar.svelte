@@ -85,11 +85,19 @@
 		<div
 			class="flex flex-col gap-1 rounded-t-xl bg-background/50 px-2 py-1 backdrop-blur-md md:px-3 md:py-1.5 lg:px-4 2xl:gap-1.5 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5"
 		>
-			<div class="flex items-center justify-between">
-				<span
-					class="text-[7px] font-medium text-white/50 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px]"
-					>{quest.stageDef.name}</span
-				>
+			<div class="flex items-center justify-between gap-1.5">
+				<div class="flex items-center gap-1 2xl:gap-1.5">
+					<img
+						src="/assets/ui/Icon_Quest.png"
+						alt=""
+						aria-hidden="true"
+						class="size-3 shrink-0 object-contain md:size-3.5 lg:size-4 2xl:size-5 3xl:size-6"
+					/>
+					<span
+						class="text-[7px] font-medium text-white/50 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px]"
+						>{quest.stageDef.name}</span
+					>
+				</div>
 			</div>
 			<div class="mt-0.5 flex w-full gap-1">
 				{#each STAGES as _, i (i)}

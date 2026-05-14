@@ -7,6 +7,7 @@
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
 	import PortraitBlocker from '$lib/components/portrait-blocker.svelte';
+	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 
 	import './layout.css';
@@ -77,4 +78,5 @@
 <AugmentPanel />
 <DebugPanel />
 <GameMenu />
+<QuestBottomSheet />
 <PortraitBlocker />

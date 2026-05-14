@@ -9,7 +9,8 @@ import { validateDrop, getDropActionType } from '$lib/inventory-validation';
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
 
 const DRAG_THRESHOLD = 1;
-const DOUBLE_CLICK_DELAY = 300;
+const DOUBLE_CLICK_DELAY = 150;
+const LONG_PRESS_DELAY = 450;
 
 type InteractionStatus = 'idle' | 'pressing' | 'dragging';
 
@@ -45,6 +46,8 @@ export class Interaction {
 	private startPos = { x: 0, y: 0 };
 	private sourceElement: HTMLElement | null = null;
 	private pressedSlot: SlotState | null = null;
+	private pointerType: string = 'mouse';
+	private longPressTimer: number | null = null;
 
 	private lastClickTime = 0;
 	private lastClickUid = '';
@@ -67,9 +70,29 @@ export class Interaction {
 		this.pressedSlot = slot;
 		this.startPos = { x: e.clientX, y: e.clientY };
 		this.sourceElement = node;
+		this.pointerType = e.pointerType;
+
+		if (e.pointerType === 'touch') {
+			this.longPressTimer = window.setTimeout(() => this.triggerLongPress(), LONG_PRESS_DELAY);
+		}
 
 		window.addEventListener('pointermove', this.handlePointerMove);
 		window.addEventListener('pointerup', this.handlePointerUp);
+	}
+
+	private triggerLongPress() {
+		this.longPressTimer = null;
+		if (this.status !== 'pressing' || !this.pressedSlot?.item) return;
+		navigator.vibrate?.(15);
+		this.overlay.openContextMenu(this.startPos.x, this.startPos.y, this.pressedSlot);
+		this.reset();
+	}
+
+	private clearLongPressTimer() {
+		if (this.longPressTimer !== null) {
+			clearTimeout(this.longPressTimer);
+			this.longPressTimer = null;
+		}
 	}
 
 	private handlePointerMove = (e: PointerEvent) => {
@@ -90,6 +113,7 @@ export class Interaction {
 	};
 
 	private reset() {
+		this.clearLongPressTimer();
 		this.status = 'idle';
 		this.dragState = null;
 		this.sourceElement = null;
@@ -111,6 +135,7 @@ export class Interaction {
 		const distance = Math.sqrt(dx * dx + dy * dy);
 
 		if (distance > DRAG_THRESHOLD) {
+			this.clearLongPressTimer();
 			this.beginDrag(e);
 		}
 	}
@@ -184,6 +209,7 @@ export class Interaction {
 		if (!this.pressedSlot?.item) return;
 
 		const itemUid = this.pressedSlot.item.uid;
+		const isTouch = e.pointerType === 'touch';
 
 		if (e.altKey || e.metaKey) return;
 		if (e.ctrlKey) {
@@ -203,7 +229,7 @@ export class Interaction {
 			this.lastClickTime = 0;
 			this.lastClickUid = '';
 		} else {
-			this.selection.select(itemUid);
+			if (!isTouch) this.selection.select(itemUid);
 			this.lastClickTime = now;
 			this.lastClickUid = itemUid;
 		}

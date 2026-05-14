@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
+	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import AudioSettings from './audio-settings.svelte';
 	import FullscreenButton from './fullscreen-button.svelte';
 
@@ -38,6 +39,7 @@
 			{#if gameLoop.status === 'idle'}
 				<div class="flex flex-col gap-2">
 					{@render menuButton('Play', () => {
+						if (isTouchDevice()) enterFullscreen();
 						gameLoop.start();
 					})}
 					<AudioSettings />
@@ -45,9 +47,11 @@
 			{:else if gameLoop.status === 'paused'}
 				<div class="flex flex-col gap-2">
 					{@render menuButton('Resume', () => {
+						if (isTouchDevice()) enterFullscreen();
 						gameLoop.resume();
 					})}
 					{@render menuButton('Restart', () => {
+						if (isTouchDevice()) enterFullscreen();
 						gameLoop.restart();
 					})}
 					<AudioSettings />
@@ -78,6 +82,7 @@
 
 				<div class="flex flex-col gap-2">
 					{@render menuButton('Retry', () => {
+						if (isTouchDevice()) enterFullscreen();
 						gameLoop.restart();
 					})}
 					<AudioSettings />
@@ -86,7 +91,7 @@
 		</div>
 
 		<div
-			class="absolute right-4 bottom-12 hidden md:right-5 md:bottom-16 md:flex 2xl:right-6 2xl:bottom-24 3xl:right-8 3xl:bottom-28"
+			class="absolute right-4 bottom-12 hidden md:right-5 md:bottom-16 md:flex 2xl:right-6 2xl:bottom-24 3xl:right-8 3xl:bottom-28 pointer-coarse:hidden"
 			transition:fade={{ duration: 300, delay: 150 }}
 		>
 			<FullscreenButton />
@@ -94,7 +99,7 @@
 
 		{#if gameLoop.status !== 'idle'}
 			<div
-				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10"
+				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10 pointer-coarse:hidden"
 				transition:fade|global={{ duration: 300, delay: 150 }}
 			>
 				<div class="flex items-center gap-1.5 md:gap-2">

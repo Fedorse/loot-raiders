@@ -24,6 +24,7 @@ export class Overlay {
 	tooltip = $state<TooltipState | null>(null);
 	recycleModal = $state<RecycleModalState | null>(null);
 	augmentPanel = $state<{ x: number; y: number } | null>(null);
+	questSheet = $state(false);
 
 	openContextMenu(x: number, y: number, slot: SlotState) {
 		if (!slot.item) return;
@@ -57,6 +58,15 @@ export class Overlay {
 		this.augmentPanel = null;
 	}
 
+	openQuestSheet() {
+		this.closeAll();
+		this.questSheet = true;
+	}
+
+	closeQuestSheet() {
+		this.questSheet = false;
+	}
+
 	showTooltip(x: number, y: number, item: InstanceItem) {
 		if (this.contextMenu || this.recycleModal || this.augmentPanel) return;
 		this.tooltip = { x, y, item };
@@ -69,6 +79,8 @@ export class Overlay {
 			this.closeRecycleModal();
 		} else if (this.contextMenu) {
 			this.closeContextMenu();
+		} else if (this.questSheet) {
+			this.closeQuestSheet();
 		}
 	}
 
@@ -81,5 +93,6 @@ export class Overlay {
 		this.tooltip = null;
 		this.recycleModal = null;
 		this.augmentPanel = null;
+		this.questSheet = false;
 	}
 }

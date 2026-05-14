@@ -84,9 +84,15 @@
 {/snippet}
 
 {#snippet footer()}
-	<div class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-0.5 pl-0.5 2xl:pr-1">
+	<div
+		class="z-10 flex h-[25%] w-full shrink-0 items-center justify-between bg-black pr-1 pl-0.5 2xl:pr-1"
+	>
 		{#if def.type === 'weapon'}
-			<img src={def.categoryIcon} alt="ammo type" class="size-2.5 object-contain md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5" />
+			<img
+				src={def.categoryIcon}
+				alt="ammo type"
+				class="size-2.5 object-contain md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5"
+			/>
 			{#if hasAttachments}
 				<img
 					src="/assets/ui/mod_slot_assets/weapon-mod.png"
@@ -95,8 +101,14 @@
 				/>
 			{/if}
 		{:else if augInfo && !augInfo.isMaxLevel}
-			<div class="flex items-center gap-0.5 font-mono text-[6px] font-black tracking-wider md:text-[7px] lg:gap-1 lg:text-[8px] 2xl:text-[9px] 3xl:text-[10px]">
-				<img src={def.categoryIcon} alt="category" class="size-2.5 object-contain opacity-50 md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5" />
+			<div
+				class="flex items-center gap-0.5 font-mono text-[6px] font-black tracking-wider md:text-[7px] lg:gap-1 lg:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
+			>
+				<img
+					src={def.categoryIcon}
+					alt="category"
+					class="size-2.5 object-contain opacity-50 md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5"
+				/>
 				<span class="text-white/30">{ROMAN[augInfo.level]}</span>
 				<ArrowUpgradeIcon class="size-1.5 md:size-2 2xl:size-2.5" />
 				<span class="text-cyan-400">{ROMAN[augInfo.level + 1]}</span>
@@ -121,11 +133,19 @@
 			</div>
 		{:else}
 			<div class="text-white/70">
-				<img src={def.categoryIcon} alt="category" class="size-2.5 object-contain md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5" />
+				<img
+					src={def.categoryIcon}
+					alt="category"
+					class="size-2.5 object-contain md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5"
+				/>
 			</div>
 			{#if displayCount > 1}
-				<div class="flex items-center gap-0.5 text-[7px] leading-none font-medium text-white md:text-[8px] lg:text-[9px] 2xl:text-xs 3xl:text-[13px]">
-					<span class="text-[6px] md:text-[7px] lg:text-[8px] 2xl:text-[9px] 3xl:text-[10px]">x</span>
+				<div
+					class="flex items-center gap-0.5 text-[7px] leading-none font-medium text-white md:text-[8px] lg:text-[9px] 2xl:text-xs 3xl:text-[13px]"
+				>
+					<span class="text-[6px] md:text-[7px] lg:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
+						>x</span
+					>
 					<span class="font-sans tracking-[-0.05em]">
 						{displayCount}
 					</span>

@@ -33,7 +33,10 @@
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
 		{@attach draggable(slotState)}
-		onpointerenter={() => (isHovered = true)}
+		onpointerenter={(e) => {
+			if (e.pointerType === 'touch') return;
+			isHovered = true;
+		}}
 		onpointerleave={() => (isHovered = false)}
 	>
 		{@render glowRing()}
@@ -61,7 +64,10 @@
 		class="relative z-20 aspect-square size-6 rounded-lg md:size-7 lg:size-8 2xl:size-10 3xl:size-12"
 		data-slot-type="attachment"
 		{@attach droppable(slotState)}
-		onpointerenter={() => (isHovered = true)}
+		onpointerenter={(e) => {
+			if (e.pointerType === 'touch') return;
+			isHovered = true;
+		}}
 		onpointerleave={() => (isHovered = false)}
 	>
 		{@render glowRing()}

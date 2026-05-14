@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
+	import { toggleFullscreen } from '$lib/fullscreen';
 
 	let { bindKey = true }: { bindKey?: boolean } = $props();
 
@@ -21,30 +22,21 @@
 			const tag = (e.target as HTMLElement)?.tagName;
 			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 			e.preventDefault();
-			toggle();
+			handleToggle();
 		};
 		window.addEventListener('keydown', onKey);
 		return () => window.removeEventListener('keydown', onKey);
 	});
 
-	function toggle() {
+	function handleToggle() {
 		audio.play('click');
-		const el = document.documentElement as HTMLElement & {
-			webkitRequestFullscreen?: () => Promise<void>;
-		};
-		if (document.fullscreenElement) {
-			document.exitFullscreen?.().catch(() => {});
-		} else if (el.requestFullscreen) {
-			el.requestFullscreen().catch(() => {});
-		} else if (el.webkitRequestFullscreen) {
-			el.webkitRequestFullscreen();
-		}
+		toggleFullscreen();
 	}
 </script>
 
 <button
 	type="button"
-	onclick={toggle}
+	onclick={handleToggle}
 	aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
 	class="group flex cursor-pointer items-center gap-1 transition-opacity hover:opacity-90 md:gap-1.5 lg:gap-2 2xl:gap-2.5"
 >

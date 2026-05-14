@@ -38,14 +38,14 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 
 	{#if loading || scanningItem}
-		<div class="h-full w-full p-[3.5px]">
+		<div class="h-full w-full p-[1.5px] md:p-[2px] lg:p-[3.5px]">
 			<div class="relative h-full w-full overflow-hidden rounded-[7px]">
 				{@render loadingItem()}
 			</div>
 		</div>
 	{:else}
 		<div
-			class="relative z-20 h-full w-full p-[3.5px]"
+			class="relative z-20 h-full w-full p-[1.5px] md:p-[2px] lg:p-[3.5px]"
 			onpointerdowncapture={(e) => {
 				if (e.button === 0) {
 					if (isAugmentSlot && item) {
@@ -69,6 +69,7 @@
 				}
 			}}
 			onpointerenter={(e) => {
+				if (e.pointerType === 'touch') return;
 				if (isAugmentSlot) return;
 				if (item && interaction.status === 'idle') {
 					const rect = e.currentTarget.getBoundingClientRect();
