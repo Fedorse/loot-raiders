@@ -22,7 +22,7 @@ export const STAGES: StageDef[] = [
 		timeLimit: 900,
 		lootCooldown: 10,
 		quests: [
-			{ defId: 'loot_chemicals', count: 2 },
+			{ defId: 'wpn_aphelion', count: 1 },
 			{ defId: 'loot_battery', count: 3 },
 			{ defId: 'loot_fabric', count: 2 },
 			{ defId: 'loot_oil', count: 2 },

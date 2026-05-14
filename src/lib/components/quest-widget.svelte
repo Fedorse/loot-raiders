@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
+	import WidgetArrow from '$lib/ui-icon/widget-arrow.svelte';
 
 	type Props = {
 		onclick?: () => void;
@@ -40,18 +41,7 @@
 
 		<div class="flex shrink-0 items-center gap-1 text-white/40">
 			<span class="text-[8px] font-bold tracking-wider uppercase">View</span>
-			<svg
-				class="size-3"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				aria-hidden="true"
-			>
-				<polyline points="6 9 12 15 18 9" />
-			</svg>
+			<WidgetArrow />
 		</div>
 	</button>
 {/if}
