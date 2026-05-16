@@ -38,7 +38,7 @@
 		{@attach clickOutside(() => overlay.closeAugmentUpgrade())}
 	>
 		<div
-			class="flex h-6 w-fit items-center gap-1.5 rounded-t-[6px] bg-modal-secondary px-2.5 font-bold text-modal-foreground md:h-7 md:px-3 lg:gap-2 lg:px-3.5 2xl:h-8 2xl:px-4 3xl:h-9 3xl:px-5"
+			class="flex h-6 w-fit items-center gap-1.5 rounded-t-[6px] bg-modal-secondary px-2.5 font-bold text-modal-foreground md:h-7 md:px-3 lg:gap-2 lg:px-3.5 2xl:h-8 2xl:px-4 3xl:h-9 3xl:px-5 pointer-coarse:hidden"
 		>
 			<img
 				src="/assets/ui/icon-actions.png"
@@ -51,7 +51,9 @@
 			>
 		</div>
 
-		<div class="flex flex-col rounded-tr-[6px] rounded-b-[6px] bg-modal text-modal-foreground">
+		<div
+			class="flex flex-col rounded-tr-[6px] rounded-b-[6px] bg-modal text-modal-foreground pointer-coarse:rounded-tl-[6px]"
+		>
 			<div
 				class="flex flex-col px-3 py-2 md:px-3.5 md:py-2.5 lg:px-4 2xl:px-5 2xl:py-3 3xl:px-6 3xl:py-3.5"
 			>
@@ -119,7 +121,6 @@
 					</div>
 
 					<div class="mt-2 flex gap-1 lg:mt-3 lg:gap-1.5 3xl:gap-2">
-						<!-- left: equip slots -->
 						<div class="flex flex-col gap-0.5 lg:gap-1">
 							<div class="flex gap-0.5 lg:gap-1">
 								<div

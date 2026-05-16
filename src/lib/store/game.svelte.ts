@@ -9,6 +9,7 @@ import { GameLoop } from './game-loop.svelte';
 import { AudioManager } from './audio.svelte';
 import { Quest } from './quest.svelte';
 import { Augment } from './augment.svelte';
+import { Device } from './device.svelte';
 
 export class Game {
 	audio = new AudioManager();
@@ -17,6 +18,7 @@ export class Game {
 	overlay = new Overlay();
 	augment = new Augment(this.inventory, this.overlay);
 	debug = new DebugStore();
+	device = new Device();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	quest = new Quest(this.inventory, this.audio);
 	loot = new LootGenerator(this.inventory, this.audio, this.quest, this.overlay, this.interaction);

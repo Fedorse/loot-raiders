@@ -10,7 +10,8 @@
 
 <div class={BTN}>
 	<div class="flex w-full items-center justify-between gap-3">
-		<span class="text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 2xl:text-md 3xl:text-lg"
+		<span
+			class="2xl:text-md text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 3xl:text-lg"
 			>Volume</span
 		>
 
@@ -41,19 +42,25 @@
 		audio.toggleMute();
 	}}
 >
-	<span class="text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 2xl:text-md 3xl:text-lg">
+	<span
+		class="2xl:text-md text-xs font-semibold tracking-wider text-white/80 group-hover:text-white md:text-sm lg:text-[15px] 3xl:text-lg"
+	>
 		Sound
 	</span>
 	<div class="flex items-center gap-1">
 		<span
-			class="mr-1 w-6 text-right text-xs font-semibold tracking-wider text-white/80 uppercase hover:text-white md:text-sm 2xl:mr-2 2xl:w-8 2xl:text-md 3xl:text-lg"
+			class="2xl:text-md mr-1 w-6 text-right text-xs font-semibold tracking-wider text-white/80 uppercase hover:text-white md:text-sm 2xl:mr-2 2xl:w-8 3xl:text-lg"
 		>
 			{audio.muted ? 'Off' : 'On'}
 		</span>
-		<div class="flex h-4 w-4 md:h-5 md:w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 items-center justify-center text-white">
+		<div
+			class="flex h-4 w-4 items-center justify-center text-white md:h-5 md:w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7"
+		>
 			<Arrow />
 		</div>
-		<div class="flex h-4 w-4 md:h-5 md:w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7 rotate-180 items-center justify-center text-white">
+		<div
+			class="flex h-4 w-4 rotate-180 items-center justify-center text-white md:h-5 md:w-5 2xl:h-6 2xl:w-6 3xl:h-7 3xl:w-7"
+		>
 			<Arrow />
 		</div>
 	</div>
@@ -61,6 +68,12 @@
 
 <style>
 	@reference "tailwindcss";
+
+	.volume-slider {
+		-webkit-appearance: none;
+		appearance: none;
+		background: #404455;
+	}
 
 	.volume-slider::-webkit-slider-thumb {
 		-webkit-appearance: none;

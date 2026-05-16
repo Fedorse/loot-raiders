@@ -6,7 +6,7 @@
 	import AugmentPanel from '$lib/components/augment-panel.svelte';
 	import DebugPanel from '$lib/components/debug-panel.svelte';
 	import GameMenu from '$lib/components/game-menu.svelte';
-	import PortraitBlocker from '$lib/components/portrait-blocker.svelte';
+	import MobileGate from '$lib/components/mobile-gate.svelte';
 	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
 	import { initGame } from '$lib/store/game.svelte';
 
@@ -19,6 +19,36 @@
 
 	$effect(() => {
 		return () => gameLoop.stop();
+	});
+
+	$effect(() => {
+		const isFullscreen = () =>
+			!!(
+				document.fullscreenElement ||
+				(document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement
+			);
+
+		const pauseIfPlaying = () => {
+			if (gameLoop.status === 'playing') gameLoop.pause();
+		};
+
+		const onFullscreenChange = () => {
+			if (!isFullscreen()) pauseIfPlaying();
+		};
+
+		const onVisibilityChange = () => {
+			if (document.hidden) pauseIfPlaying();
+		};
+
+		document.addEventListener('fullscreenchange', onFullscreenChange);
+		document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+		document.addEventListener('visibilitychange', onVisibilityChange);
+
+		return () => {
+			document.removeEventListener('fullscreenchange', onFullscreenChange);
+			document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+			document.removeEventListener('visibilitychange', onVisibilityChange);
+		};
 	});
 
 	$effect(() => {
@@ -62,11 +92,13 @@
 	}}
 />
 
-<main class="relative h-screen font-sans text-white selection:bg-blue-500/30">
+<main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
 	<img src="/assets/intro.gif" alt="bg" class="absolute inset-0 h-full w-full object-cover" />
 	<div class="absolute inset-0 h-full w-full bg-black/80"></div>
 
-	<div class="relative z-10 h-full w-full">
+	<div
+		class="relative z-10 h-full w-full pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
+	>
 		{@render children()}
 	</div>
 </main>
@@ -79,4 +111,4 @@
 <DebugPanel />
 <GameMenu />
 <QuestBottomSheet />
-<PortraitBlocker />
+<MobileGate />
