@@ -17,7 +17,7 @@ interface RecycleModalState {
 	location: ItemLocation;
 }
 const CONTEXT_MENU_WIDTH = 192;
-const CONTEXT_MENU_HEIGHT = 200;
+const CONTEXT_MENU_HEIGHT = 260;
 
 export class Overlay {
 	contextMenu = $state<MenuState | null>(null);

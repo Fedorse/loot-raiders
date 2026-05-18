@@ -2,6 +2,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getStorageConfig } from '$lib/config/storages';
+	import { getRarityStyleTooltip } from '$lib/config/rarity';
 	import { clickOutside } from '$lib/actions/actions';
 
 	const { overlay, inventory } = getGameContext();
@@ -25,9 +26,18 @@
 		oncontextmenu={(e) => e.preventDefault()}
 	>
 		<div
-			class="border-b border-modal-border px-2 pt-0.5 pb-1.5 text-[9px] font-bold tracking-wider text-muted uppercase md:px-2.5 md:pt-1 md:pb-2 md:text-[10px] lg:px-3 lg:text-[11px] 2xl:text-xs 3xl:px-3.5 3xl:text-[13px]"
+			class="flex items-center gap-1 border-b border-modal-border px-2 pt-0.5 pb-1 md:gap-1.5 md:px-2.5 md:pt-0.5 md:pb-1 lg:px-3 lg:pt-1 lg:pb-2 3xl:px-3.5"
 		>
-			{def.name}
+			<img
+				src={def.categoryIcon}
+				alt=""
+				class="size-3 shrink-0 object-contain opacity-60 brightness-0 md:size-3.5 lg:size-4 3xl:size-5"
+			/>
+			<span
+				class="text-[9px] font-bold tracking-wider text-muted uppercase md:text-[10px] lg:text-[11px] 2xl:text-xs 3xl:text-[13px]"
+			>
+				{def.name}
+			</span>
 		</div>
 
 		{#if moveTargetId}
@@ -54,7 +64,7 @@
 			</button>
 		{/if}
 
-		<div class="my-0.5 border-t border-modal-border md:my-1"></div>
+		<div class=" border-t border-modal-border"></div>
 
 		<button
 			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
@@ -76,6 +86,35 @@
 			>
 				Recycle
 			</button>
+
+			<div
+				class="hidden flex-col gap-1 border-t border-modal-border px-1 md:px-2.5 md:pt-1 pointer-coarse:flex"
+			>
+				<span class=" font-bold tracking-wider text-muted uppercase md:text-[8px]">
+					Recycles Into
+				</span>
+				<div class="flex flex-wrap gap-1 lg:gap-1.5">
+					{#each def.recycling as res (res.itemId)}
+						{@const resDef = getDef(res.itemId)}
+						{@const resStyle = getRarityStyleTooltip(resDef.rarity)}
+						<div class="size-7 md:size-7">
+							<div
+								class="flex h-full w-full overflow-hidden rounded-md bg-linear-to-tr {resStyle.bg}"
+							>
+								<div
+									class="relative flex h-full w-full items-center justify-center overflow-hidden rounded-[5px] bg-black/80"
+								>
+									<img
+										src={resDef.image}
+										alt={resDef.name}
+										class="relative z-10 h-[100%] w-[100%] object-contain"
+									/>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
 		{/if}
 	</div>
 {/if}

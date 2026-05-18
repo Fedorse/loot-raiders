@@ -42,9 +42,9 @@
 									>Next</span
 								>
 								<span
-									class="font-mono text-[7px] font-black text-cyan-400 tabular-nums xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px]"
+									class="font-mono text-[7px] font-black whitespace-pre text-cyan-400 tabular-nums xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px]"
 								>
-									{Math.ceil(loot.cooldown)}s
+									{Math.ceil(loot.cooldown).toString().padStart(2, ' ')}s
 								</span>
 							</div>
 

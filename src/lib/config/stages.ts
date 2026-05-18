@@ -19,7 +19,7 @@ export const STAGES: StageDef[] = [
 	{
 		id: 1,
 		name: 'Scavenger Run',
-		timeLimit: 30,
+		timeLimit: 300,
 		lootCooldown: 10,
 		quests: [
 			{ defId: 'wpn_aphelion', count: 1 },
