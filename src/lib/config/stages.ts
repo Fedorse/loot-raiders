@@ -19,7 +19,7 @@ export const STAGES: StageDef[] = [
 	{
 		id: 1,
 		name: 'Scavenger Run',
-		timeLimit: 900,
+		timeLimit: 30,
 		lootCooldown: 10,
 		quests: [
 			{ defId: 'wpn_aphelion', count: 1 },
@@ -39,7 +39,7 @@ export const STAGES: StageDef[] = [
 	{
 		id: 2,
 		name: 'Resource Haul',
-		timeLimit: 80,
+		timeLimit: 30,
 		lootCooldown: 9,
 		quests: [
 			{ defId: 'res_metal_parts', count: 3 },
@@ -59,7 +59,7 @@ export const STAGES: StageDef[] = [
 	{
 		id: 3,
 		name: 'Arms Deal',
-		timeLimit: 75,
+		timeLimit: 30,
 		lootCooldown: 8,
 		quests: [
 			{ defId: 'wpn_kettle', count: 1 },
@@ -75,45 +75,45 @@ export const STAGES: StageDef[] = [
 			attachmentChance: 0.25,
 			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
 		}
-	},
-	{
-		id: 4,
-		name: 'High Value Targets',
-		timeLimit: 70,
-		lootCooldown: 8,
-		quests: [
-			{ defId: 'wpn_tempest', count: 1 },
-			{ defId: 'loot_industrial_magnet', count: 1 },
-			{ defId: 'res_processor', count: 2 },
-			{ defId: 'loot_sensors', count: 2 },
-			{ defId: 'loot_voltage_converter', count: 1 }
-		],
-		lootProfile: {
-			typeWeights: { loot: 50, attachment: 12, weapon: 18, shield: 5, augment: 0 },
-			typeCaps: { weapon: 3, augment: 1, shield: 1 },
-			rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
-			attachmentChance: 0.4,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
-		}
-	},
-	{
-		id: 5,
-		name: 'Final Extraction',
-		timeLimit: 60,
-		lootCooldown: 7,
-		quests: [
-			{ defId: 'wpn_aphelion', count: 1 },
-			{ defId: 'loot_exodus_modules', count: 1 },
-			{ defId: 'res_bastion_cell', count: 1 },
-			{ defId: 'res_magnetic_accelerator', count: 1 },
-			{ defId: 'loot_leaper_pulse_unit', count: 1 }
-		],
-		lootProfile: {
-			typeWeights: { loot: 40, attachment: 15, weapon: 22, shield: 8, augment: 0 },
-			typeCaps: { weapon: 3, augment: 1, shield: 1 },
-			rarityWeights: { common: 10, uncommon: 20, rare: 30, epic: 25, legendary: 15 },
-			attachmentChance: 0.5,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
-		}
 	}
+	// {
+	// 	id: 4,
+	// 	name: 'High Value Targets',
+	// 	timeLimit: 70,
+	// 	lootCooldown: 8,
+	// 	quests: [
+	// 		{ defId: 'wpn_tempest', count: 1 },
+	// 		{ defId: 'loot_industrial_magnet', count: 1 },
+	// 		{ defId: 'res_processor', count: 2 },
+	// 		{ defId: 'loot_sensors', count: 2 },
+	// 		{ defId: 'loot_voltage_converter', count: 1 }
+	// 	],
+	// 	lootProfile: {
+	// 		typeWeights: { loot: 50, attachment: 12, weapon: 18, shield: 5, augment: 0 },
+	// 		typeCaps: { weapon: 3, augment: 1, shield: 1 },
+	// 		rarityWeights: { common: 20, uncommon: 30, rare: 30, epic: 15, legendary: 5 },
+	// 		attachmentChance: 0.4,
+	// 		getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+	// 	}
+	// },
+	// {
+	// 	id: 5,
+	// 	name: 'Final Extraction',
+	// 	timeLimit: 60,
+	// 	lootCooldown: 7,
+	// 	quests: [
+	// 		{ defId: 'wpn_aphelion', count: 1 },
+	// 		{ defId: 'loot_exodus_modules', count: 1 },
+	// 		{ defId: 'res_bastion_cell', count: 1 },
+	// 		{ defId: 'res_magnetic_accelerator', count: 1 },
+	// 		{ defId: 'loot_leaper_pulse_unit', count: 1 }
+	// 	],
+	// 	lootProfile: {
+	// 		typeWeights: { loot: 40, attachment: 15, weapon: 22, shield: 8, augment: 0 },
+	// 		typeCaps: { weapon: 3, augment: 1, shield: 1 },
+	// 		rarityWeights: { common: 10, uncommon: 20, rare: 30, epic: 25, legendary: 15 },
+	// 		attachmentChance: 0.5,
+	// 		getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+	// 	}
+	// }
 ];

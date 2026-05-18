@@ -22,6 +22,7 @@ export class Quest {
 
 	items = $state<QuestItem[]>([]);
 	currentStage = $state(0);
+	totalQuestsCompleted = $state(0);
 
 	stageDef = $derived(STAGES[this.currentStage]);
 	completed = $derived(this.items.filter((i) => i.matched).length);
@@ -29,6 +30,9 @@ export class Quest {
 	stageCompleted = $derived(this.items.length > 0 && this.items.every((i) => i.matched));
 	allStagesCompleted = $derived(
 		this.currentStage >= STAGES.length - 1 && this.stageCompleted
+	);
+	stagesCleared = $derived(
+		this.allStagesCompleted ? STAGES.length : this.currentStage
 	);
 
 	constructor(inventory: Inventory, audio: AudioManager) {
@@ -56,6 +60,7 @@ export class Quest {
 	}
 
 	reset() {
+		this.totalQuestsCompleted = 0;
 		this.loadStage(0);
 	}
 
@@ -73,6 +78,7 @@ export class Quest {
 
 			this.inventory.consumeMatched(quest.defId, quest.count);
 			quest.matched = true;
+			this.totalQuestsCompleted++;
 			score += POINTS_PER_QUEST;
 			this.audio.play('match');
 		}

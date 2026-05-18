@@ -21,6 +21,7 @@ export class GameLoop {
 
 	score = $state(0);
 	timeLeft = $state(0);
+	elapsedTime = $state(0);
 	status = $state<GameStatus>('idle');
 	gameOverReason = $state<'victory' | 'defeat' | null>(null);
 	shieldTimeBonus = $state(0);
@@ -45,6 +46,7 @@ export class GameLoop {
 		cancelAnimationFrame(this.rafId);
 		this.quest.reset();
 		this.score = 0;
+		this.elapsedTime = 0;
 		this.gameOverReason = null;
 
 		const augItem = this.inventory.createItem('aug_free_loadout', 1);
@@ -100,6 +102,7 @@ export class GameLoop {
 		}
 
 		this.timeLeft -= dt;
+		this.elapsedTime += dt;
 		if (this.timeLeft <= 0) {
 			this.timeLeft = 0;
 			this.gameOverReason = this.quest.allStagesCompleted ? 'victory' : 'defeat';

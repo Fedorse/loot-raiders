@@ -141,6 +141,7 @@ export class LootGenerator {
 	private scanIndex = $state(-1);
 	shineQueue = new SvelteSet<string>();
 	cooldown = $state(0);
+	chestsOpened = $state(0);
 
 	constructor(
 		inventory: Inventory,
@@ -222,6 +223,7 @@ export class LootGenerator {
 		this.lootQueue = items.map((i) => i.uid);
 		this.scanIndex = 0;
 		this.phase = 'loading';
+		this.chestsOpened++;
 	}
 
 	slotScanned(): void {
@@ -259,5 +261,6 @@ export class LootGenerator {
 		this.scanIndex = -1;
 		this.lootQueue = [];
 		this.shineQueue.clear();
+		this.chestsOpened = 0;
 	}
 }

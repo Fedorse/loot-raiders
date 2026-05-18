@@ -4,8 +4,9 @@
 	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import AudioSettings from './audio-settings.svelte';
 	import FullscreenButton from './fullscreen-button.svelte';
+	import GameOverStats from './game-over-stats.svelte';
 
-	const { gameLoop, audio, quest } = getGameContext();
+	const { gameLoop, audio } = getGameContext();
 
 	const BTN =
 		'group flex w-full min-w-[200px] items-center justify-center rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 py-2.5 transition-all hover:bg-[#1a2133] active:scale-[0.98] md:min-w-[240px] md:py-3 lg:min-w-[280px] lg:py-3.5 2xl:min-w-[320px] 2xl:py-4 3xl:min-w-[380px] 3xl:py-5';
@@ -57,36 +58,7 @@
 					<AudioSettings />
 				</div>
 			{:else if gameLoop.status === 'over'}
-				{#if gameLoop.gameOverReason === 'victory'}
-					<h1
-						class="text-xl font-black tracking-tight text-emerald-400 uppercase md:text-2xl 2xl:text-3xl 3xl:text-4xl"
-					>
-						Victory
-					</h1>
-					<p class="text-[10px] text-emerald-300/60 md:text-xs 2xl:text-sm 3xl:text-base">
-						All stages completed
-					</p>
-				{:else}
-					<h1
-						class="text-xl font-black tracking-tight text-red-400 uppercase md:text-2xl 2xl:text-3xl 3xl:text-4xl"
-					>
-						Defeated
-					</h1>
-					<p class="text-[10px] text-red-300/60 md:text-xs 2xl:text-sm 3xl:text-base">
-						Time ran out — Stage {quest.currentStage + 1}
-					</p>
-				{/if}
-				<div class="text-2xl font-bold text-white md:text-3xl 2xl:text-4xl 3xl:text-5xl">
-					{gameLoop.score} pts
-				</div>
-
-				<div class="flex flex-col gap-2">
-					{@render menuButton('Retry', () => {
-						if (isTouchDevice()) enterFullscreen();
-						gameLoop.restart();
-					})}
-					<AudioSettings />
-				</div>
+				<GameOverStats />
 			{/if}
 		</div>
 

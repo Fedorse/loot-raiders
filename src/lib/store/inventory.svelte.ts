@@ -242,15 +242,55 @@ export class Inventory {
 		const config = getStorageConfig(loc.storageId);
 		const targetId = config?.quickMoveTarget;
 		if (!targetId) return false;
-		const emptySlot = this.getFirstEmptySlot(targetId);
-		if (!emptySlot) return false;
 
 		const item = this.getItem(loc);
 		if (!item) return false;
-		this.removeItem(loc);
-		this.setItem(emptySlot, item);
-		this.audio.play('swap');
-		return true;
+
+		const def = getDef(item.defId);
+
+		if (def.type === 'weapon' && loc.storageId !== 'weapon') {
+			const weaponSlot = this.getFirstEmptySlot('weapon');
+			if (weaponSlot) {
+				this.removeItem(loc);
+				this.setItem(weaponSlot, item);
+				this.audio.play('swap');
+				return true;
+			}
+		}
+
+		let transferred = false;
+
+		if (def.maxStack) {
+			const size = this.getStorageSize(targetId);
+			for (let i = 0; i < size && item.count > 0; i++) {
+				const targetLoc: ItemLocation = { type: 'slot', storageId: targetId, index: i };
+				const targetItem = this.getItem(targetLoc);
+				if (!targetItem || targetItem.defId !== item.defId) continue;
+				const room = def.maxStack - targetItem.count;
+				if (room <= 0) continue;
+				const portion = Math.min(room, item.count);
+				targetItem.count += portion;
+				item.count -= portion;
+				transferred = true;
+			}
+		}
+
+		if (item.count === 0) {
+			this.removeItem(loc);
+			this.audio.play('swap');
+			return true;
+		}
+
+		const emptySlot = this.getFirstEmptySlot(targetId);
+		if (emptySlot) {
+			this.removeItem(loc);
+			this.setItem(emptySlot, item);
+			this.audio.play('swap');
+			return true;
+		}
+
+		if (transferred) this.audio.play('swap');
+		return transferred;
 	}
 
 	splitStack(loc: ItemLocation): boolean {
