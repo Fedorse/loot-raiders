@@ -146,7 +146,7 @@
 
 		<div class="flex items-center gap-3 px-3">
 			<img
-				src="/assets/ui/Icon_Quest.png"
+				src="/assets/ui/Icon_Quest.webp"
 				alt=""
 				aria-hidden="true"
 				class="size-8 shrink-0 object-contain"

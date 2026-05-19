@@ -210,7 +210,7 @@
 
 				<div class="flex items-center gap-1 2xl:gap-1.5 4xl:gap-2">
 					<img
-						src="/assets/ui/Coins.png"
+						src="/assets/ui/Coins.webp"
 						alt="coins"
 						class="size-3 object-contain 2xl:size-3.5 3xl:size-4 4xl:size-5"
 					/>
@@ -237,7 +237,7 @@
 					></div>
 
 					<img
-						src="/assets/ui/placeholder/weight.png"
+						src="/assets/ui/placeholder/weight.webp"
 						alt="weight"
 						class="size-2.5 object-contain 2xl:size-3 3xl:size-3.5 4xl:size-4"
 					/>

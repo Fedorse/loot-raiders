@@ -95,7 +95,7 @@
 			/>
 			{#if hasAttachments}
 				<img
-					src="/assets/ui/mod_slot_assets/weapon-mod.png"
+					src="/assets/ui/mod_slot_assets/weapon-mod.webp"
 					alt="modded"
 					class="size-2.5 object-contain opacity-50 md:size-3 lg:size-3.5 2xl:size-4 3xl:size-5"
 				/>

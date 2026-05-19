@@ -93,7 +93,16 @@
 />
 
 <main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
-	<img src="/assets/intro.gif" alt="bg" class="absolute inset-0 h-full w-full object-cover" />
+	<video
+		src="/assets/intro.mp4"
+		autoplay
+		loop
+		muted
+		playsinline
+		disablepictureinpicture
+		aria-hidden="true"
+		class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+	></video>
 	<div class="absolute inset-0 h-full w-full bg-black/80"></div>
 
 	<div

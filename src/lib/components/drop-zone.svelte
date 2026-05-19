@@ -26,7 +26,7 @@
 		class="relative flex min-h-14 w-full flex-col items-center justify-center gap-1 rounded-lg border border-white/20 transition-all duration-150 md:min-h-24 md:gap-1.5 lg:min-h-32 lg:gap-2 xl:min-h-36 2xl:min-h-40 3xl:min-h-44 3xl:gap-2.5"
 	>
 		<img
-			src="assets/ui/drop.png"
+			src="assets/ui/drop.webp"
 			alt="Drop Item"
 			class="size-5 object-contain transition-all duration-150 md:size-8 lg:size-10 2xl:size-12 3xl:size-14"
 		/>

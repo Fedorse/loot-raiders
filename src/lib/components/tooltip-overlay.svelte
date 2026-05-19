@@ -46,7 +46,7 @@
 			class="flex h-6 w-fit items-center gap-1.5 rounded-t-[6px] bg-modal-secondary px-2.5 font-bold text-modal-foreground md:h-7 md:px-3 lg:gap-2 lg:px-3.5 2xl:h-8 2xl:px-4 3xl:h-9 3xl:px-5"
 		>
 			<img
-				src="/assets/ui/icon-actions.png"
+				src="/assets/ui/icon-actions.webp"
 				alt="actions"
 				class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6"
 			/>

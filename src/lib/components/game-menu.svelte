@@ -87,7 +87,7 @@
 				</div>
 				<div class="flex items-center gap-1.5 md:gap-2">
 					<img
-						src="/assets/ui/icon-actions.png"
+						src="/assets/ui/icon-actions.webp"
 						alt="category"
 						class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6"
 					/>

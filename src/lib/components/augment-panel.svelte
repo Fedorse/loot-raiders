@@ -41,7 +41,7 @@
 			class="flex h-6 w-fit items-center gap-1.5 rounded-t-[6px] bg-modal-secondary px-2.5 font-bold text-modal-foreground md:h-7 md:px-3 lg:gap-2 lg:px-3.5 2xl:h-8 2xl:px-4 3xl:h-9 3xl:px-5 pointer-coarse:hidden"
 		>
 			<img
-				src="/assets/ui/icon-actions.png"
+				src="/assets/ui/icon-actions.webp"
 				alt="actions"
 				class="size-3.5 object-contain md:size-4 2xl:size-5 3xl:size-6"
 			/>
@@ -127,7 +127,7 @@
 									class="flex size-8 items-center justify-center rounded border border-modal-foreground/20 md:size-9 lg:size-10 2xl:size-13 3xl:size-15"
 								>
 									<img
-										src="/assets/ui/placeholder/augment_placeholder.png"
+										src="/assets/ui/placeholder/augment_placeholder.webp"
 										alt="augment"
 										class="size-5 object-contain md:size-6 2xl:size-8 3xl:size-10"
 									/>
@@ -136,7 +136,7 @@
 									class="flex size-8 items-center justify-center rounded border border-modal-foreground/20 md:size-9 lg:size-10 2xl:size-13 3xl:size-15"
 								>
 									<img
-										src="/assets/ui/placeholder/shield_placeholder.png"
+										src="/assets/ui/placeholder/shield_placeholder.webp"
 										alt="shield"
 										class="size-5 object-contain md:size-6 2xl:size-8 3xl:size-10"
 									/>
@@ -146,7 +146,7 @@
 								class="flex h-7 items-center justify-center rounded border border-modal-foreground/20 md:h-8 lg:h-9 2xl:h-11 3xl:h-13"
 							>
 								<img
-									src="/assets/ui/placeholder/placeholder_weapon.png"
+									src="/assets/ui/placeholder/placeholder_weapon.webp"
 									alt="weapon"
 									class="h-5 object-contain md:h-6 2xl:h-8 3xl:h-10"
 								/>
@@ -155,7 +155,7 @@
 								class="flex h-7 items-center justify-center rounded border border-modal-foreground/20 md:h-8 lg:h-9 2xl:h-11 3xl:h-13"
 							>
 								<img
-									src="/assets/ui/placeholder/placeholder_weapon.png"
+									src="/assets/ui/placeholder/placeholder_weapon.webp"
 									alt="weapon"
 									class="h-5 object-contain md:h-6 2xl:h-8 3xl:h-10"
 								/>

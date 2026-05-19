@@ -89,7 +89,7 @@
 			<div class="flex items-center justify-between gap-1.5">
 				<div class="flex items-center gap-1 2xl:gap-1.5 4xl:gap-2">
 					<img
-						src="/assets/ui/Icon_Quest.png"
+						src="/assets/ui/Icon_Quest.webp"
 						alt=""
 						aria-hidden="true"
 						class="size-3 shrink-0 object-contain md:size-3.5 lg:size-4 2xl:size-5 3xl:size-6 4xl:size-7"
