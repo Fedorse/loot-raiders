@@ -49,6 +49,10 @@ export class Interaction {
 	private pointerType: string = 'mouse';
 	private longPressTimer: number | null = null;
 
+	private pendingPointerX = 0;
+	private pendingPointerY = 0;
+	private pointerRafId = 0;
+
 	private lastClickTime = 0;
 	private lastClickUid = '';
 
@@ -114,6 +118,10 @@ export class Interaction {
 
 	private reset() {
 		this.clearLongPressTimer();
+		if (this.pointerRafId) {
+			cancelAnimationFrame(this.pointerRafId);
+			this.pointerRafId = 0;
+		}
 		this.status = 'idle';
 		this.dragState = null;
 		this.sourceElement = null;
@@ -174,7 +182,13 @@ export class Interaction {
 	}
 
 	private updatePointerPosition(e: PointerEvent) {
-		this.pointer = { x: e.clientX, y: e.clientY };
+		this.pendingPointerX = e.clientX;
+		this.pendingPointerY = e.clientY;
+		if (this.pointerRafId) return;
+		this.pointerRafId = requestAnimationFrame(() => {
+			this.pointer = { x: this.pendingPointerX, y: this.pendingPointerY };
+			this.pointerRafId = 0;
+		});
 	}
 
 	private handleDropAction() {
@@ -236,6 +250,14 @@ export class Interaction {
 	}
 
 	setHoveredSlot(slot: SlotState) {
+		const current = this.hoveredSlot;
+		if (
+			current &&
+			isEqualLocation(current.location, slot.location) &&
+			current.item?.uid === slot.item?.uid
+		) {
+			return;
+		}
 		this.hoveredSlot = slot;
 	}
 
@@ -248,6 +270,11 @@ export class Interaction {
 	shouldShowInvalidHint(slot: SlotState): boolean {
 		if (this.status !== 'dragging' || !this.dragState) return false;
 		if (slot.location.type === 'trash') return false;
+
+		if (slot.location.type === 'slot') {
+			const sid = slot.location.storageId;
+			if (sid === 'lootBack' || sid === 'backpack') return false;
+		}
 
 		const resolver = this.inventory.getItem.bind(this.inventory);
 		const isValid = validateDrop(this.dragState, slot, resolver);

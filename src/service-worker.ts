@@ -8,15 +8,19 @@ import { build, files, version } from '$service-worker';
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
 const CACHE = `loot-raiders-${version}`;
-const ASSETS = [...build, ...files];
+
+const CRITICAL = build;
+const KNOWN = new Set([...build, ...files]);
 
 sw.addEventListener('install', (event) => {
-	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
+	event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CRITICAL)));
 });
 
 sw.addEventListener('activate', (event) => {
 	event.waitUntil(
-		caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+		caches
+			.keys()
+			.then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
 	);
 });
 
@@ -30,14 +34,15 @@ sw.addEventListener('fetch', (event) => {
 		(async () => {
 			const cache = await caches.open(CACHE);
 
-			if (ASSETS.includes(url.pathname)) {
+			// Cache-first for known assets (build + static files).
+			if (KNOWN.has(url.pathname)) {
 				const cached = await cache.match(url.pathname);
 				if (cached) return cached;
 			}
 
 			try {
 				const response = await fetch(event.request);
-				if (response.status === 200) {
+				if (response.status === 200 && KNOWN.has(url.pathname)) {
 					cache.put(event.request, response.clone());
 				}
 				return response;

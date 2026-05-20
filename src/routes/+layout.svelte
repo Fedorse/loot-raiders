@@ -93,8 +93,8 @@
 />
 
 <main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
-	<video
-		src="/assets/intro.mp4"
+	<!-- <video
+		src="/assets/intro-bg-960-crf30.mp4"
 		autoplay
 		loop
 		muted
@@ -102,7 +102,8 @@
 		disablepictureinpicture
 		aria-hidden="true"
 		class="pointer-events-none absolute inset-0 h-full w-full object-cover"
-	></video>
+	></video> -->
+
 	<div class="absolute inset-0 h-full w-full bg-black/80"></div>
 
 	<div

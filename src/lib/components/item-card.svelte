@@ -59,7 +59,8 @@
 					<img
 						src={def.image}
 						alt="Loot"
-						class="relative z-10 h-full w-full object-contain transition-transform {readonly
+						class="relative z-10 h-full w-full object-contain transition-transform {readonly ||
+						interaction.status === 'dragging'
 							? ''
 							: 'group-hover:scale-105'}"
 					/>

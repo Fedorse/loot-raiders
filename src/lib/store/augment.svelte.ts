@@ -14,7 +14,7 @@ export class Augment {
 	}
 
 	info = $derived.by(() => {
-		const augment = this.inventory.getItem({ type: 'slot', storageId: 'augment', index: 0 });
+		const augment = this.inventory.augmentItem;
 		if (!augment) return null;
 
 		const def = getDef(augment.defId);

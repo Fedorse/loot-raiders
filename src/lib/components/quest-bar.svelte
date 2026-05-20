@@ -84,7 +84,7 @@
 >
 	{#if gameLoop.status !== 'idle'}
 		<div
-			class="flex flex-col gap-1 rounded-t-xl bg-background/50 px-2 py-1 backdrop-blur-md md:px-3 md:py-1.5 lg:px-4 2xl:gap-1.5 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:gap-2 4xl:px-7 4xl:py-3"
+			class="flex flex-col gap-1 rounded-t-xl bg-background/50 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 lg:px-4 2xl:gap-1.5 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:gap-2 4xl:px-7 4xl:py-3"
 		>
 			<div class="flex items-center justify-between gap-1.5">
 				<div class="flex items-center gap-1 2xl:gap-1.5 4xl:gap-2">
@@ -118,7 +118,7 @@
 		</div>
 
 		<div
-			class="flex flex-col gap-1 overflow-hidden bg-background/50 px-1.5 py-2 backdrop-blur-md md:gap-1.5 md:px-2 md:py-3 lg:px-2.5 lg:py-3.5 2xl:gap-2 2xl:px-3 2xl:py-4 3xl:gap-3 3xl:px-4 3xl:py-5 4xl:gap-4 4xl:px-5 4xl:py-6"
+			class="flex flex-col gap-1 overflow-hidden bg-background/50 backdrop-blur-md px-1.5 py-2 md:gap-1.5 md:px-2 md:py-3 lg:px-2.5 lg:py-3.5 2xl:gap-2 2xl:px-3 2xl:py-4 3xl:gap-3 3xl:px-4 3xl:py-5 4xl:gap-4 4xl:px-5 4xl:py-6"
 		>
 			{#each quest.items as item (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
@@ -188,7 +188,7 @@
 			{/each}
 		</div>
 		<div
-			class="flex items-center justify-between rounded-b-lg bg-background/50 px-2 py-1 backdrop-blur-md md:px-3 md:py-1.5 lg:px-4 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:px-7 4xl:py-3"
+			class="flex items-center justify-between rounded-b-lg bg-background/50 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 lg:px-4 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:px-7 4xl:py-3"
 		>
 			<span
 				class="text-[7px] font-medium text-white/80 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-[12px]"

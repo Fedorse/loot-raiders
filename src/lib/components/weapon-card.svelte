@@ -16,7 +16,7 @@
 	let { item, className = '', location, onmatched }: Props = $props();
 	let def = $derived(getDef(item.defId));
 
-	const { gameLoop } = getGameContext();
+	const { gameLoop, interaction } = getGameContext();
 	const style = $derived(getRarityStyle(def.rarity));
 </script>
 
@@ -44,7 +44,10 @@
 				<img
 					src={def.image}
 					alt="weapon"
-					class="max-h-full max-w-full object-contain transition-transform group-hover/weapon:scale-110"
+					class="max-h-full max-w-full object-contain transition-transform {interaction.status ===
+					'dragging'
+						? ''
+						: 'group-hover/weapon:scale-110'}"
 				/>
 			</div>
 			<div class="weapon-card__slots z-20 mb-0.5 flex shrink-0 items-center justify-center gap-0.5 lg:mb-1 lg:gap-1 3xl:gap-1.5">

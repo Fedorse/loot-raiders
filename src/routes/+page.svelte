@@ -26,7 +26,7 @@
 				<div class="flex items-start gap-1 md:gap-1 lg:gap-4 xl:gap-4 2xl:gap-5 3xl:gap-10">
 					<div class="z-10 flex flex-col items-start">
 						<div
-							class="flex h-6 items-center gap-1.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
+							class="flex h-6 items-center gap-1.5 rounded-t-lg bg-background/50 backdrop-blur-md px-3 md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
 							data-wide-short-bar
 						>
 							<span
@@ -70,7 +70,7 @@
 						</div>
 
 						<div
-							class="z-10 flex flex-col gap-1 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 p-1 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
+							class="z-10 flex flex-col gap-1 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 backdrop-blur-md p-1 md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
 							data-wide-short-panel
 						>
 							<div class="grid grid-cols-4">
@@ -91,7 +91,7 @@
 					<div class="z-10 flex flex-col items-end">
 						{@render scoreTimeTab()}
 						<div
-							class="flex flex-col gap-1 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 p-1 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
+							class="flex flex-col gap-1 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 backdrop-blur-md p-1 md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
 							data-wide-short-panel
 						>
 							<div
@@ -158,7 +158,7 @@
 	{#if gameLoop.status !== 'idle'}
 		{@const weightPct = Math.min(100, (inventory.totalWeight / inventory.maxWeight) * 100)}
 		<div
-			class="flex h-6 items-center gap-2.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
+			class="flex h-6 items-center gap-2.5 rounded-t-lg bg-background/50 backdrop-blur-md px-3 md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
 			data-wide-short-bar
 		>
 			<button

@@ -14,7 +14,7 @@
 		type="button"
 		{onclick}
 		aria-label="Open quests"
-		class="group flex w-full items-center gap-2 rounded-2xl bg-[#0c101c]/80 px-2 py-1.5 ring-1 ring-white/5 backdrop-blur-md transition-transform active:scale-[0.98]"
+		class="group flex w-full items-center gap-2 rounded-2xl bg-[#0c101c]/80 backdrop-blur-md px-2 py-1.5 ring-1 ring-white/5 transition-transform active:scale-[0.98]"
 	>
 		<img
 			src="/assets/ui/Icon_Quest.webp"

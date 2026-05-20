@@ -16,9 +16,8 @@
 
 	const tempSlots = $derived.by(() => {
 		if (storageId !== 'backpack' || !overlay.augmentPanel) return 0;
-		const aug = inventory.getItem({ type: 'slot', storageId: 'augment', index: 0 });
-		if (!aug) return 0;
-		const upgrade = getAugmentUpgrade(aug.defId);
+		if (!inventory.augmentItem) return 0;
+		const upgrade = getAugmentUpgrade(inventory.augmentItem.defId);
 		return upgrade?.bonusSlots ?? 0;
 	});
 </script>

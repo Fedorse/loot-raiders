@@ -13,18 +13,19 @@ const EQUIP_STORAGES: StorageId[] = ['backpack', 'weapon', 'augment', 'shield'];
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
 
+	augmentItem = $derived(this.getItem({ type: 'slot', storageId: 'augment', index: 0 }));
+	shieldItem = $derived(this.getItem({ type: 'slot', storageId: 'shield', index: 0 }));
+
 	bonusBackpackSlots = $derived.by(() => {
-		const augItem = this.getItem({ type: 'slot', storageId: 'augment', index: 0 });
-		if (!augItem) return 0;
-		return getAugmentBonusSlots(augItem.defId);
+		if (!this.augmentItem) return 0;
+		return getAugmentBonusSlots(this.augmentItem.defId);
 	});
 	private selection: Selection;
 	private audio: AudioManager;
 
 	maxWeight = $derived.by(() => {
-		const augItem = this.getItem({ type: 'slot', storageId: 'augment', index: 0 });
-		if (!augItem) return 25;
-		return getDef(augItem.defId).maxCarryWeight ?? 25;
+		if (!this.augmentItem) return 25;
+		return getDef(this.augmentItem.defId).maxCarryWeight ?? 25;
 	});
 
 	totalExtract = $derived.by(() => {

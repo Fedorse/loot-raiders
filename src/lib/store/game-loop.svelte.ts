@@ -18,6 +18,7 @@ export class GameLoop {
 	private rafId = 0;
 	private lastTime = 0;
 	private appliedShieldRarities = new Set<string>();
+	private pendingMatchScore = 0;
 
 	score = $state(0);
 	timeLeft = $state(0);
@@ -40,6 +41,28 @@ export class GameLoop {
 		this.overlay = overlay;
 		this.loot = loot;
 		this.quest = quest;
+
+		$effect.root(() => {
+			$effect(() => {
+				const shield = this.inventory.shieldItem;
+				if (!shield) return;
+				const def = getDef(shield.defId);
+				if (this.appliedShieldRarities.has(def.rarity)) return;
+				const bonus = def.timeBonus ?? 0;
+				this.timeLeft += bonus;
+				this.shieldTimeBonus = bonus;
+				this.appliedShieldRarities.add(def.rarity);
+				if (this.status === 'playing') {
+					this.audio.play('sheild');
+				}
+			});
+
+			$effect(() => {
+				if (this.status !== 'playing') return;
+				const ms = this.quest.checkMatches();
+				if (ms > 0) this.pendingMatchScore += ms;
+			});
+		});
 	}
 
 	start() {
@@ -85,21 +108,6 @@ export class GameLoop {
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
-		const shield = this.inventory.getItem({
-			type: 'slot',
-			storageId: 'shield',
-			index: 0
-		});
-		if (shield) {
-			const def = getDef(shield.defId);
-			if (!this.appliedShieldRarities.has(def.rarity)) {
-				const bonus = def.timeBonus ?? 0;
-				this.timeLeft += bonus;
-				this.shieldTimeBonus = bonus;
-				this.appliedShieldRarities.add(def.rarity);
-				this.audio.play('sheild');
-			}
-		}
 
 		this.timeLeft -= dt;
 		this.elapsedTime += dt;
@@ -112,7 +120,10 @@ export class GameLoop {
 
 		this.loot.tick(dt);
 
-		this.score += this.quest.checkMatches();
+		if (this.pendingMatchScore > 0) {
+			this.score += this.pendingMatchScore;
+			this.pendingMatchScore = 0;
+		}
 
 		if (this.quest.stageCompleted && !this.quest.allStagesCompleted) {
 			const nextStage = this.quest.advanceStage();
@@ -138,6 +149,7 @@ export class GameLoop {
 		this.inventory.clearStorage('augment');
 		this.inventory.clearStorage('shield');
 		this.appliedShieldRarities.clear();
+		this.pendingMatchScore = 0;
 
 		this.start();
 	}

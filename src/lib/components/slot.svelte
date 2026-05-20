@@ -206,7 +206,7 @@
 			var(--glow-magenta) 360deg
 		);
 		animation: rotate 4s linear infinite;
-		filter: blur(1px);
+		will-change: transform;
 	}
 
 	@keyframes rotate {
