@@ -3,8 +3,9 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import AudioSettings from './audio-settings.svelte';
-	import FullscreenButton from './fullscreen-button.svelte';
 	import GameOverStats from './game-over-stats.svelte';
+
+	let { showPreloader = false }: { showPreloader?: boolean } = $props();
 
 	const { gameLoop, audio } = getGameContext();
 
@@ -28,14 +29,14 @@
 	</button>
 {/snippet}
 
-{#if gameLoop.status !== 'playing'}
+{#if gameLoop.status !== 'playing' && !showPreloader}
 	<div
-		class="fixed inset-0 z-[10] flex items-center justify-center bg-black/70 backdrop-blur-xs"
-		transition:fade={{ duration: 150 }}
+		class="fixed inset-0 z-[30] flex items-center justify-center bg-black/70 backdrop-blur-xs"
+		transition:fade|global={{ duration: gameLoop.status === 'idle' ? 300 : 0 }}
 	>
 		<div
 			class="flex flex-col items-center gap-4 md:gap-5 lg:gap-6 2xl:gap-8 3xl:gap-10"
-			transition:scale={{ duration: 200, start: 0.5 }}
+			in:scale|global={{ duration: 200, start: 0.85 }}
 		>
 			{#if gameLoop.status === 'idle'}
 				<div class="flex flex-col gap-2">
@@ -62,17 +63,9 @@
 			{/if}
 		</div>
 
-		<div
-			class="absolute right-4 bottom-12 hidden md:right-5 md:bottom-16 md:flex 2xl:right-6 2xl:bottom-24 3xl:right-8 3xl:bottom-28 pointer-coarse:hidden"
-			transition:fade={{ duration: 300, delay: 150 }}
-		>
-			<FullscreenButton />
-		</div>
-
 		{#if gameLoop.status !== 'idle'}
 			<div
-				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-16 md:left-5 md:gap-6 2xl:bottom-24 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10 pointer-coarse:hidden"
-				transition:fade|global={{ duration: 300, delay: 150 }}
+				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-10 md:left-5 md:gap-6 2xl:bottom-14 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10 pointer-coarse:hidden"
 			>
 				<div class="flex items-center gap-1.5 md:gap-2">
 					<kbd

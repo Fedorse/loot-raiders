@@ -3,23 +3,6 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 
 	const { device } = getGameContext();
-
-	let isPortraitMobile = $state(false);
-
-	$effect(() => {
-		device.init();
-
-		const portrait = matchMedia('(orientation: portrait) and (max-width: 1023px)');
-		const update = () => {
-			isPortraitMobile = portrait.matches;
-		};
-		update();
-		portrait.addEventListener('change', update);
-
-		return () => {
-			portrait.removeEventListener('change', update);
-		};
-	});
 </script>
 
 {#snippet rotateIcon()}
@@ -67,7 +50,7 @@
 	</div>
 {/snippet}
 
-{#if isPortraitMobile}
+{#if device.isPortraitMobile}
 	<div
 		class="fixed inset-0 z-[9999] flex h-full flex-col items-center bg-black/95 p-8 pb-[calc(env(safe-area-inset-bottom)+2rem)] backdrop-blur-md"
 		transition:fade={{ duration: 200 }}

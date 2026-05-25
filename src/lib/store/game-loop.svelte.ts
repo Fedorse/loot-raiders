@@ -105,6 +105,33 @@ export class GameLoop {
 		this.audio.unduckBGM();
 	}
 
+	attachAutoPause(): () => void {
+		const isFullscreen = () =>
+			!!(
+				document.fullscreenElement ||
+				(document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement
+			);
+		const pauseIfPlaying = () => {
+			if (this.status === 'playing') this.pause();
+		};
+		const onFullscreenChange = () => {
+			if (!isFullscreen()) pauseIfPlaying();
+		};
+		const onVisibilityChange = () => {
+			if (document.hidden) pauseIfPlaying();
+		};
+
+		document.addEventListener('fullscreenchange', onFullscreenChange);
+		document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+		document.addEventListener('visibilitychange', onVisibilityChange);
+
+		return () => {
+			document.removeEventListener('fullscreenchange', onFullscreenChange);
+			document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+			document.removeEventListener('visibilitychange', onVisibilityChange);
+		};
+	}
+
 	private tick(now: number) {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
