@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { Tween } from 'svelte/motion';
 	import { cubicOut } from 'svelte/easing';
+	import { fly, fade } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getDef } from '$lib/config/items';
 	import { formatTime } from '$lib/utils';
 	import { getExtractionTier } from '$lib/config/extraction';
+	import { STAGES } from '$lib/config/stages';
 	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import type { ItemRarity } from '$lib/types';
 
@@ -21,9 +23,7 @@
 	const augmentItem = inventory.getItem({ type: 'slot', storageId: 'augment', index: 0 });
 	const augmentRarity: ItemRarity | null = augmentItem ? getDef(augmentItem.defId).rarity : null;
 
-	const finalScore = gameLoop.score;
 	const finalExtract = inventory.totalExtract;
-	const finalQuests = quest.totalQuestsCompleted;
 	const finalStages = quest.stagesCleared;
 	const finalChests = loot.chestsOpened;
 	const finalTime = Math.floor(gameLoop.elapsedTime);
@@ -33,17 +33,13 @@
 	const DURATION = 1400;
 	const opts = { duration: DURATION, easing: cubicOut };
 
-	const score = new Tween(0, opts);
 	const extract = new Tween(0, opts);
-	const quests = new Tween(0, opts);
 	const stages = new Tween(0, opts);
 	const chests = new Tween(0, opts);
 	const time = new Tween(0, opts);
 
 	$effect(() => {
-		score.target = finalScore;
 		extract.target = finalExtract;
-		quests.target = finalQuests;
 		stages.target = finalStages;
 		chests.target = finalChests;
 		time.target = finalTime;
@@ -52,112 +48,143 @@
 	const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 </script>
 
-{#snippet row(label: string, value: string, hint?: string)}
+{#snippet stat(label: string, value: string, accentClass = 'text-white', delay = 0)}
 	<div
-		class="flex items-center justify-between rounded-md bg-background/40 px-3 py-2 backdrop-blur-sm md:px-4 md:py-2.5 2xl:px-5 2xl:py-3"
+		in:fly|global={{ y: 6, duration: 280, delay }}
+		class="flex flex-col items-center gap-0.5 md:gap-1"
 	>
+		<span class="font-mono text-sm font-bold tracking-tight tabular-nums md:text-base 2xl:text-lg 3xl:text-xl {accentClass}">
+			{value}
+		</span>
 		<span
-			class="text-[8px] font-semibold tracking-wider text-white/60 uppercase md:text-[9px] lg:text-[10px] 2xl:text-xs 3xl:text-sm"
+			class="text-[7px] font-semibold tracking-[0.25em] text-white/35 uppercase md:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
 		>
 			{label}
-		</span>
-		<span class="flex items-baseline gap-1.5">
-			<span
-				class="font-mono text-sm font-bold tracking-tight text-white tabular-nums md:text-base lg:text-lg 2xl:text-xl 3xl:text-2xl"
-			>
-				{value}
-			</span>
-			{#if hint}
-				<span
-					class="text-[7px] font-semibold tracking-wider text-white/40 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px]"
-				>
-					{hint}
-				</span>
-			{/if}
 		</span>
 	</div>
 {/snippet}
 
+{#snippet divider()}
+	<span aria-hidden="true" class="h-3 w-px bg-white/15 md:h-3.5 2xl:h-4"></span>
+{/snippet}
+
 <div
-	class="flex w-[300px] flex-col gap-2 md:w-[360px] md:gap-2.5 lg:w-[420px] lg:gap-3 2xl:w-[520px] 2xl:gap-4 3xl:w-[600px] 3xl:gap-5"
+	class="flex w-[320px] flex-col items-center gap-5 md:w-[400px] md:gap-6 lg:w-[460px] 2xl:w-[560px] 2xl:gap-7 3xl:w-[640px] 3xl:gap-8"
 >
-	<div class="flex flex-col items-start gap-0.5 md:gap-1">
+	<!-- Outcome eyebrow -->
+	<div in:fade|global={{ duration: 300 }} class="flex items-center gap-2">
 		<span
-			class="text-[8px] font-semibold tracking-[0.3em] text-white/40 uppercase md:text-[9px] 2xl:text-[10px] 3xl:text-xs"
+			aria-hidden="true"
+			class="h-px w-8 {victory ? 'bg-emerald-400/60' : 'bg-red-400/60'} md:w-10 2xl:w-12"
+		></span>
+		<span
+			class="text-[8px] font-bold tracking-[0.4em] uppercase md:text-[9px] 2xl:text-[10px] 3xl:text-xs {victory
+				? 'text-emerald-300'
+				: 'text-red-300'}"
 		>
-			Extraction Report
+			{victory ? 'Extraction Complete' : 'Run Terminated'}
 		</span>
+		<span
+			aria-hidden="true"
+			class="h-px w-8 {victory ? 'bg-emerald-400/60' : 'bg-red-400/60'} md:w-10 2xl:w-12"
+		></span>
+	</div>
+
+	<!-- Tier title as hero -->
+	<div in:fly|global={{ y: -6, duration: 350, delay: 80 }} class="text-center">
 		<h1
-			class="text-2xl font-black tracking-tight uppercase md:text-3xl 2xl:text-4xl 3xl:text-5xl"
-			class:text-emerald-400={victory}
-			class:text-red-400={!victory}
-		>
-			{victory ? 'Victory' : 'Defeated'}
-		</h1>
-		<p
-			class="font-mono text-xs font-bold tracking-wider uppercase md:text-sm 2xl:text-base 3xl:text-lg"
-			class:text-emerald-300={victory}
-			class:text-red-300={!victory}
+			class="text-2xl font-black tracking-tight uppercase md:text-3xl 2xl:text-4xl 3xl:text-5xl {victory
+				? 'text-emerald-200 drop-shadow-[0_0_18px_rgba(110,231,183,0.25)]'
+				: 'text-red-200 drop-shadow-[0_0_18px_rgba(252,165,165,0.25)]'}"
 		>
 			{tier.title}
-		</p>
+		</h1>
 		<p
-			class="mt-1 max-w-[95%] text-[10px] leading-snug text-white/50 italic md:mt-1.5 md:text-[11px] lg:text-xs 2xl:text-[13px] 3xl:text-sm"
+			class="mt-2 max-w-[40ch] text-center text-[10px] leading-relaxed text-white/45 italic md:mt-2.5 md:text-[11px] lg:text-xs 2xl:mt-3 2xl:text-[13px] 3xl:text-sm"
 		>
-			{tier.description}
+			"{tier.description}"
 		</p>
 	</div>
 
+	<!-- Hero extract -->
 	<div
-		class="flex items-center justify-between rounded-md border border-white/5 px-3 py-2.5 backdrop-blur-md md:px-4 md:py-3 2xl:px-5 2xl:py-4 {victory
-			? 'bg-emerald-950/30'
-			: 'bg-red-950/30'}"
+		in:fly|global={{ y: 8, duration: 400, delay: 200 }}
+		class="flex flex-col items-center"
 	>
+		<div class="flex items-baseline gap-2">
+			<span
+				class="font-mono text-5xl font-black tracking-tight text-amber-100 tabular-nums drop-shadow-[0_0_22px_rgba(251,191,36,0.3)] md:text-6xl 2xl:text-7xl 3xl:text-8xl"
+			>
+				{fmt(extract.current)}
+			</span>
+			<span
+				class="text-base font-bold tracking-[0.3em] text-amber-300/70 uppercase md:text-lg 2xl:text-xl"
+			>
+				cr
+			</span>
+		</div>
 		<span
-			class="text-[9px] font-bold tracking-wider text-white/70 uppercase md:text-[10px] lg:text-[11px] 2xl:text-xs 3xl:text-sm"
+			class="mt-1 text-[8px] font-semibold tracking-[0.3em] text-white/35 uppercase md:text-[9px] 2xl:text-[10px] 3xl:text-xs"
 		>
-			Round Total
-		</span>
-		<span
-			class="font-mono text-2xl font-black tracking-tight tabular-nums md:text-3xl 2xl:text-4xl 3xl:text-5xl"
-			class:text-emerald-400={victory}
-			class:text-red-400={!victory}
-		>
-			{fmt(score.current)}
+			Total Extract
 		</span>
 	</div>
 
-	<div class="flex flex-col gap-1 md:gap-1.5">
-		{@render row('Time on Surface', formatTime(time.current))}
-		{@render row('Stages Cleared', `${fmt(stages.current)} / 5`)}
-		{@render row('Quests Completed', fmt(quests.current))}
-		{@render row('Chests Opened', fmt(chests.current))}
-		{@render row('Total Extract', fmt(extract.current), 'cr')}
+	<!-- Ornamental divider -->
+	<div
+		in:fade|global={{ duration: 300, delay: 300 }}
+		aria-hidden="true"
+		class="flex w-full items-center gap-3 px-2"
+	>
+		<span class="h-px flex-1 bg-gradient-to-r from-transparent to-white/15"></span>
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.5"
+			class="size-3 text-white/25 md:size-3.5 2xl:size-4"
+		>
+			<path d="M12 2 2 12l10 10 10-10z" />
+		</svg>
+		<span class="h-px flex-1 bg-gradient-to-l from-transparent to-white/15"></span>
+	</div>
+
+	<!-- Inline stats row -->
+	<div class="flex items-center gap-4 md:gap-5 2xl:gap-7 3xl:gap-9">
+		{@render stat('Time', formatTime(time.current), 'text-white', 380)}
+		{@render divider()}
+		{@render stat('Stages', `${fmt(stages.current)} / ${STAGES.length}`, 'text-white', 440)}
+		{@render divider()}
+		{@render stat('Chests', fmt(chests.current), 'text-white', 500)}
 		{#if augmentRarity}
+			{@render divider()}
 			<div
-				class="flex items-center justify-between rounded-md bg-background/40 px-3 py-2 backdrop-blur-sm md:px-4 md:py-2.5 2xl:px-5 2xl:py-3"
+				in:fly|global={{ y: 6, duration: 280, delay: 560 }}
+				class="flex flex-col items-center gap-0.5 md:gap-1"
 			>
 				<span
-					class="text-[8px] font-semibold tracking-wider text-white/60 uppercase md:text-[9px] lg:text-[10px] 2xl:text-xs 3xl:text-sm"
-				>
-					Augment Tier
-				</span>
-				<span
-					class="font-mono text-sm font-bold tracking-wider uppercase tabular-nums md:text-base lg:text-lg 2xl:text-xl 3xl:text-2xl"
+					class="font-mono text-sm font-bold tracking-wider uppercase tabular-nums md:text-base 2xl:text-lg 3xl:text-xl"
 					style="color: var(--rarity-{augmentRarity})"
 				>
 					{augmentRarity}
+				</span>
+				<span
+					class="text-[7px] font-semibold tracking-[0.25em] text-white/35 uppercase md:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
+				>
+					Augment
 				</span>
 			</div>
 		{/if}
 	</div>
 
+	<!-- Retry -->
 	<button
 		type="button"
 		onclick={onRetry}
-		class="group relative mt-1 flex w-full items-center justify-center gap-2 overflow-hidden rounded-md border px-4 py-2.5 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] md:mt-1.5 md:py-3 2xl:mt-2 2xl:py-4 {victory
-			? 'border-emerald-500/30 bg-emerald-600/10 hover:border-emerald-400/60 hover:bg-emerald-600/20'
-			: 'border-red-500/30 bg-red-600/10 hover:border-red-400/60 hover:bg-red-600/20'}"
+		in:fly|global={{ y: 8, duration: 350, delay: 640 }}
+		class="group relative mt-1 flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-md border px-4 py-2.5 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] md:mt-2 md:py-3 2xl:mt-3 2xl:py-4 {victory
+			? 'border-emerald-500/30 bg-emerald-600/10 hover:border-emerald-400/60 hover:bg-emerald-600/15'
+			: 'border-red-500/30 bg-red-600/10 hover:border-red-400/60 hover:bg-red-600/15'}"
 	>
 		<span
 			class="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"
@@ -175,7 +202,7 @@
 			<path d="M3 3v5h5" />
 		</svg>
 		<span
-			class="text-xs font-bold tracking-[0.2em] uppercase md:text-sm 2xl:text-base 3xl:text-lg {victory
+			class="text-xs font-bold tracking-[0.25em] uppercase md:text-sm 2xl:text-base 3xl:text-lg {victory
 				? 'text-emerald-300'
 				: 'text-red-300'}"
 		>

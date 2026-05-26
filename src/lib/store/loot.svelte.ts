@@ -262,5 +262,6 @@ export class LootGenerator {
 		this.lootQueue = [];
 		this.shineQueue.clear();
 		this.chestsOpened = 0;
+		this.cooldown = 0;
 	}
 }

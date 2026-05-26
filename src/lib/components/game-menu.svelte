@@ -63,7 +63,7 @@
 			{/if}
 		</div>
 
-		{#if gameLoop.status !== 'idle'}
+		{#if gameLoop.status === 'paused'}
 			<div
 				class="absolute bottom-12 left-4 flex gap-4 font-bold text-muted md:bottom-10 md:left-5 md:gap-6 2xl:bottom-14 2xl:left-6 2xl:gap-8 3xl:bottom-28 3xl:left-8 3xl:gap-10 pointer-coarse:hidden"
 			>
