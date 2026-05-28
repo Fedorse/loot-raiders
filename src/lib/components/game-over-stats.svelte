@@ -9,204 +9,212 @@
 	import { STAGES } from '$lib/config/stages';
 	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import type { ItemRarity } from '$lib/types';
+	import Restart from '$lib/ui-icon/restart.svelte';
+	import Leaderboard from '$lib/ui-icon/leaderboard.svelte';
+
+	const TONE_STYLE = {
+		good: {
+			border: 'border-emerald-500',
+			text: 'text-emerald-500',
+			tint: 'rgba(34,197,94,0.13)',
+			glow: 'rgba(34,197,94,0.4)'
+		},
+		neutral: {
+			border: 'border-amber-400',
+			text: 'text-amber-400',
+			tint: 'rgba(255,184,0,0.13)',
+			glow: 'rgba(255,184,0,0.4)'
+		},
+		bad: {
+			border: 'border-red-500',
+			text: 'text-red-500',
+			tint: 'rgba(239,68,68,0.13)',
+			glow: 'rgba(239,68,68,0.4)'
+		}
+	} as const;
 
 	const { gameLoop, quest, inventory, loot, audio } = getGameContext();
 
-	function onRetry() {
+	function restartGame() {
 		audio.play('click');
 		if (isTouchDevice()) enterFullscreen();
 		gameLoop.restart();
 	}
 
-	const victory = gameLoop.gameOverReason === 'victory';
+	function onSubmitScore() {
+		audio.play('click');
+		// TODO: hook up to leaderboard submission
+	}
 
-	const augmentItem = inventory.getItem({ type: 'slot', storageId: 'augment', index: 0 });
+	const augmentItem = inventory.augmentItem;
 	const augmentRarity: ItemRarity | null = augmentItem ? getDef(augmentItem.defId).rarity : null;
 
 	const finalExtract = inventory.totalExtract;
-	const finalStages = quest.stagesCleared;
-	const finalChests = loot.chestsOpened;
-	const finalTime = Math.floor(gameLoop.elapsedTime);
+	const tier = getExtractionTier(finalExtract);
 
-	const tier = getExtractionTier(finalExtract, victory);
+	const toneStyle = TONE_STYLE[tier.tone];
 
-	const DURATION = 1400;
-	const opts = { duration: DURATION, easing: cubicOut };
+	const opts = { duration: 1400, easing: cubicOut };
+	function countUp(to: number) {
+		const t = new Tween(0, opts);
+		t.target = to;
+		return t;
+	}
 
-	const extract = new Tween(0, opts);
-	const stages = new Tween(0, opts);
-	const chests = new Tween(0, opts);
-	const time = new Tween(0, opts);
-
-	$effect(() => {
-		extract.target = finalExtract;
-		stages.target = finalStages;
-		chests.target = finalChests;
-		time.target = finalTime;
-	});
+	const extract = countUp(finalExtract);
+	const stages = countUp(quest.stagesCleared);
+	const chests = countUp(loot.chestsOpened);
+	const time = countUp(Math.floor(gameLoop.elapsedTime));
 
 	const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 </script>
 
-{#snippet stat(label: string, value: string, accentClass = 'text-white', delay = 0)}
-	<div
-		in:fly|global={{ y: 6, duration: 280, delay }}
-		class="flex flex-col items-center gap-0.5 md:gap-1"
-	>
-		<span class="font-mono text-sm font-bold tracking-tight tabular-nums md:text-base 2xl:text-lg 3xl:text-xl {accentClass}">
-			{value}
-		</span>
-		<span
-			class="text-[7px] font-semibold tracking-[0.25em] text-white/35 uppercase md:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
-		>
+{#snippet breakdownCell(label: string, value: string)}
+	<div class="rounded-xs border border-white/8 bg-white/[0.04] px-3 py-1.5 lg:px-3.5 lg:py-3">
+		<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-white/50 uppercase">
 			{label}
-		</span>
+		</div>
+		<div
+			class="mt-1 font-mono text-[18px] leading-none font-black tracking-[-0.01em] text-white/90 tabular-nums md:text-[22px] 3xl:text-[26px]"
+		>
+			{value}
+		</div>
 	</div>
-{/snippet}
-
-{#snippet divider()}
-	<span aria-hidden="true" class="h-3 w-px bg-white/15 md:h-3.5 2xl:h-4"></span>
 {/snippet}
 
 <div
-	class="flex w-[320px] flex-col items-center gap-5 md:w-[400px] md:gap-6 lg:w-[460px] 2xl:w-[560px] 2xl:gap-7 3xl:w-[640px] 3xl:gap-8"
+	in:fade|global={{ duration: 240 }}
+	class="relative w-[calc(100vw-1rem)] max-w-[420px] rounded-md bg-background/50 font-sans text-white/90 shadow-[0_30px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md landscape-narrow:max-w-[540px] landscape-mid:max-w-[620px] md:max-w-[680px] lg:max-w-[760px] 3xl:max-w-[840px]"
 >
-	<!-- Outcome eyebrow -->
-	<div in:fade|global={{ duration: 300 }} class="flex items-center gap-2">
+	<div class="flex items-center justify-end border-b border-white/8 px-5 py-3">
 		<span
-			aria-hidden="true"
-			class="h-px w-8 {victory ? 'bg-emerald-400/60' : 'bg-red-400/60'} md:w-10 2xl:w-12"
-		></span>
-		<span
-			class="text-[8px] font-bold tracking-[0.4em] uppercase md:text-[9px] 2xl:text-[10px] 3xl:text-xs {victory
-				? 'text-emerald-300'
-				: 'text-red-300'}"
+			class="flex items-center gap-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-amber-400 uppercase"
 		>
-			{victory ? 'Extraction Complete' : 'Run Terminated'}
+			<span class="size-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffb800]"></span>
+			Run Report
 		</span>
-		<span
-			aria-hidden="true"
-			class="h-px w-8 {victory ? 'bg-emerald-400/60' : 'bg-red-400/60'} md:w-10 2xl:w-12"
-		></span>
 	</div>
 
-	<!-- Tier title as hero -->
-	<div in:fly|global={{ y: -6, duration: 350, delay: 80 }} class="text-center">
-		<h1
-			class="text-2xl font-black tracking-tight uppercase md:text-3xl 2xl:text-4xl 3xl:text-5xl {victory
-				? 'text-emerald-200 drop-shadow-[0_0_18px_rgba(110,231,183,0.25)]'
-				: 'text-red-200 drop-shadow-[0_0_18px_rgba(252,165,165,0.25)]'}"
-		>
-			{tier.title}
-		</h1>
-		<p
-			class="mt-2 max-w-[40ch] text-center text-[10px] leading-relaxed text-white/45 italic md:mt-2.5 md:text-[11px] lg:text-xs 2xl:mt-3 2xl:text-[13px] 3xl:text-sm"
-		>
-			"{tier.description}"
-		</p>
-	</div>
-
-	<!-- Hero extract -->
 	<div
-		in:fly|global={{ y: 8, duration: 400, delay: 200 }}
-		class="flex flex-col items-center"
+		class="grid grid-cols-[110px_1fr] items-center gap-4 border-b border-white/8 px-4 py-2 landscape-narrow:grid-cols-[120px_1fr] landscape-mid:grid-cols-[130px_1fr] md:grid-cols-[140px_1fr] md:gap-5 md:px-5 md:py-3 lg:grid-cols-[170px_1fr] lg:gap-7 lg:px-6 lg:py-6"
+		in:fly|global={{ y: 8, duration: 420, delay: 80 }}
 	>
-		<div class="flex items-baseline gap-2">
+		<div
+			class="relative flex h-[110px] items-center justify-center border-2 landscape-narrow:h-[100px] landscape-mid:h-[110px] md:h-[140px] lg:h-[170px] {toneStyle.border}"
+			style="background: radial-gradient(circle at 50% 50%, {toneStyle.tint} 0%, transparent 70%);"
+		>
 			<span
-				class="font-mono text-5xl font-black tracking-tight text-amber-100 tabular-nums drop-shadow-[0_0_22px_rgba(251,191,36,0.3)] md:text-6xl 2xl:text-7xl 3xl:text-8xl"
+				aria-hidden="true"
+				class="absolute -top-[2px] -left-[2px] size-3.5 border-t-2 border-l-2 border-white/90"
+			></span>
+			<span
+				aria-hidden="true"
+				class="absolute -top-[2px] -right-[2px] size-3.5 border-t-2 border-r-2 border-white/90"
+			></span>
+			<span
+				aria-hidden="true"
+				class="absolute -bottom-[2px] -left-[2px] size-3.5 border-b-2 border-l-2 border-white/90"
+			></span>
+			<span
+				aria-hidden="true"
+				class="absolute -right-[2px] -bottom-[2px] size-3.5 border-r-2 border-b-2 border-white/90"
+			></span>
+
+			<span
+				class="text-[80px] leading-[0.9] font-black tracking-[-0.06em] font-stretch-condensed landscape-narrow:text-[70px] landscape-mid:text-[80px] md:text-[100px] lg:text-[130px] 3xl:text-[150px] {toneStyle.text}"
+				style="font-family: ui-sans-serif, Impact, 'Arial Black', sans-serif; text-shadow: 0 0 24px {toneStyle.glow};"
 			>
-				{fmt(extract.current)}
+				{tier.grade}
 			</span>
+
 			<span
-				class="text-base font-bold tracking-[0.3em] text-amber-300/70 uppercase md:text-lg 2xl:text-xl"
+				class="absolute -top-[10px] left-2 bg-[#0f111a] px-2 py-[2px] font-mono text-[9px] font-extrabold tracking-[0.4em] text-white/50 uppercase"
 			>
-				cr
+				Grade
 			</span>
 		</div>
-		<span
-			class="mt-1 text-[8px] font-semibold tracking-[0.3em] text-white/35 uppercase md:text-[9px] 2xl:text-[10px] 3xl:text-xs"
-		>
-			Total Extract
-		</span>
-	</div>
 
-	<!-- Ornamental divider -->
-	<div
-		in:fade|global={{ duration: 300, delay: 300 }}
-		aria-hidden="true"
-		class="flex w-full items-center gap-3 px-2"
-	>
-		<span class="h-px flex-1 bg-gradient-to-r from-transparent to-white/15"></span>
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="1.5"
-			class="size-3 text-white/25 md:size-3.5 2xl:size-4"
-		>
-			<path d="M12 2 2 12l10 10 10-10z" />
-		</svg>
-		<span class="h-px flex-1 bg-gradient-to-l from-transparent to-white/15"></span>
-	</div>
-
-	<!-- Inline stats row -->
-	<div class="flex items-center gap-4 md:gap-5 2xl:gap-7 3xl:gap-9">
-		{@render stat('Time', formatTime(time.current), 'text-white', 380)}
-		{@render divider()}
-		{@render stat('Stages', `${fmt(stages.current)} / ${STAGES.length}`, 'text-white', 440)}
-		{@render divider()}
-		{@render stat('Chests', fmt(chests.current), 'text-white', 500)}
-		{#if augmentRarity}
-			{@render divider()}
-			<div
-				in:fly|global={{ y: 6, duration: 280, delay: 560 }}
-				class="flex flex-col items-center gap-0.5 md:gap-1"
-			>
-				<span
-					class="font-mono text-sm font-bold tracking-wider uppercase tabular-nums md:text-base 2xl:text-lg 3xl:text-xl"
-					style="color: var(--rarity-{augmentRarity})"
+		<div class="flex flex-col gap-0.5 lg:gap-2.5">
+			<div>
+				<h1
+					class="text-2xl leading-none font-black tracking-[-0.02em] text-white uppercase md:text-3xl lg:text-[32px] 3xl:text-[36px]"
 				>
-					{augmentRarity}
-				</span>
-				<span
-					class="text-[7px] font-semibold tracking-[0.25em] text-white/35 uppercase md:text-[8px] 2xl:text-[9px] 3xl:text-[10px]"
-				>
-					Augment
-				</span>
+					{tier.title}
+				</h1>
+				<p class="mt-1.5 max-w-xs font-serif text-xs leading-relaxed text-white/50 italic">
+					"{tier.description}"
+				</p>
 			</div>
-		{/if}
+
+			<div
+				class="mt-0.5 flex items-end justify-between gap-5 border-t border-dashed border-white/8 pt-1.5 lg:mt-1.5 lg:pt-3"
+			>
+				<div>
+					<div class="font-mono text-[9px] font-extrabold tracking-[0.4em] text-white/50 uppercase">
+						Loot Value
+					</div>
+					<div class="mt-1 flex items-center gap-2">
+						<span
+							class="font-mono text-[32px] leading-none font-black tracking-[-0.04em] text-amber-400 tabular-nums drop-shadow-[0_0_20px_rgba(255,184,0,0.3)] landscape-mid:text-[36px] md:text-[40px] lg:text-[48px] 3xl:text-[56px]"
+						>
+							{fmt(extract.current)}
+						</span>
+						<img
+							src="/assets/ui/Coins.webp"
+							alt="credits"
+							class="size-8 object-contain drop-shadow-[0_0_12px_rgba(255,184,0,0.35)] md:size-9"
+						/>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
-	<!-- Retry -->
-	<button
-		type="button"
-		onclick={onRetry}
-		in:fly|global={{ y: 8, duration: 350, delay: 640 }}
-		class="group relative mt-1 flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-md border px-4 py-2.5 transition-all duration-200 hover:scale-[1.01] active:scale-[0.98] md:mt-2 md:py-3 2xl:mt-3 2xl:py-4 {victory
-			? 'border-emerald-500/30 bg-emerald-600/10 hover:border-emerald-400/60 hover:bg-emerald-600/15'
-			: 'border-red-500/30 bg-red-600/10 hover:border-red-400/60 hover:bg-red-600/15'}"
+	<div
+		class="px-4 pt-2 pb-1.5 md:px-5 lg:px-6 lg:pt-5 lg:pb-6"
+		in:fade|global={{ duration: 320, delay: 340 }}
 	>
-		<span
-			class="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-		></span>
-		<svg
-			viewBox="0 0 24 24"
-			fill="none"
-			stroke="currentColor"
-			stroke-width="2.5"
-			stroke-linecap="round"
-			stroke-linejoin="round"
-			class="size-3.5 md:size-4 2xl:size-5 {victory ? 'text-emerald-300' : 'text-red-300'}"
+		<div
+			class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-white/50 uppercase"
 		>
-			<path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-			<path d="M3 3v5h5" />
-		</svg>
-		<span
-			class="text-xs font-bold tracking-[0.25em] uppercase md:text-sm 2xl:text-base 3xl:text-lg {victory
-				? 'text-emerald-300'
-				: 'text-red-300'}"
+			Run Breakdown
+		</div>
+		<div class="grid grid-cols-4 gap-1.5">
+			{@render breakdownCell('Time', formatTime(time.current))}
+			{@render breakdownCell('Stages', `${fmt(stages.current)}/${STAGES.length}`)}
+			{@render breakdownCell('Chests', fmt(chests.current))}
+			<div class="rounded-xs border border-white/8 bg-white/[0.04] px-3 py-2.5 md:px-3.5 md:py-3">
+				<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-white/50 uppercase">
+					Augment
+				</div>
+				<div
+					class="mt-1 font-mono text-base leading-none font-black tracking-[0.1em] uppercase"
+					style="color: {augmentRarity
+						? `var(--rarity-${augmentRarity})`
+						: 'rgba(255,255,255,0.3)'};"
+				>
+					{augmentRarity?.toUpperCase() ?? 'NONE'}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-2 gap-px bg-white/8" in:fly|global={{ y: 8, duration: 350, delay: 460 }}>
+		<button
+			type="button"
+			onclick={restartGame}
+			class="group flex items-center justify-center gap-2.5 rounded-md border-none bg-gradient-to-b from-amber-400/10 to-amber-400/[0.03] py-3 text-amber-400 transition-all hover:from-amber-400/20 hover:to-amber-400/5 active:scale-[0.99] md:py-4"
 		>
-			Retry Extraction
-		</span>
-	</button>
+			<Restart />
+			<span class="text-[13px] font-black tracking-[0.28em] uppercase"> Retry </span>
+		</button>
+		<button
+			type="button"
+			onclick={onSubmitScore}
+			class="flex items-center justify-center gap-2.5 rounded-md border-none bg-white/[0.03] py-3 text-white/90 transition-all hover:bg-white/[0.06] active:scale-[0.99] md:py-4"
+		>
+			<Leaderboard />
+			<span class="text-[13px] font-black tracking-[0.28em] uppercase"> Submit Score </span>
+		</button>
+	</div>
 </div>

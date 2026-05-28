@@ -31,7 +31,7 @@
 
 {#if gameLoop.status !== 'playing' && !showPreloader}
 	<div
-		class="fixed inset-0 z-[30] flex items-center justify-center bg-black/70 backdrop-blur-xs"
+		class="fixed inset-0 z-[30] flex items-center justify-center bg-radial from-black/55 to-black/100 backdrop-blur-xs"
 		transition:fade|global={{ duration: gameLoop.status === 'idle' ? 300 : 0 }}
 	>
 		<div
