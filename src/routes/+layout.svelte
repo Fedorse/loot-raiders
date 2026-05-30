@@ -8,6 +8,7 @@
 	import GameMenu from '$lib/components/game-menu.svelte';
 	import MobileGate from '$lib/components/mobile-gate.svelte';
 	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
+	import LeaderboardModal from '$lib/components/leaderboard-modal.svelte';
 	import { Preloader } from '$lib/motion-core';
 	import { initGame } from '$lib/store/game.svelte';
 	import { assetLoader } from '$lib/store/asset-loader.svelte';
@@ -22,10 +23,11 @@
 
 	const game = initGame();
 
-	const { gameLoop, interaction, device } = game;
+	const { gameLoop, interaction, device, leaderboard } = game;
 
 	onMount(() => {
 		device.init();
+		leaderboard.init();
 		assetLoader.preload();
 		const detachAutoPause = gameLoop.attachAutoPause();
 		return () => {
@@ -102,6 +104,7 @@
 <AugmentPanel />
 <GameMenu {showPreloader} />
 <QuestBottomSheet />
+<LeaderboardModal />
 <MobileGate />
 
 {#if showPreloader && !device.isPortraitMobile}

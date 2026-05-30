@@ -9,6 +9,7 @@ import { AudioManager } from './audio.svelte';
 import { Quest } from './quest.svelte';
 import { Augment } from './augment.svelte';
 import { Device } from './device.svelte';
+import { Leaderboard } from './leaderboard.svelte';
 
 export class Game {
 	audio = new AudioManager();
@@ -28,6 +29,7 @@ export class Game {
 		this.loot,
 		this.quest
 	);
+	leaderboard = new Leaderboard();
 }
 
 const GAME_KEY = Symbol('GAME');
