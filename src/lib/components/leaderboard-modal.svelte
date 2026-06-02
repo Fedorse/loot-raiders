@@ -1,35 +1,51 @@
 <script lang="ts">
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
+	import { getLeaderboard } from '$lib/leaderboard/leaderboard.remote';
 	import { formatTime } from '$lib/utils';
 	import Cross from '$lib/ui-icon/cross.svelte';
 	import LeaderboardIcon from '$lib/ui-icon/leaderboard.svelte';
 
-	const { overlay, leaderboard, audio } = getGameContext();
+	const { overlay, audio } = getGameContext();
 
 	let listEl = $state<HTMLDivElement | undefined>();
+
+	const query = $derived(overlay.leaderboard ? getLeaderboard() : undefined);
+	const data = $derived(query?.current);
 
 	function handleClose() {
 		audio.play('click');
 		overlay.closeLeaderboard();
-		leaderboard.clearLastSubmitted();
 	}
 
 	const rows = $derived(
-		leaderboard.sortedEntries.map((entry, index) => ({
+		(data?.entries ?? []).map((entry, index) => ({
 			entry,
 			rank: index + 1,
-			isMine: entry.playerId === leaderboard.myPlayerId,
-			isLastSubmitted:
-				entry.playerId === leaderboard.myPlayerId && leaderboard.pulseMyRow
+			isMine: entry.playerId === data?.myPlayerId
 		}))
 	);
 
-	const myRank = $derived(leaderboard.myRank ?? rows.find((r) => r.isMine)?.rank ?? null);
+	const myRank = $derived(data?.myRank ?? rows.find((r) => r.isMine)?.rank ?? null);
+
+	const MIN_ROWS = 3;
+	const skeletonRows = [0, 1, 2, 3];
+
+	const isLoading = $derived(query !== undefined && data === undefined);
+
+	const displayRows = $derived.by(() => {
+		const real = rows.map((r) => ({ ...r, placeholder: false as const }));
+		if (real.length >= MIN_ROWS) return real;
+		const fillers = Array.from({ length: MIN_ROWS - real.length }, (_, i) => ({
+			placeholder: true as const,
+			rank: real.length + i + 1
+		}));
+		return [...real, ...fillers];
+	});
 
 	$effect(() => {
-		if (!overlay.leaderboard || !listEl || !leaderboard.myPlayerId) return;
-		const target = leaderboard.myPlayerId;
+		const target = data?.myPlayerId;
+		if (!overlay.leaderboard || !listEl || !target) return;
 		queueMicrotask(() => {
 			const row = listEl?.querySelector<HTMLElement>(`[data-entry-id="${target}"]`);
 			row?.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -57,10 +73,14 @@
 			transition:scale={{ duration: 200, start: 0.95 }}
 			onclick={(e) => e.stopPropagation()}
 		>
-			<div class="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-5 md:py-4">
+			<div
+				class="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-5 md:py-4"
+			>
 				<div class="flex items-center gap-2.5 text-amber-400">
 					<LeaderboardIcon />
-					<span class="font-mono text-[11px] font-extrabold tracking-[0.36em] uppercase md:text-[12px]">
+					<span
+						class="font-mono text-[11px] font-extrabold tracking-[0.36em] uppercase md:text-[12px]"
+					>
 						Leaderboard
 					</span>
 				</div>
@@ -76,7 +96,7 @@
 
 			{#if myRank !== null}
 				<div
-					class="flex items-center justify-between border-b border-white/8 bg-amber-400/[0.06] px-5 py-2 font-mono text-[10px] font-extrabold tracking-[0.3em] text-amber-400/80 uppercase"
+					class="flex items-center justify-between border-b border-white/8 px-5 py-2 font-mono text-[10px] font-extrabold tracking-[0.3em] text-white uppercase"
 				>
 					<span>Your rank</span>
 					<span class="text-base font-black tracking-normal text-amber-400 tabular-nums">
@@ -95,44 +115,85 @@
 			</div>
 
 			<div bind:this={listEl} class="flex-1 overflow-y-auto px-2 py-1 md:px-3">
-				{#each rows as row (row.entry.playerId)}
-					<div
-						data-entry-id={row.entry.playerId}
-						class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 rounded-sm px-2 py-2 transition-colors md:grid-cols-[48px_1fr_110px_80px] md:px-3"
-						class:bg-amber-400-soft={row.isMine}
-						class:ring-1={row.isMine}
-						class:ring-amber-400-soft={row.isMine}
-						class:animate-pulse-once={row.isLastSubmitted}
-					>
-						<div class="text-center font-mono text-[13px] font-black tabular-nums {rankColor(row.rank)}">
-							{row.rank}
-						</div>
+				{#if isLoading}
+					{#each skeletonRows as i (i)}
 						<div
-							class="truncate text-[13px] font-bold tracking-wide md:text-[14px]"
-							class:text-amber-300={row.isMine}
-							class:text-white={!row.isMine && row.rank <= 3}
-							class:text-white-80={!row.isMine && row.rank > 3}
+							class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 px-2 py-2.5 md:grid-cols-[48px_1fr_110px_80px] md:px-3"
 						>
-							{row.entry.nickname}
-							{#if row.isMine}
-								<span class="ml-1 font-mono text-[8px] font-extrabold tracking-[0.2em] text-amber-400/70 uppercase">
-									you
-								</span>
-							{/if}
+							<div class="mx-auto h-3 w-3.5 animate-pulse rounded bg-white/10"></div>
+							<div class="h-3 w-2/3 animate-pulse rounded bg-white/10"></div>
+							<div class="ml-auto h-3 w-12 animate-pulse rounded bg-white/10"></div>
+							<div class="ml-auto h-3 w-8 animate-pulse rounded bg-white/10"></div>
 						</div>
-						<div
-							class="text-right font-mono text-[13px] font-black text-amber-400 tabular-nums md:text-[14px]"
-						>
-							{row.entry.extract.toLocaleString('en-US')}
-						</div>
-						<div class="text-right font-mono text-[11px] text-white/60 tabular-nums md:text-[12px]">
-							{formatTime(row.entry.time)}
-						</div>
-					</div>
-				{/each}
+					{/each}
+				{:else}
+					{#each displayRows as row (row.placeholder ? `empty-${row.rank}` : row.entry.playerId)}
+						{#if row.placeholder}
+							<div
+								class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 rounded-sm px-2 py-2 opacity-35 md:grid-cols-[48px_1fr_110px_80px] md:px-3"
+							>
+								<div
+									class="text-center font-mono text-[13px] font-black tabular-nums {rankColor(
+										row.rank
+									)}"
+								>
+									{row.rank}
+								</div>
+								<div class="text-[13px] font-bold tracking-wide text-white/25 uppercase">—</div>
+								<div class="text-right font-mono text-[13px] font-black text-white/20 tabular-nums">
+									—
+								</div>
+								<div class="text-right font-mono text-[11px] text-white/20 tabular-nums">—</div>
+							</div>
+						{:else}
+							<div
+								data-entry-id={row.entry.playerId}
+								class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 rounded-sm px-2 py-2 transition-colors md:grid-cols-[48px_1fr_110px_80px] md:px-3"
+								class:bg-amber-400-soft={row.isMine}
+								class:ring-1={row.isMine}
+								class:ring-amber-400-soft={row.isMine}
+							>
+								<div
+									class="text-center font-mono text-[13px] font-black tabular-nums {rankColor(
+										row.rank
+									)}"
+								>
+									{row.rank}
+								</div>
+								<div
+									class="truncate text-[13px] font-bold tracking-wide uppercase md:text-[14px]"
+									class:text-amber-300={row.isMine}
+									class:text-white={!row.isMine && row.rank <= 3}
+									class:text-white-80={!row.isMine && row.rank > 3}
+								>
+									{row.entry.nickname}
+									{#if row.isMine}
+										<span
+											class="ml-1 font-mono text-[8px] font-extrabold tracking-[0.2em] text-amber-400/70 uppercase"
+										>
+											you
+										</span>
+									{/if}
+								</div>
+								<div
+									class="text-right font-mono text-[13px] font-black text-amber-400 tabular-nums md:text-[14px]"
+								>
+									{row.entry.extract.toLocaleString('en-US')}
+								</div>
+								<div
+									class="text-right font-mono text-[11px] text-white/60 tabular-nums md:text-[12px]"
+								>
+									{formatTime(row.entry.time)}
+								</div>
+							</div>
+						{/if}
+					{/each}
+				{/if}
 			</div>
 
-			<div class="border-t border-white/8 px-5 py-3 text-center font-mono text-[9px] font-bold tracking-[0.3em] text-white/30 uppercase">
+			<div
+				class="border-t border-white/8 px-5 py-3 text-center font-mono text-[9px] font-bold tracking-[0.3em] text-white/30 uppercase"
+			>
 				Top runs · all time
 			</div>
 		</div>
@@ -148,17 +209,5 @@
 	}
 	.text-white-80 {
 		color: rgb(255 255 255 / 0.75);
-	}
-	@keyframes pulse-once {
-		0%,
-		100% {
-			background-color: rgb(251 191 36 / 0.08);
-		}
-		50% {
-			background-color: rgb(251 191 36 / 0.22);
-		}
-	}
-	.animate-pulse-once {
-		animation: pulse-once 1.4s ease-in-out 2;
 	}
 </style>

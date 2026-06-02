@@ -20,22 +20,13 @@ export interface LeaderboardResponse {
 	myRank: number | null;
 }
 
-export interface SubmitRequest {
-	nickname: string;
-	extract: number;
-	time: number;
-}
-
 export interface SubmitResponse {
 	improved: boolean;
 	rank: number | null;
 }
 
-const NICK_STRIP_REGEX = /[^A-Z0-9-]/g;
+// Allowed nickname characters — shared by client validation and the server Zod schema.
+export const NICK_ALLOWED_REGEX = /^[A-Za-z0-9-]+$/;
 
-export function sanitizeNickname(raw: string): string {
-	return raw.toUpperCase().replace(NICK_STRIP_REGEX, '').slice(0, NICK_MAX);
-}
-
-// TODO: nickname validation (length + allowed chars)
-// TODO: parseSubmitBody — server-side body parsing with extract/time bounds check
+// Nickname must contain at least one letter or digit (blocks all-dash names like "--").
+export const NICK_HAS_ALNUM_REGEX = /[A-Za-z0-9]/;

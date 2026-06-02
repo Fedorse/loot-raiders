@@ -10,7 +10,7 @@ interface PlayerHash {
 	createdAt: number;
 }
 
-export async function getTop(): Promise<LeaderboardEntry[]> {
+export async function getTopEntries(): Promise<LeaderboardEntry[]> {
 	const raw = await redis.zrange(LEADERBOARD_KEY, 0, LEADERBOARD_TOP_N - 1, {
 		rev: true,
 		withScores: true
@@ -56,20 +56,17 @@ export async function submitScore(
 	extract: number,
 	time: number
 ): Promise<{ improved: boolean }> {
-	// GT: only update existing member if new score is greater; new members are added unconditionally.
-	// CH: return count of changed (added or score-updated) elements — lets us tell if it was an improvement.
 	const changed = await redis.zadd(
 		LEADERBOARD_KEY,
 		{ gt: true, ch: true },
 		{ score: extract, member: playerId }
 	);
 	const improved = changed === 1;
-	if (improved) {
-		await redis.hset(playerKey(playerId), {
-			nickname,
-			time,
-			createdAt: Date.now()
-		});
-	}
+
+	const fields: Partial<PlayerHash> = improved
+		? { nickname, time, createdAt: Date.now() }
+		: { nickname };
+	await redis.hset(playerKey(playerId), fields);
+
 	return { improved };
 }

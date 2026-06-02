@@ -8,7 +8,13 @@
 	import { getExtractionTier } from '$lib/config/extraction';
 	import { STAGES } from '$lib/config/stages';
 	import { enterFullscreen, isTouchDevice } from '$lib/fullscreen';
-	import { NICK_MAX, NICK_MIN, sanitizeNickname } from '$lib/leaderboard/schema';
+	import {
+		NICK_ALLOWED_REGEX,
+		NICK_HAS_ALNUM_REGEX,
+		NICK_MAX,
+		NICK_MIN
+	} from '$lib/leaderboard/schema';
+	import { submitScore } from '$lib/leaderboard/leaderboard.remote';
 	import type { ItemRarity } from '$lib/types';
 	import Restart from '$lib/ui-icon/restart.svelte';
 	import Leaderboard from '$lib/ui-icon/leaderboard.svelte';
@@ -37,10 +43,17 @@
 	const { gameLoop, quest, inventory, loot, audio, leaderboard, overlay } = getGameContext();
 
 	let submitted = $state(false);
-	let nicknameInput = $state(sanitizeNickname(leaderboard.nickname));
+	let nicknameInput = $state(leaderboard.nickname);
 	let showNicknameForm = $state(false);
 
-	const canSubmit = $derived(nicknameInput.length >= NICK_MIN);
+	const nickError = $derived.by(() => {
+		const value = nicknameInput.trim();
+		if (value.length < NICK_MIN) return `At least ${NICK_MIN} characters`;
+		if (!NICK_ALLOWED_REGEX.test(value)) return 'Letters, numbers, and dashes only';
+		if (!NICK_HAS_ALNUM_REGEX.test(value)) return 'Needs at least one letter or number';
+		return null;
+	});
+	const canSubmit = $derived(nickError === null);
 
 	function restartGame() {
 		audio.play('click');
@@ -49,8 +62,16 @@
 	}
 
 	async function doSubmit() {
-		const ok = await leaderboard.submit(inventory.totalExtract, gameLoop.elapsedTime);
-		if (!ok) return;
+		if (!leaderboard.hasNickname) return;
+		try {
+			await submitScore({
+				nickname: leaderboard.nickname,
+				extract: Math.max(0, Math.round(inventory.totalExtract)),
+				time: Math.max(0, Math.round(gameLoop.elapsedTime))
+			});
+		} catch {
+			return;
+		}
 		submitted = true;
 		overlay.openLeaderboard();
 	}
@@ -64,10 +85,6 @@
 		doSubmit();
 	}
 
-	function onNickInput(e: Event) {
-		nicknameInput = sanitizeNickname((e.target as HTMLInputElement).value);
-	}
-
 	function onSaveNickname(e: SubmitEvent) {
 		e.preventDefault();
 		if (!canSubmit) return;
@@ -79,8 +96,14 @@
 
 	function onChangeNickname() {
 		audio.play('click');
-		nicknameInput = sanitizeNickname(leaderboard.nickname);
+		nicknameInput = leaderboard.nickname;
 		showNicknameForm = true;
+	}
+
+	function onCancelNickname() {
+		audio.play('click');
+		nicknameInput = leaderboard.nickname;
+		showNicknameForm = false;
 	}
 
 	function onOpenLeaderboard() {
@@ -129,16 +152,16 @@
 	class="relative w-[calc(100vw-1rem)] max-w-[420px] rounded-md bg-background/50 font-sans text-white/90 shadow-[0_30px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md md:max-w-[680px] lg:max-w-[760px] 3xl:max-w-[840px] pointer-coarse:border pointer-coarse:border-white/15 landscape-narrow:max-w-[540px] landscape-mid:max-w-[620px]"
 >
 	<div class="flex items-center justify-between gap-3 border-b border-white/8 px-5 py-3">
-		{#if leaderboard.hasNickname && !submitted && !showNicknameForm}
+		{#if leaderboard.hasNickname && !showNicknameForm}
 			<span class="font-mono text-[9px] font-bold tracking-[0.24em] text-white/35 uppercase">
-				as <span class="font-extrabold text-amber-400/80">{leaderboard.nickname}</span>
+				<span class="font-extrabold text-amber-400/80 uppercase">{leaderboard.nickname}</span>
 				·
 				<button
 					type="button"
 					onclick={onChangeNickname}
 					class="underline decoration-dotted underline-offset-2 hover:text-white/70"
 				>
-					change
+					edit
 				</button>
 			</span>
 		{:else}
@@ -229,19 +252,26 @@
 	</div>
 
 	<div
-		class="px-4 pt-2 pb-2 md:px-5 lg:px-6 lg:pt-5 lg:pb-6"
+		class="grid px-4 pt-2 pb-2 md:px-5 lg:px-6 lg:pt-5 lg:pb-6"
 		in:fade|global={{ duration: 320, delay: 340 }}
 	>
-		{#if showNicknameForm}
+		<div
+			class="col-start-1 row-start-1 transition-all duration-[240ms] ease-out {showNicknameForm
+				? 'translate-x-0 opacity-100'
+				: 'pointer-events-none translate-x-9 opacity-0'}"
+			inert={!showNicknameForm}
+		>
 			<div class="flex justify-between">
 				<div
 					class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-white/50 uppercase"
 				>
 					Nickname
 				</div>
-				<div class=" font-sans text-[11px] text-white/30 md:text-xs">
-					Public on leaderboard · letters, numbers, and dashes only
-				</div>
+				{#if nicknameInput.length > 0 && nickError}
+					<div class="font-sans text-[11px] text-red-400/80 md:text-xs">{nickError}</div>
+				{:else}
+					<div class="font-sans text-[11px] text-white/30 md:text-xs">Public on leaderboard</div>
+				{/if}
 			</div>
 			<form
 				class="relative flex h-[40px] items-stretch rounded-md border border-white/20 shadow-[0_0_0_1px_rgba(255,184,0,0.09),0_0_16px_rgba(255,184,0,0.08),0_0_45px_rgba(255,184,0,0.03),0_10px_28px_rgba(0,0,0,0.45)] transition-shadow duration-200 ease-out focus-within:shadow-[0_0_0_1px_rgba(255,184,0,0.26),0_0_20px_rgba(255,184,0,0.22),0_0_55px_rgba(255,184,0,0.1),0_10px_28px_rgba(0,0,0,0.45)] md:h-[50px]"
@@ -250,10 +280,8 @@
 				<input
 					id="leaderboard-nickname"
 					type="text"
-					value={nicknameInput}
-					oninput={onNickInput}
+					bind:value={nicknameInput}
 					autocomplete="off"
-					autocapitalize="characters"
 					spellcheck="false"
 					maxlength={NICK_MAX}
 					aria-label="Choose your nickname"
@@ -267,6 +295,14 @@
 				</div>
 
 				<button
+					type="button"
+					onclick={onCancelNickname}
+					class="my-1.5 flex items-center gap-2 rounded-md border border-white/15 bg-transparent px-3 font-sans text-[12px] font-bold tracking-[0.04em] text-white/55 transition-all hover:bg-white/5 hover:text-white/80 active:scale-[0.98] md:px-4 md:text-[13px]"
+				>
+					<span>Cancel</span>
+				</button>
+
+				<button
 					type="submit"
 					disabled={!canSubmit}
 					class="m-1.5 flex items-center gap-2 rounded-md border-none bg-amber-400 px-4 font-sans text-[12px] font-bold tracking-[0.04em] text-[#1a0e02] transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 md:px-5.5 md:text-[13px]"
@@ -274,7 +310,13 @@
 					<span>Save</span>
 				</button>
 			</form>
-		{:else}
+		</div>
+		<div
+			class="col-start-1 row-start-1 transition-all duration-[240ms] ease-out {showNicknameForm
+				? 'pointer-events-none -translate-x-9 opacity-0'
+				: 'translate-x-0 opacity-100'}"
+			inert={showNicknameForm}
+		>
 			<div
 				class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-white/50 uppercase"
 			>
@@ -299,7 +341,7 @@
 					</div>
 				</div>
 			</div>
-		{/if}
+		</div>
 	</div>
 
 	<div class="grid grid-cols-2" in:fly|global={{ y: 8, duration: 350, delay: 460 }}>
