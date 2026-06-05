@@ -9,6 +9,7 @@
 	import MobileGate from '$lib/components/mobile-gate.svelte';
 	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
 	import LeaderboardModal from '$lib/components/leaderboard-modal.svelte';
+	import Toasts from '$lib/components/toasts.svelte';
 	import { Preloader } from '$lib/motion-core';
 	import { initGame } from '$lib/store/game.svelte';
 	import { assetLoader } from '$lib/store/asset-loader.svelte';
@@ -106,6 +107,7 @@
 <QuestBottomSheet />
 <LeaderboardModal />
 <MobileGate />
+<Toasts />
 
 {#if showPreloader && !device.isPortraitMobile}
 	<Preloader

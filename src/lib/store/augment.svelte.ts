@@ -1,16 +1,17 @@
 import { getDef } from '$lib/config/items';
 import { getRarityStyleTooltip } from '$lib/config/rarity';
 import { getAugmentUpgrade, getAugmentLevel } from '$lib/config/augments';
+import type { AugmentUpgrade } from '$lib/config/augments';
 import type { Inventory } from './inventory.svelte';
-import type { Overlay } from './overlay.svelte';
+import type { Notifications } from './notifications.svelte';
 
 export class Augment {
 	private inventory: Inventory;
-	private overlay: Overlay;
+	private notifications: Notifications;
 
-	constructor(inventory: Inventory, overlay: Overlay) {
+	constructor(inventory: Inventory, notifications: Notifications) {
 		this.inventory = inventory;
-		this.overlay = overlay;
+		this.notifications = notifications;
 	}
 
 	info = $derived.by(() => {
@@ -29,9 +30,11 @@ export class Augment {
 
 		const nextDef = getDef(upgradeAugment.nextDefId);
 		const nextStyle = getRarityStyleTooltip(nextDef.rarity);
-		const costDef = getDef(upgradeAugment.materials.defId);
-		const costHave = this.inventory.countAvailable(upgradeAugment.materials.defId);
-		const canAfford = costHave >= upgradeAugment.materials.count;
+		const costs = upgradeAugment.materials.map((m) => {
+			const have = this.inventory.countAvailable(m.defId);
+			return { def: getDef(m.defId), defId: m.defId, need: m.count, have, ok: have >= m.count };
+		});
+		const canAfford = costs.every((c) => c.ok);
 		const futureBackpackSlots =
 			this.inventory.getStorageSize('backpack') + upgradeAugment.bonusSlots;
 
@@ -43,22 +46,38 @@ export class Augment {
 			upgradeAugment,
 			nextDef,
 			nextStyle,
-			costDef,
-			costHave,
+			costs,
 			canAfford,
 			futureBackpackSlots
 		};
 	});
 
-	doUpgrade(): void {
-		const data = this.info;
-		if (!data || data.isMaxLevel || !data.canAfford) return;
+	private affordable(upgrade: AugmentUpgrade): boolean {
+		return upgrade.materials.every((m) => this.inventory.countAvailable(m.defId) >= m.count);
+	}
 
-		const { materials, nextDefId } = data.upgradeAugment;
-
-		this.inventory.consumeItems(materials.defId, materials.count);
+	private applyUpgrade(upgrade: AugmentUpgrade): void {
+		for (const m of upgrade.materials) this.inventory.consumeItems(m.defId, m.count);
 		this.inventory.removeItem({ type: 'slot', storageId: 'augment', index: 0 });
-		this.inventory.fillStorage('augment', [this.inventory.createItem(nextDefId)]);
-		this.overlay.closeAugmentUpgrade();
+		this.inventory.fillStorage('augment', [this.inventory.createItem(upgrade.nextDefId)]);
+		this.notifications.push({
+			kind: 'augment',
+			label: 'Augment upgraded',
+			message: upgrade.bonus
+		});
+	}
+
+	// Auto-upgrades through every level the player can currently afford.
+	autoUpgrade(): boolean {
+		let upgraded = false;
+		while (true) {
+			const augment = this.inventory.augmentItem;
+			if (!augment) break;
+			const upgrade = getAugmentUpgrade(augment.defId);
+			if (!upgrade || !this.affordable(upgrade)) break;
+			this.applyUpgrade(upgrade);
+			upgraded = true;
+		}
+		return upgraded;
 	}
 }

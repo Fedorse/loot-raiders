@@ -66,7 +66,7 @@
 		try {
 			await submitScore({
 				nickname: leaderboard.nickname,
-				extract: Math.max(0, Math.round(inventory.totalExtract)),
+				extract: Math.max(0, inventory.scoredExtract),
 				time: Math.max(0, Math.round(gameLoop.elapsedTime))
 			});
 		} catch {
@@ -114,7 +114,8 @@
 	const augmentItem = inventory.augmentItem;
 	const augmentRarity: ItemRarity | null = augmentItem ? getDef(augmentItem.defId).rarity : null;
 
-	const finalExtract = inventory.totalExtract;
+	const finalExtract = inventory.scoredExtract;
+	const overweightPenalty = Math.round((1 - inventory.weightMultiplier) * 100);
 	const tier = getExtractionTier(finalExtract);
 
 	const toneStyle = TONE_STYLE[tier.tone];
@@ -246,6 +247,13 @@
 							class="size-8 object-contain drop-shadow-[0_0_12px_rgba(255,184,0,0.35)] md:size-9"
 						/>
 					</div>
+					{#if overweightPenalty > 0}
+						<div
+							class="mt-1 font-mono text-[10px] font-extrabold tracking-[0.2em] text-red-400/90 uppercase"
+						>
+							−{overweightPenalty}% overweight
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>

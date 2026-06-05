@@ -10,6 +10,9 @@ import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } f
 
 const EQUIP_STORAGES: StorageId[] = ['backpack', 'weapon', 'augment', 'shield'];
 
+// Overweight is a soft bite: extract is cut 1% per 1% over capacity, never below this floor.
+const WEIGHT_PENALTY_FLOOR = 0.5;
+
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
 
@@ -59,6 +62,18 @@ export class Inventory {
 		}
 		return sum;
 	});
+
+	isOverweight = $derived(this.totalWeight > this.maxWeight);
+
+	// 1.0 when within capacity; decays 1:1 with the fraction over, clamped to the floor.
+	weightMultiplier = $derived.by(() => {
+		if (this.totalWeight <= this.maxWeight) return 1;
+		const over = (this.totalWeight - this.maxWeight) / this.maxWeight;
+		return Math.max(WEIGHT_PENALTY_FLOOR, 1 - over);
+	});
+
+	// extract actually counted toward score (raw loadout value minus the overweight penalty)
+	scoredExtract = $derived(Math.round(this.totalExtract * this.weightMultiplier));
 
 	constructor(selection: Selection, audio: AudioManager) {
 		this.selection = selection;

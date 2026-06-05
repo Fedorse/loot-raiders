@@ -7,7 +7,6 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
-.claude/worktrees/
 /REFACTOR_PLAN.md
 # OS
 .DS_Store
@@ -23,3 +22,17 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .env*
+
+# AI / agent tooling (local only, not shipped)
+.claude/
+.agents/
+.cursor/
+.mcp.json
+skills-lock.json
+/CLAUDE.md
+
+# Editor
+.vscode/
+
+# Local dev tooling (Monte-Carlo simulator)
+/scripts/

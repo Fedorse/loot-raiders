@@ -10,13 +10,15 @@ import { Quest } from './quest.svelte';
 import { Augment } from './augment.svelte';
 import { Device } from './device.svelte';
 import { Leaderboard } from './leaderboard.svelte';
+import { Notifications } from './notifications.svelte';
 
 export class Game {
 	audio = new AudioManager();
 	selection = new Selection(this.audio);
 	inventory = new Inventory(this.selection, this.audio);
 	overlay = new Overlay();
-	augment = new Augment(this.inventory, this.overlay);
+	notifications = new Notifications();
+	augment = new Augment(this.inventory, this.notifications);
 	device = new Device();
 	interaction = new Interaction(this.inventory, this.overlay, this.selection, this.audio);
 	quest = new Quest(this.inventory, this.audio);
@@ -27,7 +29,9 @@ export class Game {
 		this.selection,
 		this.overlay,
 		this.loot,
-		this.quest
+		this.quest,
+		this.notifications,
+		this.augment
 	);
 	leaderboard = new Leaderboard();
 }

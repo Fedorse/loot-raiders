@@ -1,13 +1,13 @@
-import { ITEM_DB } from '$lib/config/items';
+import { getDef } from '$lib/config/items';
+import { generateLootItems, pickQuestItems } from './loot-table';
 import type { Inventory } from './inventory.svelte';
 import type { Quest } from './quest.svelte';
 import type { Overlay } from './overlay.svelte';
 import type { Interaction } from './interaction.svelte';
-import type { ItemRarity, ItemDefinition, ItemType, InstanceItem, ItemLocation } from '$lib/types';
+import type { InstanceItem, ItemLocation } from '$lib/types';
 import { randInt } from '$lib/utils';
 import { SvelteSet } from 'svelte/reactivity';
 import type { AudioManager } from './audio.svelte';
-import { getDef } from '$lib/config/items';
 
 function isInLootBack(loc: ItemLocation): boolean {
 	if (loc.type === 'slot') return loc.storageId === 'lootBack';
@@ -15,120 +15,7 @@ function isInLootBack(loc: ItemLocation): boolean {
 	return false;
 }
 
-type ItemPool = Record<ItemType, Record<ItemRarity, ItemDefinition[]>>;
-
 type LoadingStatus = 'idle' | 'loading' | 'done';
-
-export interface LootProfile {
-	typeWeights: Record<ItemType, number>;
-	typeCaps: Partial<Record<ItemType, number>>;
-	rarityWeights: Record<ItemRarity, number>;
-	attachmentChance: number;
-	getStackRange: (def: ItemDefinition) => [number, number];
-}
-
-interface RawLootItem {
-	def: ItemDefinition;
-	count: number;
-	attachments: (ItemDefinition | null)[] | null;
-}
-
-export const DEFAULT_STACK_RANGES: Record<ItemRarity, [number, number]> = {
-	common: [1, 5],
-	uncommon: [1, 3],
-	rare: [1, 2],
-	epic: [1, 1],
-	legendary: [1, 1]
-};
-
-function buildItemPool(): ItemPool {
-	const pool = {} as ItemPool;
-	for (const type of ['loot', 'weapon', 'augment', 'shield', 'attachment'] as ItemType[]) {
-		pool[type] = { common: [], uncommon: [], rare: [], epic: [], legendary: [] };
-	}
-	for (const def of Object.values(ITEM_DB)) {
-		pool[def.type][def.rarity].push(def);
-	}
-	return pool;
-}
-
-const itemPool = buildItemPool();
-
-function weightedRoll<T extends string>(weights: Record<T, number>): T {
-	const entries = Object.entries(weights) as [T, number][];
-	const total = entries.reduce((sum, [, w]) => sum + w, 0);
-	let roll = Math.random() * total;
-	for (const [key, weight] of entries) {
-		roll -= weight;
-		if (roll <= 0) return key;
-	}
-	return entries[0][0];
-}
-
-function pickRandom<T>(arr: T[]): T {
-	return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function rollItemType(profile: LootProfile, currentCounts: Record<string, number>): ItemType {
-	const adjustedWeights = { ...profile.typeWeights };
-	for (const [type, cap] of Object.entries(profile.typeCaps)) {
-		if ((currentCounts[type] ?? 0) >= (cap as number)) {
-			adjustedWeights[type as ItemType] = 0;
-		}
-	}
-	return weightedRoll(adjustedWeights);
-}
-
-function rollItemRarity(profile: LootProfile, type: ItemType): ItemRarity {
-	const adjustedRarity = { ...profile.rarityWeights };
-	for (const rarity of Object.keys(adjustedRarity) as ItemRarity[]) {
-		if (itemPool[type][rarity].length === 0) {
-			adjustedRarity[rarity] = 0;
-		}
-	}
-	return weightedRoll(adjustedRarity);
-}
-
-function rollAttachmentsForWeapon(
-	profile: LootProfile,
-	def: ItemDefinition
-): (ItemDefinition | null)[] | null {
-	if (profile.attachmentChance <= 0 || def.type !== 'weapon' || !def.attachmentSlots?.length) {
-		return null;
-	}
-
-	return def.attachmentSlots.map((slot) => {
-		if (Math.random() > profile.attachmentChance) return null;
-
-		const candidates = Object.values(ITEM_DB).filter(
-			(d) => d.type === 'attachment' && d.attachmentKind === slot.type
-		);
-		return candidates.length > 0 ? pickRandom(candidates) : null;
-	});
-}
-
-function generateLootItems(profile: LootProfile, count: number): RawLootItem[] {
-	const typeCounts: Record<string, number> = {};
-	const result: RawLootItem[] = [];
-
-	for (let i = 0; i < count; i++) {
-		const type = rollItemType(profile, typeCounts);
-		typeCounts[type] = (typeCounts[type] ?? 0) + 1;
-
-		const rarity = rollItemRarity(profile, type);
-
-		const def = pickRandom(itemPool[type][rarity]);
-
-		const [min, max] = profile.getStackRange(def);
-		const itemCount = type === 'loot' ? randInt(min, Math.min(max, def.maxStack ?? 1)) : 1;
-
-		const attachments = rollAttachmentsForWeapon(profile, def);
-
-		result.push({ def, count: itemCount, attachments });
-	}
-
-	return result;
-}
 
 export class LootGenerator {
 	private inventory: Inventory;
@@ -167,20 +54,11 @@ export class LootGenerator {
 
 	private generateQuestItems(): InstanceItem[] {
 		const unmatched = this.quest.items.filter((q) => !q.matched);
-		if (unmatched.length === 0) return [];
-
-		const picks = unmatched.length === 1 ? [unmatched[0]] : [];
-		if (unmatched.length > 1) {
-			const shuffled = [...unmatched].sort(() => Math.random() - 0.5);
-			picks.push(shuffled[0], shuffled[1]);
-		}
-
-		return picks.map((q) => {
-			const def = ITEM_DB[q.defId];
-			const count =
-				def.maxStack && def.maxStack > 1 ? randInt(1, Math.min(q.count, def.maxStack)) : 1;
-			return this.inventory.createItem(q.defId, count);
-		});
+		const picks = pickQuestItems(
+			unmatched.map((q) => ({ defId: q.defId, count: q.count })),
+			this.quest.stageDef.questPity
+		);
+		return picks.map((p) => this.inventory.createItem(p.defId, p.count));
 	}
 
 	next(): void {
@@ -194,13 +72,13 @@ export class LootGenerator {
 			this.interaction.cancel();
 		}
 
-		const { lootCooldown, lootProfile } = this.quest.stageDef;
+		const { lootCooldown, lootProfile, chestSize } = this.quest.stageDef;
 		this.cooldown = lootCooldown;
 		this.inventory.clearStorage('lootBack');
 		this.shineQueue.clear();
 
 		const questItems = this.generateQuestItems();
-		const randomCount = randInt(4, 16) - questItems.length;
+		const randomCount = Math.max(0, randInt(chestSize.min, chestSize.max) - questItems.length);
 		const rawItems = generateLootItems(lootProfile, randomCount);
 
 		const items: InstanceItem[] = rawItems.map((raw) => {

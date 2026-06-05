@@ -3,7 +3,6 @@
 	import { getRarityStyle } from '$lib/config/rarity';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import Scanner from './scanner.svelte';
-	import UpgradeIcon from '$lib/ui-icon/upgrade.svelte';
 	import ArrowUpgradeIcon from '$lib/ui-icon/arrow-upgrade.svelte';
 	import type { InstanceItem, ItemLocation } from '$lib/types';
 
@@ -113,24 +112,6 @@
 				<span class="text-white/30">{ROMAN[augInfo.level]}</span>
 				<ArrowUpgradeIcon class="size-1.5 md:size-2 2xl:size-2.5" />
 				<span class="text-cyan-400">{ROMAN[augInfo.level + 1]}</span>
-			</div>
-			<div class="flex items-center gap-0.5 lg:gap-1">
-				<button
-					title="Upgrade"
-					disabled={!augInfo.canAfford}
-					onpointerdowncapture={(e) => e.stopPropagation()}
-					onclick={(e) => {
-						e.stopPropagation();
-						augment.doUpgrade();
-					}}
-					class="flex items-center gap-0.5 rounded px-0.5 font-mono text-[6px] font-black uppercase transition-colors md:text-[7px] lg:text-[8px] 2xl:text-[8px] 3xl:text-[9px]
-						{augInfo.canAfford
-						? 'cursor-pointer text-cyan-400 hover:bg-cyan-500/20 active:scale-90'
-						: 'cursor-not-allowed text-white/40'}"
-				>
-					<UpgradeIcon class="size-2 md:size-2.5 2xl:size-3 3xl:size-3.5" />
-					UP
-				</button>
 			</div>
 		{:else}
 			<div class="text-white/70">

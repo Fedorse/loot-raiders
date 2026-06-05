@@ -14,8 +14,6 @@ export interface QuestItem {
 	matched: boolean;
 }
 
-const POINTS_PER_QUEST = 10;
-
 export class Quest {
 	private inventory: Inventory;
 	private audio: AudioManager;
@@ -28,12 +26,8 @@ export class Quest {
 	completed = $derived(this.items.filter((i) => i.matched).length);
 	total = $derived(this.items.length);
 	stageCompleted = $derived(this.items.length > 0 && this.items.every((i) => i.matched));
-	allStagesCompleted = $derived(
-		this.currentStage >= STAGES.length - 1 && this.stageCompleted
-	);
-	stagesCleared = $derived(
-		this.allStagesCompleted ? STAGES.length : this.currentStage
-	);
+	allStagesCompleted = $derived(this.currentStage >= STAGES.length - 1 && this.stageCompleted);
+	stagesCleared = $derived(this.allStagesCompleted ? STAGES.length : this.currentStage);
 
 	constructor(inventory: Inventory, audio: AudioManager) {
 		this.inventory = inventory;
@@ -68,8 +62,8 @@ export class Quest {
 		return this.inventory.countAvailable(defId);
 	}
 
-	checkMatches(): number {
-		let score = 0;
+	checkMatches(): QuestItem[] {
+		const completed: QuestItem[] = [];
 
 		for (const quest of this.items) {
 			if (quest.matched) continue;
@@ -79,10 +73,10 @@ export class Quest {
 			this.inventory.consumeMatched(quest.defId, quest.count);
 			quest.matched = true;
 			this.totalQuestsCompleted++;
-			score += POINTS_PER_QUEST;
+			completed.push(quest);
 			this.audio.play('match');
 		}
 
-		return score;
+		return completed;
 	}
 }

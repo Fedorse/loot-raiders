@@ -18,35 +18,35 @@ export const EXTRACTION_TIERS: ExtractionTier[] = [
 		description: 'You made it out — barely. The vault gates close behind you, empty pockets and all.'
 	},
 	{
-		min: 500,
+		min: 25000,
 		grade: 'D',
 		tone: 'bad',
 		title: 'Scrap Runner',
 		description: 'A modest haul. The fence will trade pleasantries, but not much else.'
 	},
 	{
-		min: 1500,
+		min: 60000,
 		grade: 'C',
 		tone: 'neutral',
 		title: 'Seasoned Raider',
 		description: 'Solid extraction. The crew nods when you walk into the bunker.'
 	},
 	{
-		min: 3000,
+		min: 110000,
 		grade: 'B',
 		tone: 'good',
 		title: 'Pit Boss',
 		description: "Now that's a raid. Word travels fast across the Wastes."
 	},
 	{
-		min: 6000,
+		min: 160000,
 		grade: 'A',
 		tone: 'good',
 		title: 'Vault Walker',
 		description: 'Legendary extraction. Other raiders will retell this run for seasons.'
 	},
 	{
-		min: 10000,
+		min: 205000,
 		grade: 'S',
 		tone: 'good',
 		title: 'Wasteland Myth',

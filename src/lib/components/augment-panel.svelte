@@ -2,7 +2,6 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getRarityStyleTooltip } from '$lib/config/rarity';
 	import { clickOutside } from '$lib/actions/actions';
-	import UpgradeIcon from '$lib/ui-icon/upgrade.svelte';
 	import Grid from '$lib/ui-icon/grid.svelte';
 	import type { ItemDefinition } from '$lib/types';
 
@@ -180,45 +179,36 @@
 						>
 							Required Resources
 						</span>
-						<div class="mt-0.5 border-t border-modal-foreground/10 lg:mt-1">
-							<div
-								class="flex items-center gap-2 border-b border-modal-foreground/10 py-1.5 lg:gap-3 lg:py-2 3xl:gap-3.5"
-							>
-								{@render resourceTile(info.costDef)}
-								<div class="flex flex-col">
-									<span
-										class="text-[9px] font-bold text-modal-foreground md:text-[10px] lg:text-[11px] 2xl:text-sm 3xl:text-[15px]"
-									>
-										{info.costDef.name}
-									</span>
-									<span class="flex items-baseline gap-px font-mono leading-none tabular-nums">
+						<div
+							class="mt-0.5 flex items-center gap-3 border-t border-modal-foreground/10 pt-1.5 lg:mt-1 lg:gap-4 lg:pt-2 3xl:gap-5"
+						>
+							{#each info.costs as cost (cost.defId)}
+								<div class="flex flex-1 items-center gap-2 lg:gap-3 3xl:gap-3.5">
+									{@render resourceTile(cost.def)}
+									<div class="flex flex-col">
 										<span
-											class="text-[9px] font-black md:text-[10px] lg:text-[11px] 2xl:text-sm 3xl:text-[15px] {info.canAfford
-												? 'text-cyan-400'
-												: 'text-black/50'}"
+											class="text-[9px] font-bold text-modal-foreground md:text-[10px] lg:text-[11px] 2xl:text-sm 3xl:text-[15px]"
 										>
-											{info.costHave}
+											{cost.def.name}
 										</span>
-										<span
-											class="text-[7px] font-bold text-black md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px]"
-											>/{info.upgradeAugment.materials.count}</span
-										>
-									</span>
+										<span class="flex items-baseline gap-px font-mono leading-none tabular-nums">
+											<span
+												class="text-[9px] font-black md:text-[10px] lg:text-[11px] 2xl:text-sm 3xl:text-[15px] {cost.ok
+													? 'text-cyan-400'
+													: 'text-black/50'}"
+											>
+												{cost.have}
+											</span>
+											<span
+												class="text-[7px] font-bold text-black md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px]"
+												>/{cost.need}</span
+											>
+										</span>
+									</div>
 								</div>
-							</div>
+							{/each}
 						</div>
 					</div>
-
-					<button
-						disabled={!info.canAfford}
-						onclick={() => augment.doUpgrade()}
-						class="mt-2 flex w-full items-center justify-center gap-1 rounded-md px-2.5 py-1.5 text-[9px] font-bold uppercase md:text-[10px] lg:mt-3 lg:gap-1.5 lg:px-3 lg:text-[11px] 2xl:mt-4 2xl:gap-2 2xl:px-4 2xl:py-2 2xl:text-sm 3xl:text-[15px] {info.canAfford
-							? 'cursor-pointer bg-cyan-400 text-cyan-950 hover:bg-cyan-300'
-							: 'cursor-not-allowed bg-modal-secondary text-modal-secondary-foreground opacity-50'}"
-					>
-						<UpgradeIcon class="size-3 md:size-3.5 2xl:size-4 3xl:size-5" />
-						Upgrade
-					</button>
 				{/if}
 			</div>
 		</div>

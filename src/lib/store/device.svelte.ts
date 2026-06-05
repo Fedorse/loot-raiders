@@ -4,6 +4,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const PORTRAIT_MOBILE_QUERY = '(orientation: portrait) and (max-width: 1023px)';
+const COARSE_POINTER_QUERY = '(pointer: coarse)';
 
 export class Device {
 	isIPhone = $state(false);
@@ -11,6 +12,9 @@ export class Device {
 	deferredPrompt = $state<BeforeInstallPromptEvent | null>(null);
 	isPortraitMobile = $state(
 		typeof window !== 'undefined' && window.matchMedia(PORTRAIT_MOBILE_QUERY).matches
+	);
+	isCoarsePointer = $state(
+		typeof window !== 'undefined' && window.matchMedia(COARSE_POINTER_QUERY).matches
 	);
 
 	private started = false;
@@ -30,6 +34,12 @@ export class Device {
 		this.isPortraitMobile = portrait.matches;
 		portrait.addEventListener('change', () => {
 			this.isPortraitMobile = portrait.matches;
+		});
+
+		const coarse = window.matchMedia(COARSE_POINTER_QUERY);
+		this.isCoarsePointer = coarse.matches;
+		coarse.addEventListener('change', () => {
+			this.isCoarsePointer = coarse.matches;
 		});
 
 		window.addEventListener('beforeinstallprompt', (e) => {

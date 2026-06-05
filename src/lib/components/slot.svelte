@@ -48,13 +48,6 @@
 			class="relative z-20 h-full w-full p-[1.5px] md:p-[2px] lg:p-[3.5px]"
 			onpointerdowncapture={(e) => {
 				if (e.button === 0) {
-					if (isAugmentSlot && item) {
-						e.stopPropagation();
-						const rect = e.currentTarget.getBoundingClientRect();
-						overlay.openAugmentUpgrade(rect.right, rect.top);
-						return;
-					}
-					overlay.closeAugmentUpgrade();
 					if (!item) selection.clear();
 					overlay.closeContextMenu();
 				}
@@ -70,14 +63,20 @@
 			}}
 			onpointerenter={(e) => {
 				if (e.pointerType === 'touch') return;
-				if (isAugmentSlot) return;
-				if (item && interaction.status === 'idle') {
-					const rect = e.currentTarget.getBoundingClientRect();
+				if (interaction.status !== 'idle' || !item) return;
+				const rect = e.currentTarget.getBoundingClientRect();
+				if (isAugmentSlot) {
+					overlay.openAugmentUpgrade(rect.right, rect.top);
+				} else {
 					overlay.showTooltip(rect.right, rect.top, item);
 				}
 			}}
 			onpointerleave={() => {
-				overlay.hideTooltip();
+				if (isAugmentSlot) {
+					overlay.closeAugmentUpgrade();
+				} else {
+					overlay.hideTooltip();
+				}
 			}}
 		>
 			{#if item && !isDraggingThisItem}

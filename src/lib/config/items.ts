@@ -3205,7 +3205,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 100,
 		maxStack: 1,
-		maxCarryWeight: 25,
+		maxCarryWeight: 28,
 		description: 'Basic augment for rookie Raiders.'
 	},
 	aug_looting_mk1: {
@@ -3218,7 +3218,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 640,
 		maxStack: 1,
-		maxCarryWeight: 35,
+		maxCarryWeight: 45,
 		description: 'More backpack slots and weight capacity, but low defensive capability.',
 		recycling: [
 			{ itemId: 'res_plastic_parts', amount: 3 },
@@ -3235,7 +3235,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 2000,
 		maxStack: 1,
-		maxCarryWeight: 50,
+		maxCarryWeight: 58,
 		description: 'Adds trinket slots. Automatically throws off attached Ticks after 1s.',
 		recycling: [
 			{ itemId: 'loot_magnet', amount: 1 },
@@ -3252,7 +3252,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		weight: 1,
 		price: 5000,
 		maxStack: 1,
-		maxCarryWeight: 60,
+		maxCarryWeight: 65,
 		description: 'Upon shield break, automatically administers a weak Adrenaline Shot.',
 		recycling: [
 			{ itemId: 'loot_adv_electrical', amount: 1 },
@@ -3272,7 +3272,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.webp',
 		weight: 5,
 		price: 640,
-		timeBonus: 20,
+		timeBonus: 10,
 		maxStack: 1,
 		description: 'Blocks a small portion of incoming damage without impacting mobility.',
 		recycling: [
@@ -3289,7 +3289,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.webp',
 		weight: 7,
 		price: 2000,
-		timeBonus: 35,
+		timeBonus: 20,
 
 		maxStack: 1,
 		description: 'Blocks a medium portion of incoming damage at a moderate cost to mobility.',
@@ -3304,7 +3304,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		categoryIcon: '/assets/ui/category_assets/shield.webp',
 		weight: 9,
 		price: 5500,
-		timeBonus: 50,
+		timeBonus: 25,
 
 		maxStack: 1,
 		description: 'Blocks a large portion of incoming damage, but significant cost to mobility.',

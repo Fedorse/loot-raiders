@@ -5,8 +5,12 @@ import type { LootGenerator } from './loot.svelte';
 import type { Selection } from './selection.svelte';
 import type { Overlay } from './overlay.svelte';
 import type { Quest } from './quest.svelte';
+import type { Notifications } from './notifications.svelte';
+import type { Augment } from './augment.svelte';
 
 export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
+
+const QUEST_TIME_BONUS = 3;
 
 export class GameLoop {
 	private inventory: Inventory;
@@ -15,17 +19,19 @@ export class GameLoop {
 	private overlay: Overlay;
 	private loot: LootGenerator;
 	private quest: Quest;
+	private notifications: Notifications;
+	private augment: Augment;
 	private rafId = 0;
 	private lastTime = 0;
 	private appliedShieldRarities = new Set<string>();
-	private pendingMatchScore = 0;
+	private pendingMatchTime = 0;
 
-	score = $state(0);
 	timeLeft = $state(0);
 	elapsedTime = $state(0);
 	status = $state<GameStatus>('idle');
 	gameOverReason = $state<'victory' | 'defeat' | null>(null);
 	shieldTimeBonus = $state(0);
+	questTimeBonus = $state(0);
 
 	constructor(
 		inventory: Inventory,
@@ -33,7 +39,9 @@ export class GameLoop {
 		selection: Selection,
 		overlay: Overlay,
 		loot: LootGenerator,
-		quest: Quest
+		quest: Quest,
+		notifications: Notifications,
+		augment: Augment
 	) {
 		this.audio = audio;
 		this.inventory = inventory;
@@ -41,6 +49,8 @@ export class GameLoop {
 		this.overlay = overlay;
 		this.loot = loot;
 		this.quest = quest;
+		this.notifications = notifications;
+		this.augment = augment;
 
 		$effect.root(() => {
 			$effect(() => {
@@ -54,13 +64,28 @@ export class GameLoop {
 				this.appliedShieldRarities.add(def.rarity);
 				if (this.status === 'playing') {
 					this.audio.play('sheild');
+					if (bonus > 0) {
+						this.notifications.push({
+							kind: 'shield',
+							label: 'Shield bonus',
+							amount: bonus,
+							suffix: 's'
+						});
+					}
 				}
 			});
 
 			$effect(() => {
 				if (this.status !== 'playing') return;
-				const ms = this.quest.checkMatches();
-				if (ms > 0) this.pendingMatchScore += ms;
+				const completed = this.quest.checkMatches();
+				if (completed.length === 0) return;
+				this.pendingMatchTime += completed.length * QUEST_TIME_BONUS;
+				this.questTimeBonus = completed.length * QUEST_TIME_BONUS;
+			});
+
+			$effect(() => {
+				if (this.status !== 'playing') return;
+				this.augment.autoUpgrade();
 			});
 		});
 	}
@@ -68,7 +93,6 @@ export class GameLoop {
 	start() {
 		cancelAnimationFrame(this.rafId);
 		this.quest.reset();
-		this.score = 0;
 		this.elapsedTime = 0;
 		this.gameOverReason = null;
 
@@ -147,15 +171,21 @@ export class GameLoop {
 
 		this.loot.tick(dt);
 
-		if (this.pendingMatchScore > 0) {
-			this.score += this.pendingMatchScore;
-			this.pendingMatchScore = 0;
+		if (this.pendingMatchTime > 0) {
+			this.timeLeft += this.pendingMatchTime;
+			this.pendingMatchTime = 0;
 		}
 
 		if (this.quest.stageCompleted && !this.quest.allStagesCompleted) {
+			const clearedName = this.quest.stageDef.name;
 			const nextStage = this.quest.advanceStage();
 			if (nextStage) {
-				this.timeLeft += nextStage.timeLimit;
+				this.timeLeft = nextStage.timeLimit;
+				this.notifications.push({
+					kind: 'stage',
+					label: 'Stage cleared',
+					message: clearedName
+				});
 			}
 		}
 
@@ -176,7 +206,9 @@ export class GameLoop {
 		this.inventory.clearStorage('augment');
 		this.inventory.clearStorage('shield');
 		this.appliedShieldRarities.clear();
-		this.pendingMatchScore = 0;
+		this.pendingMatchTime = 0;
+		this.questTimeBonus = 0;
+		this.notifications.clear();
 
 		this.start();
 	}
