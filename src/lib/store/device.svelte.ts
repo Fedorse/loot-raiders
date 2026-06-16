@@ -16,6 +16,7 @@ export class Device {
 	isCoarsePointer = $state(
 		typeof window !== 'undefined' && window.matchMedia(COARSE_POINTER_QUERY).matches
 	);
+	isFullscreen = $state(typeof document !== 'undefined' && !!document.fullscreenElement);
 
 	private started = false;
 
@@ -40,6 +41,11 @@ export class Device {
 		this.isCoarsePointer = coarse.matches;
 		coarse.addEventListener('change', () => {
 			this.isCoarsePointer = coarse.matches;
+		});
+
+		this.isFullscreen = !!document.fullscreenElement;
+		document.addEventListener('fullscreenchange', () => {
+			this.isFullscreen = !!document.fullscreenElement;
 		});
 
 		window.addEventListener('beforeinstallprompt', (e) => {

@@ -5,7 +5,7 @@
 	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import AugmentPanel from '$lib/components/augment-panel.svelte';
-	import GameMenu from '$lib/components/game-menu.svelte';
+	import GameMenu from '$lib/components/menu/game-menu.svelte';
 	import MobileGate from '$lib/components/mobile-gate.svelte';
 	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
 	import LeaderboardModal from '$lib/components/leaderboard-modal.svelte';

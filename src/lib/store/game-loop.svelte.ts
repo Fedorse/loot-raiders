@@ -192,7 +192,7 @@ export class GameLoop {
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
-	restart() {
+	private resetState() {
 		cancelAnimationFrame(this.rafId);
 		this.gameOverReason = null;
 
@@ -209,7 +209,18 @@ export class GameLoop {
 		this.pendingMatchTime = 0;
 		this.questTimeBonus = 0;
 		this.notifications.clear();
+	}
 
+	restart() {
+		this.resetState();
 		this.start();
+	}
+
+	quit() {
+		this.resetState();
+		this.audio.stopBGM();
+		this.timeLeft = 0;
+		this.elapsedTime = 0;
+		this.status = 'idle';
 	}
 }

@@ -1,7 +1,7 @@
 import type { Game } from '$lib/store/game.svelte';
 
 export function handleGlobalKeydown(e: KeyboardEvent, game: Game): void {
-	const { gameLoop, loot, overlay } = game;
+	const { gameLoop, loot, overlay, audio } = game;
 
 	if (e.key === 'Escape') {
 		if (gameLoop.status === 'playing') {
@@ -14,8 +14,17 @@ export function handleGlobalKeydown(e: KeyboardEvent, game: Game): void {
 		return;
 	}
 
-	if (e.key === ' ' && gameLoop.status === 'playing') {
-		e.preventDefault();
-		loot.next();
+	if (e.key === ' ') {
+		const tag = (e.target as HTMLElement)?.tagName;
+		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+		if (gameLoop.status === 'playing') {
+			e.preventDefault();
+			loot.next();
+		} else if (gameLoop.status === 'idle' && !overlay.leaderboard) {
+			e.preventDefault();
+			audio.play('click');
+			gameLoop.start();
+		}
 	}
 }

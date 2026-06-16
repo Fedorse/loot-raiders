@@ -5,7 +5,7 @@
 	import QuestBar from '$lib/components/quest-bar.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import QuestWidget from '$lib/components/quest-widget.svelte';
-	import FullscreenButton from '$lib/components/fullscreen-button.svelte';
+	import Disclaimer from '$lib/components/menu/disclaimer.svelte';
 	import { formatTime } from '$lib/utils';
 
 	const { gameLoop, inventory, loot, selection, audio, overlay, device } = getGameContext();
@@ -143,11 +143,10 @@
 				: 'pointer-events-none opacity-0'}"
 		>
 			<Shortcuts />
-			<div class="ml-auto">
-				<FullscreenButton bindKey={gameLoop.status === 'playing'} />
-			</div>
 		</div>
 	</div>
+
+	<Disclaimer minimal class="z-20" />
 </div>
 
 {#snippet divider()}
