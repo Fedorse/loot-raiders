@@ -9,6 +9,9 @@ export class Augment {
 	private inventory: Inventory;
 	private notifications: Notifications;
 
+	// Bumped on every applied auto-upgrade so the UI can play a one-shot flash.
+	upgradePulse = $state(0);
+
 	constructor(inventory: Inventory, notifications: Notifications) {
 		this.inventory = inventory;
 		this.notifications = notifications;
@@ -65,6 +68,7 @@ export class Augment {
 			label: 'Augment upgraded',
 			message: upgrade.bonus
 		});
+		this.upgradePulse++;
 	}
 
 	// Auto-upgrades through every level the player can currently afford.

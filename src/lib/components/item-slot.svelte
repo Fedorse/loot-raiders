@@ -23,12 +23,15 @@
 	const showAsWeaponCard = $derived(
 		def.type === 'weapon' && location.type === 'slot' && location.storageId === 'weapon'
 	);
+
+	// Augment is fixed in its slot by design — the player can never drag it out.
+	const isAugment = $derived(location.type === 'slot' && location.storageId === 'augment');
 </script>
 
 <div
 	class="{className} h-full w-full"
 	{@attach droppable(slotState)}
-	{@attach draggable(slotState)}
+	{@attach !isAugment && draggable(slotState)}
 >
 	{#if showAsWeaponCard}
 		<WeaponCard {item} {location} className="h-full w-full" {onmatched} />

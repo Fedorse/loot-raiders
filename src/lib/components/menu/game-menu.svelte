@@ -34,7 +34,7 @@
 				>
 					<div>
 						<div
-							class="hidden pl-15 md:block pointer-coarse:hidden"
+							class="hidden pl-12 md:block pointer-coarse:hidden"
 							in:fly|global={{ y: -10, duration: 300 }}
 						>
 							<Wordmark />
@@ -76,7 +76,7 @@
 				</div>
 			</div>
 
-			<div class="absolute top-1/2 right-0 z-10 hidden -translate-y-1/2 pr-7 pointer-coarse:block">
+			<div class="absolute top-1/2 right-0 z-10 hidden -translate-y-1/2 pr-20 pointer-coarse:block">
 				<Wordmark />
 			</div>
 

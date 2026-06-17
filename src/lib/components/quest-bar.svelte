@@ -84,7 +84,7 @@
 >
 	{#if gameLoop.status !== 'idle'}
 		<div
-			class="flex flex-col gap-1 rounded-t-xl bg-background/50 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 lg:px-4 2xl:gap-1.5 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:gap-2 4xl:px-7 4xl:py-3"
+			class="flex flex-col gap-1 rounded-t-xl bg-background/50 px-2 py-1 backdrop-blur-md md:px-3 md:py-1.5 lg:px-4 2xl:gap-1.5 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:gap-2 4xl:px-7 4xl:py-3"
 		>
 			<div class="flex items-center justify-between gap-1.5">
 				<div class="flex items-center gap-1 2xl:gap-1.5 4xl:gap-2">
@@ -94,10 +94,12 @@
 						aria-hidden="true"
 						class="size-3 shrink-0 object-contain md:size-3.5 lg:size-4 2xl:size-5 3xl:size-6 4xl:size-7"
 					/>
-					<span
-						class="text-[7px] font-medium text-white/50 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-[12px]"
-						>{quest.stageDef.name}</span
-					>
+					{#key quest.currentStage}
+						<span
+							class="stage-name text-[7px] font-medium text-white/50 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-[12px]"
+							>{quest.stageDef.name}</span
+						>
+					{/key}
 				</div>
 			</div>
 			<div class="mt-0.5 flex w-full gap-1">
@@ -117,16 +119,18 @@
 			</div>
 		</div>
 
+
 		<div
-			class="flex flex-col gap-1 overflow-hidden bg-background/50 backdrop-blur-md px-1.5 py-2 md:gap-1.5 md:px-2 md:py-3 lg:px-2.5 lg:py-3.5 2xl:gap-2 2xl:px-3 2xl:py-4 3xl:gap-3 3xl:px-4 3xl:py-5 4xl:gap-4 4xl:px-5 4xl:py-6"
+			class="flex flex-col gap-1 overflow-hidden bg-background/50 px-1.5 py-2 backdrop-blur-md md:gap-1.5 md:px-2 md:py-3 lg:min-h-[468px] lg:px-2.5 lg:py-3.5 2xl:min-h-[568px] 2xl:gap-2 2xl:px-3 2xl:py-4 3xl:min-h-[676px] 3xl:gap-3 3xl:px-4 3xl:py-5 4xl:min-h-[784px] 4xl:gap-4 4xl:px-5 4xl:py-6"
 		>
-			{#each quest.items as item (item.id)}
+			{#each quest.items as item, i (item.id)}
 				{@const style = getRarityStyle(item.def.rarity)}
 				{@const showAsWeaponLayout =
 					item.def.type === 'weapon' && !!item.def.attachmentSlots?.length}
 
 				<div
-					class="flex w-full justify-center transition-opacity duration-500"
+					class="stage-item flex w-full justify-center transition-opacity duration-500"
+					style="--i: {i}"
 					class:opacity-60={item.matched}
 				>
 					{#if showAsWeaponLayout}
@@ -188,7 +192,7 @@
 			{/each}
 		</div>
 		<div
-			class="flex items-center justify-between rounded-b-lg bg-background/50 backdrop-blur-md px-2 py-1 md:px-3 md:py-1.5 lg:px-4 2xl:px-5 2xl:py-2 3xl:px-6 3xl:py-2.5 4xl:px-7 4xl:py-3"
+			class="flex items-center justify-between rounded-b-lg bg-background/50 px-2 pb-1 backdrop-blur-md md:px-3 md:pb-1.5 lg:px-4 2xl:px-5 2xl:pb-2 3xl:px-6 3xl:pb-2.5 4xl:px-7 4xl:pb-3"
 		>
 			<span
 				class="text-[7px] font-medium text-white/80 uppercase md:text-[8px] lg:text-[9px] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-[12px]"
@@ -221,3 +225,43 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	.stage-item {
+		animation: stage-item-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+		animation-delay: calc(var(--i, 0) * 70ms);
+	}
+
+	.stage-name {
+		animation: stage-name-in 400ms ease-out;
+	}
+
+	@keyframes stage-item-in {
+		from {
+			opacity: 0;
+			transform: translateY(10px) scale(0.96);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	@keyframes stage-name-in {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.stage-item,
+		.stage-name {
+			animation: none;
+		}
+	}
+</style>

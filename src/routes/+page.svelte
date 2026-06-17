@@ -2,13 +2,15 @@
 	import Shortcuts from '$lib/components/shortcuts.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import StorageGrid from '$lib/components/storage-grid.svelte';
+	import { ElectricBorder } from '$lib/motion-core';
 	import QuestBar from '$lib/components/quest-bar.svelte';
 	import DropZone from '$lib/components/drop-zone.svelte';
 	import QuestWidget from '$lib/components/quest-widget.svelte';
 	import Disclaimer from '$lib/components/menu/disclaimer.svelte';
 	import { formatTime } from '$lib/utils';
 
-	const { gameLoop, inventory, loot, selection, audio, overlay, device } = getGameContext();
+	const { gameLoop, inventory, loot, selection, audio, overlay, device, augment } =
+		getGameContext();
 </script>
 
 <div class="flex h-full items-center justify-center" onpointerdown={() => selection.clear()}>
@@ -102,10 +104,18 @@
 									data-wide-short-storage-stack
 								>
 									<div class="flex gap-0.5 md:gap-0.5 lg:gap-3 xl:gap-3.5 2xl:gap-4 3xl:gap-5">
-										<StorageGrid
-											storageId="augment"
-											class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
-										/>
+										<ElectricBorder
+											pulse={augment.upgradePulse}
+											color="#22d3ee"
+											speed={1}
+											chaos={0.05}
+											borderRadius={8}
+										>
+											<StorageGrid
+												storageId="augment"
+												class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
+											/>
+										</ElectricBorder>
 										<StorageGrid
 											storageId="shield"
 											class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
