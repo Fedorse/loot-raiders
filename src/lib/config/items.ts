@@ -26,7 +26,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
+			{ type: 'magazine_light', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -74,7 +74,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -103,7 +103,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' }
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' }
 		]
 	},
 	wpn_bettina: {
@@ -187,7 +187,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -241,7 +241,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
+			{ type: 'magazine_light', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -270,7 +270,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
+			{ type: 'magazine_light', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -298,9 +298,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'res_simple_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
-			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp' },
+			{ type: 'muzzle_shotgun', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/shotgun_magazine.webp' },
+			{ type: 'magazine_shotgun', placeholder: '/assets/ui/mod_slot_assets/shotgun_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -327,9 +327,9 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'res_heavy_gun_parts', amount: 2 }
 		],
 		attachmentSlots: [
-			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp' },
+			{ type: 'muzzle_shotgun', placeholder: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/shotgun_magazine.webp' },
+			{ type: 'magazine_shotgun', placeholder: '/assets/ui/mod_slot_assets/shotgun_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -357,7 +357,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 			{ itemId: 'res_rubber_parts', amount: 1 }
 		],
 		attachmentSlots: [
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' }
+			{ type: 'magazine_light', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' }
 		]
 	},
 	wpn_burletta: {
@@ -381,7 +381,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' }
+			{ type: 'magazine_light', placeholder: '/assets/ui/mod_slot_assets/light_magazine.webp' }
 		]
 	},
 	wpn_venator: {
@@ -408,7 +408,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		],
 		attachmentSlots: [
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' }
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' }
 		]
 	},
 
@@ -468,7 +468,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		],
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -501,7 +501,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		attachmentSlots: [
 			{ type: 'muzzle', placeholder: '/assets/ui/mod_slot_assets/muzzle.webp' },
 			{ type: 'underbarrel', placeholder: '/assets/ui/mod_slot_assets/underbarrel.webp' },
-			{ type: 'magazine', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
+			{ type: 'magazine_medium', placeholder: '/assets/ui/mod_slot_assets/medium_magazine.webp' },
 			{ type: 'stock', placeholder: '/assets/ui/mod_slot_assets/stock.webp' }
 		]
 	},
@@ -1083,7 +1083,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_shotgun_choke_1',
 		name: 'Shotgun Choke I',
 		type: 'attachment',
-		attachmentKind: 'muzzle',
+		attachmentKind: 'muzzle_shotgun',
 		rarity: 'common',
 		image: '/assets/items/WeaponMods/ShotgunChoke1.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp',
@@ -1097,7 +1097,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_shotgun_choke_2',
 		name: 'Shotgun Choke II',
 		type: 'attachment',
-		attachmentKind: 'muzzle',
+		attachmentKind: 'muzzle_shotgun',
 		rarity: 'uncommon',
 		image: '/assets/items/WeaponMods/ShotgunChoke2.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp',
@@ -1114,7 +1114,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_shotgun_choke_3',
 		name: 'Shotgun Choke III',
 		type: 'attachment',
-		attachmentKind: 'muzzle',
+		attachmentKind: 'muzzle_shotgun',
 		rarity: 'rare',
 		image: '/assets/items/WeaponMods/ShotgunChoke3.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_muzzle.webp',
@@ -1135,7 +1135,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_light_mag_1',
 		name: 'Extended Light Mag I',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_light',
 		rarity: 'common',
 		image: '/assets/items/WeaponMods/ExtendedLightMag1.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/light_magazine.webp',
@@ -1149,7 +1149,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_light_mag_2',
 		name: 'Extended Light Mag II',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_light',
 		rarity: 'uncommon',
 		image: '/assets/items/WeaponMods/ExtendedLightMag2.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/light_magazine.webp',
@@ -1166,7 +1166,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_light_mag_3',
 		name: 'Extended Light Mag III',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_light',
 		rarity: 'rare',
 		image: '/assets/items/WeaponMods/ExtendedLightMag3.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/light_magazine.webp',
@@ -1183,7 +1183,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_medium_mag_1',
 		name: 'Extended Medium Mag I',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_medium',
 		rarity: 'common',
 		image: '/assets/items/WeaponMods/ExtendedMediumMag1.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/medium_magazine.webp',
@@ -1197,7 +1197,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_medium_mag_2',
 		name: 'Extended Medium Mag II',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_medium',
 		rarity: 'uncommon',
 		image: '/assets/items/WeaponMods/ExtendedMediumMag2.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/medium_magazine.webp',
@@ -1214,7 +1214,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_medium_mag_3',
 		name: 'Extended Medium Mag III',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_medium',
 		rarity: 'rare',
 		image: '/assets/items/WeaponMods/ExtendedMediumMag3.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/medium_magazine.webp',
@@ -1231,7 +1231,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_shotgun_mag_1',
 		name: 'Extended Shotgun Mag I',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_shotgun',
 		rarity: 'common',
 		image: '/assets/items/WeaponMods/ExtendedShotgunMag1.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_magazine.webp',
@@ -1245,7 +1245,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_shotgun_mag_2',
 		name: 'Extended Shotgun Mag II',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_shotgun',
 		rarity: 'uncommon',
 		image: '/assets/items/WeaponMods/ExtendedShotgunMag2.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_magazine.webp',
@@ -1262,7 +1262,7 @@ export const ITEM_DB: Record<string, ItemDefinition> = {
 		id: 'att_ext_shotgun_mag_3',
 		name: 'Extended Shotgun Mag III',
 		type: 'attachment',
-		attachmentKind: 'magazine',
+		attachmentKind: 'magazine_shotgun',
 		rarity: 'rare',
 		image: '/assets/items/WeaponMods/ExtendedShotgunMag3.webp',
 		categoryIcon: '/assets/ui/mod_slot_assets/shotgun_magazine.webp',

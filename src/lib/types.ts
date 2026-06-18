@@ -1,7 +1,16 @@
 // ---- Enums ----
 export type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-export type AttachmentType = 'optic' | 'muzzle' | 'magazine' | 'grip' | 'stock' | 'underbarrel';
+export type AttachmentType =
+	| 'optic'
+	| 'muzzle'
+	| 'muzzle_shotgun'
+	| 'magazine_light'
+	| 'magazine_medium'
+	| 'magazine_shotgun'
+	| 'grip'
+	| 'stock'
+	| 'underbarrel';
 export type StorageId = 'backpack' | 'lootBack' | 'weapon' | 'augment' | 'shield';
 
 // ---- Universal location ----
