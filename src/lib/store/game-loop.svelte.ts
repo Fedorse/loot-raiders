@@ -8,7 +8,7 @@ import type { Quest } from './quest.svelte';
 import type { Notifications } from './notifications.svelte';
 import type { Augment } from './augment.svelte';
 
-export type GameStatus = 'idle' | 'playing' | 'paused' | 'over';
+export type GameStatus = 'idle' | 'playing' | 'paused' | 'tutorial' | 'over';
 
 const QUEST_TIME_BONUS = 3;
 
@@ -32,6 +32,9 @@ export class GameLoop {
 	gameOverReason = $state<'victory' | 'defeat' | null>(null);
 	shieldTimeBonus = $state(0);
 	questTimeBonus = $state(0);
+
+	// The game board is mounted for both a normal run and a Tutorial Mode session.
+	inSession = $derived(this.status === 'playing' || this.status === 'tutorial');
 
 	constructor(
 		inventory: Inventory,
@@ -75,22 +78,28 @@ export class GameLoop {
 				}
 			});
 
+			// Runs in Tutorial Mode too (not just a live run): step 3 needs the quest to
+			// auto-match the instant the item lands in the Loadout. The frozen clock means
+			// pendingMatchTime simply never drains in tutorial — harmless, cleared on teardown.
 			$effect(() => {
-				if (this.status !== 'playing') return;
+				if (!this.inSession) return;
 				const completed = this.quest.checkMatches();
 				if (completed.length === 0) return;
 				this.pendingMatchTime += completed.length * QUEST_TIME_BONUS;
 				this.questTimeBonus = completed.length * QUEST_TIME_BONUS;
 			});
 
+			// Also runs in Tutorial Mode so step 7's seeded resources trigger the auto-upgrade.
+			// Lazy per-step seeding (ADR-0004) keeps resources absent until then, so it cannot
+			// fire early despite running for the whole session.
 			$effect(() => {
-				if (this.status !== 'playing') return;
+				if (!this.inSession) return;
 				this.augment.autoUpgrade();
 			});
 		});
 	}
 
-	start() {
+	private setupSession() {
 		cancelAnimationFrame(this.rafId);
 		this.quest.reset();
 		this.elapsedTime = 0;
@@ -100,12 +109,26 @@ export class GameLoop {
 		this.inventory.fillStorage('augment', [augItem]);
 
 		this.timeLeft = this.quest.stageDef.timeLimit;
+	}
+
+	start() {
+		this.setupSession();
 
 		this.status = 'playing';
 		this.audio.playBGM();
 
 		this.lastTime = performance.now();
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
+	}
+
+	// Tutorial Mode: a real session that shares the board with a normal run, but the
+	// clock is frozen and the automatic loot cadence is suspended — no rAF loop runs,
+	// and the quest-match / auto-upgrade effects are gated on `status === 'playing'`.
+	startTutorial() {
+		this.setupSession();
+
+		this.status = 'tutorial';
+		this.audio.playBGM();
 	}
 
 	stop() {
@@ -160,6 +183,18 @@ export class GameLoop {
 		const dt = (now - this.lastTime) / 1000;
 		this.lastTime = now;
 
+		this.step(dt);
+
+		if (this.status === 'playing') {
+			this.rafId = requestAnimationFrame((t) => this.tick(t));
+		}
+	}
+
+	// Advances the run by `dt` seconds. Frozen unless a normal run is in progress, so a
+	// Tutorial Mode session leaves the clock and loot cadence untouched across a tick.
+	step(dt: number) {
+		if (this.status !== 'playing') return;
+
 		this.timeLeft -= dt;
 		this.elapsedTime += dt;
 		if (this.timeLeft <= 0) {
@@ -188,8 +223,6 @@ export class GameLoop {
 				});
 			}
 		}
-
-		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
 	private resetState() {

@@ -16,6 +16,10 @@ const WEIGHT_PENALTY_FLOOR = 0.5;
 export class Inventory {
 	items = $state<OccupiedSlot[]>([]);
 
+	// Bumped on every successful recycle so observers (e.g. the FTUE) can react to a
+	// verb-like action that has no clean derived signature. Mirrors augment.upgradePulse.
+	recyclePulse = $state(0);
+
 	augmentItem = $derived(this.getItem({ type: 'slot', storageId: 'augment', index: 0 }));
 	shieldItem = $derived(this.getItem({ type: 'slot', storageId: 'shield', index: 0 }));
 
@@ -364,6 +368,7 @@ export class Inventory {
 			}
 		}
 		this.audio.play('recycle');
+		this.recyclePulse++;
 		return true;
 	}
 

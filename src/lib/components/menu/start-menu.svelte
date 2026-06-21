@@ -7,7 +7,7 @@
 	import LeaderboardIcon from '$lib/ui-icon/leaderboard.svelte';
 	import ChevronRight from '$lib/ui-icon/chevron-right.svelte';
 
-	const { gameLoop, audio, overlay, leaderboard } = getGameContext();
+	const { audio, overlay, leaderboard, tutorial } = getGameContext();
 
 	const rankQuery = getLeaderboard();
 	const myRank = $derived(rankQuery.current?.myRank ?? null);
@@ -15,7 +15,7 @@
 	function play() {
 		audio.play('click');
 		if (isTouchDevice()) enterFullscreen();
-		gameLoop.start();
+		tutorial.enter();
 	}
 	function openLeaderboard() {
 		audio.play('click');

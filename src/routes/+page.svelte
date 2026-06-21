@@ -54,7 +54,8 @@
 
 							<button
 								type="button"
-								onclick={() => gameLoop.status === 'playing' && loot.next()}
+								data-tut="open-now"
+								onclick={() => gameLoop.inSession && loot.next()}
 								aria-label="Open loot now"
 								class="group flex cursor-pointer items-center gap-1 transition-opacity hover:opacity-90 2xl:gap-1.5 4xl:gap-2 pointer-coarse:rounded-md pointer-coarse:bg-cyan-400/10 pointer-coarse:px-1.5 pointer-coarse:py-0.5 pointer-coarse:ring-1 pointer-coarse:ring-cyan-400/30 pointer-coarse:active:scale-95"
 							>
@@ -75,7 +76,7 @@
 							class="z-10 flex flex-col gap-1 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 p-1 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
 							data-wide-short-panel
 						>
-							<div class="grid grid-cols-4">
+							<div class="grid grid-cols-4" data-tut="loot-drop">
 								<StorageGrid
 									storageId="lootBack"
 									class="aspect-square h-11 w-11 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-22 xl:w-22 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32 landscape-narrow:h-12 landscape-narrow:w-12 landscape-mid:h-14 landscape-mid:w-14 wide-short:h-22 wide-short:w-22"
@@ -104,22 +105,26 @@
 									data-wide-short-storage-stack
 								>
 									<div class="flex gap-0.5 md:gap-0.5 lg:gap-3 xl:gap-3.5 2xl:gap-4 3xl:gap-5">
-										<ElectricBorder
-											pulse={augment.upgradePulse}
-											color="#22d3ee"
-											speed={1}
-											chaos={0.05}
-											borderRadius={8}
-										>
+										<div data-tut="augment">
+											<ElectricBorder
+												pulse={augment.upgradePulse}
+												color="#22d3ee"
+												speed={1}
+												chaos={0.05}
+												borderRadius={8}
+											>
+												<StorageGrid
+													storageId="augment"
+													class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
+												/>
+											</ElectricBorder>
+										</div>
+										<div data-tut="shield">
 											<StorageGrid
-												storageId="augment"
+												storageId="shield"
 												class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
 											/>
-										</ElectricBorder>
-										<StorageGrid
-											storageId="shield"
-											class="h-11 w-16 md:h-14 md:w-24 lg:h-20 lg:w-[112px] xl:h-22 xl:w-[126px] 2xl:h-24 2xl:w-[140px] 3xl:h-28 3xl:w-[160px] 4xl:h-32 4xl:w-[180px] landscape-narrow:h-12 landscape-narrow:w-18 landscape-mid:h-14 landscape-mid:w-20 wide-short:h-22 wide-short:w-[126px]"
-										/>
+										</div>
 									</div>
 									<StorageGrid
 										storageId="weapon"
@@ -128,7 +133,7 @@
 								</div>
 
 								<div class="flex flex-col gap-1 md:gap-1 lg:gap-3 xl:gap-3.5 2xl:gap-4 3xl:gap-5">
-									<div class="grid grid-cols-4">
+									<div class="grid grid-cols-4" data-tut="backpack">
 										<StorageGrid
 											storageId="backpack"
 											class="aspect-square h-11 w-11 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-22 xl:w-22 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32 landscape-narrow:h-12 landscape-narrow:w-12 landscape-mid:h-14 landscape-mid:w-14 wide-short:h-22 wide-short:w-22"
@@ -147,8 +152,8 @@
 		</div>
 
 		<div
-			class="hidden w-full items-center transition-opacity md:flex pointer-coarse:hidden {gameLoop.status ===
-			'playing'
+			data-tut="hotkeys"
+			class="hidden w-full items-center transition-opacity md:flex pointer-coarse:hidden {gameLoop.inSession
 				? 'opacity-100'
 				: 'pointer-events-none opacity-0'}"
 		>
@@ -195,6 +200,7 @@
 			<div class="h-2.5 w-[1px] bg-white/20 2xl:h-3 3xl:h-3.5 4xl:h-4"></div>
 
 			<span
+				data-tut="timer"
 				class="relative inline-block font-mono text-[10px] font-bold tracking-widest transition-colors duration-300 xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px] {gameLoop.timeLeft <
 				10
 					? 'text-red-400'

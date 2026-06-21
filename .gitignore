@@ -30,9 +30,11 @@ vite.config.ts.timestamp-*
 .mcp.json
 skills-lock.json
 /CLAUDE.md
-
+.scratch
+docs
 # Editor
 .vscode/
+
 
 # Local dev tooling (Monte-Carlo simulator)
 /scripts/

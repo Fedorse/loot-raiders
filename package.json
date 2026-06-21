@@ -11,6 +11,7 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"sim": "vite-node scripts/loot-sim.ts",
+		"tut": "vite-node scripts/tutorial-sim.ts",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},

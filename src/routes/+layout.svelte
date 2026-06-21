@@ -6,6 +6,8 @@
 	import RecycleModal from '$lib/components/recycle-modal.svelte';
 	import AugmentPanel from '$lib/components/augment-panel.svelte';
 	import GameMenu from '$lib/components/menu/game-menu.svelte';
+	import Coachmark from '$lib/components/coachmark.svelte';
+	import TutorialHighlight from '$lib/components/tutorial-highlight.svelte';
 	import MobileGate from '$lib/components/mobile-gate.svelte';
 	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
 	import LeaderboardModal from '$lib/components/leaderboard-modal.svelte';
@@ -41,7 +43,7 @@
 
 	$effect(() => {
 		if (!videoEl) return;
-		if (gameLoop.status === 'playing') {
+		if (gameLoop.inSession) {
 			videoEl.play().catch(() => {});
 		} else {
 			videoEl.pause();
@@ -78,7 +80,7 @@
 		<source src="/assets/intro.mp4" type="video/mp4" />
 	</video>
 
-	{#if gameLoop.status === 'playing'}
+	{#if gameLoop.inSession}
 		<div class="absolute inset-0 h-full w-full bg-black/80"></div>
 	{/if}
 
@@ -88,7 +90,7 @@
 		{@render children()}
 	</div>
 
-	{#if gameLoop.status !== 'playing'}
+	{#if !gameLoop.inSession}
 		<img
 			src="/assets/preload/intro.webp"
 			alt=""
@@ -104,6 +106,8 @@
 <RecycleModal />
 <AugmentPanel />
 <GameMenu {showPreloader} />
+<TutorialHighlight />
+<Coachmark />
 <QuestBottomSheet />
 <LeaderboardModal />
 <MobileGate />

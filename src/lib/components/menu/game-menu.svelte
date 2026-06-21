@@ -18,7 +18,7 @@
 	const runStage = $derived(`${quest.currentStage + 1}/${STAGES.length}`);
 </script>
 
-{#if gameLoop.status !== 'playing' && !showPreloader}
+{#if !gameLoop.inSession && !showPreloader}
 	<div
 		class="fixed inset-0 z-30 bg-gradient-to-r from-black/90 via-black/55 to-black/15 backdrop-blur-xs"
 		transition:fade|global={{ duration: gameLoop.status === 'idle' ? 300 : 0 }}

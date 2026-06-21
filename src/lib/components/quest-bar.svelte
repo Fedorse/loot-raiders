@@ -81,6 +81,7 @@
 
 <div
 	class="relative z-10 flex w-36 flex-col rounded-t-lg rounded-b-none md:w-40 lg:w-44 2xl:w-56 3xl:w-64 4xl:w-72"
+	data-tut="quest-bar"
 >
 	{#if gameLoop.status !== 'idle'}
 		<div
@@ -118,7 +119,6 @@
 				{/each}
 			</div>
 		</div>
-
 
 		<div
 			class="flex flex-col gap-1 overflow-hidden bg-background/50 px-1.5 py-2 backdrop-blur-md md:gap-1.5 md:px-2 md:py-3 lg:min-h-[468px] lg:px-2.5 lg:py-3.5 2xl:min-h-[568px] 2xl:gap-2 2xl:px-3 2xl:py-4 3xl:min-h-[676px] 3xl:gap-3 3xl:px-4 3xl:py-5 4xl:min-h-[784px] 4xl:gap-4 4xl:px-5 4xl:py-6"

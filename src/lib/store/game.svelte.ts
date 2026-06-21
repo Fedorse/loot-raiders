@@ -11,6 +11,7 @@ import { Augment } from './augment.svelte';
 import { Device } from './device.svelte';
 import { Leaderboard } from './leaderboard.svelte';
 import { Notifications } from './notifications.svelte';
+import { Tutorial } from './tutorial.svelte';
 
 export class Game {
 	audio = new AudioManager();
@@ -34,6 +35,7 @@ export class Game {
 		this.augment
 	);
 	leaderboard = new Leaderboard();
+	tutorial = new Tutorial(this.gameLoop, this.loot, this.inventory, this.quest, this.augment);
 }
 
 const GAME_KEY = Symbol('GAME');

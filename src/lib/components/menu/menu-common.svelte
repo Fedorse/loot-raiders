@@ -5,17 +5,29 @@
 	import Video from '$lib/ui-icon/video.svelte';
 	import Fullscreen from '$lib/ui-icon/fullscreen.svelte';
 
-	const { audio, device } = getGameContext();
+	const { audio, device, gameLoop, tutorial } = getGameContext();
+
+	// Replay is gated to the main (idle) menu — never the pause menu, so there is no
+	// in-progress run to discard and no confirmation modal is needed.
+	const canReplay = $derived(gameLoop.status === 'idle');
 
 	function onFullscreen() {
 		audio.play('click');
 		toggleFullscreen();
 	}
+
+	function howToPlay() {
+		audio.play('click');
+		tutorial.start();
+	}
 </script>
 
 <button
-	class="group flex w-full cursor-default items-center gap-3 rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 px-5 py-3.5 text-left opacity-90 transition-all hover:bg-[#1a2133] active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
-	disabled
+	onclick={howToPlay}
+	disabled={!canReplay}
+	class="group flex w-full items-center gap-3 rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 px-5 py-3.5 text-left transition-all hover:bg-[#1a2133] active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5 {canReplay
+		? ''
+		: 'cursor-default opacity-90'}"
 >
 	<Video
 		class="size-5 flex-none text-white/55 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"

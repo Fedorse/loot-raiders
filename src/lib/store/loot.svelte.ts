@@ -30,6 +30,11 @@ export class LootGenerator {
 	cooldown = $state(0);
 	chestsOpened = $state(0);
 
+	// Tutorial Mode override (ADR-0004): when set, next() emits this deterministic drop
+	// instead of a random roll, so the real "Open Now" button still works but its output
+	// is scripted per step. Cleared on reset() when a session tears down.
+	scriptedDrop: (() => InstanceItem[]) | null = null;
+
 	constructor(
 		inventory: Inventory,
 		audio: AudioManager,
@@ -72,10 +77,21 @@ export class LootGenerator {
 			this.interaction.cancel();
 		}
 
-		const { lootCooldown, lootProfile, chestSize } = this.quest.stageDef;
-		this.cooldown = lootCooldown;
+		this.cooldown = this.quest.stageDef.lootCooldown;
 		this.inventory.clearStorage('lootBack');
 		this.shineQueue.clear();
+
+		const items = this.scriptedDrop ? this.scriptedDrop() : this.generateRandomDrop();
+
+		this.inventory.fillStorage('lootBack', items);
+		this.lootQueue = items.map((i) => i.uid);
+		this.scanIndex = 0;
+		this.phase = 'loading';
+		this.chestsOpened++;
+	}
+
+	private generateRandomDrop(): InstanceItem[] {
+		const { lootProfile, chestSize } = this.quest.stageDef;
 
 		const questItems = this.generateQuestItems();
 		const randomCount = Math.max(0, randInt(chestSize.min, chestSize.max) - questItems.length);
@@ -97,11 +113,7 @@ export class LootGenerator {
 			items.splice(pos, 0, qi);
 		}
 
-		this.inventory.fillStorage('lootBack', items);
-		this.lootQueue = items.map((i) => i.uid);
-		this.scanIndex = 0;
-		this.phase = 'loading';
-		this.chestsOpened++;
+		return items;
 	}
 
 	slotScanned(): void {
@@ -141,5 +153,6 @@ export class LootGenerator {
 		this.shineQueue.clear();
 		this.chestsOpened = 0;
 		this.cooldown = 0;
+		this.scriptedDrop = null;
 	}
 }

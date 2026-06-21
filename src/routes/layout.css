@@ -179,6 +179,18 @@ body.dragging-attachment [data-slot-type='attachment'] {
 	pointer-events: auto !important;
 }
 
+/* Tutorial interaction gate (ADR-0005): the app root goes pointer-transparent while a
+ * step is active; only the step's resolved targets are clickable. Reuses the same idiom
+ * as the dragging-weapon gate above and sidesteps the backdrop-blur stacking-context trap
+ * (z-index promotion can't escape a panel's backdrop-filter context). */
+body.tutorial-active main {
+	pointer-events: none;
+}
+
+body.tutorial-active .tut-active {
+	pointer-events: auto !important;
+}
+
 /* Mobile-landscape slot scale-up: bump slots above the 44px base on narrow
  * landscape phones below md: (768px). Gated on min-height 280px to skip
  * ultra-short viewports. */
