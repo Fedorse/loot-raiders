@@ -37,18 +37,20 @@
 		>
 	</button>
 
-	<button
-		onclick={restart}
-		class="group flex w-full items-center gap-3 rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 px-5 py-3.5 text-left transition-all hover:bg-[#1a2133] active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
-	>
-		<Restart
-			class="size-5 flex-none text-white/55 group-hover:text-white 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
-		/>
-		<span
-			class="flex-1 text-[15px] font-semibold tracking-wider text-white/80 group-hover:text-white lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
-			>Restart</span
+	{#if !gameLoop.pausedTutorial}
+		<button
+			onclick={restart}
+			class="group flex w-full items-center gap-3 rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 px-5 py-3.5 text-left transition-all hover:bg-[#1a2133] active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
 		>
-	</button>
+			<Restart
+				class="size-5 flex-none text-white/55 group-hover:text-white 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
+			/>
+			<span
+				class="flex-1 text-[15px] font-semibold tracking-wider text-white/80 group-hover:text-white lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
+				>Restart</span
+			>
+		</button>
+	{/if}
 
 	<MenuCommon />
 </div>

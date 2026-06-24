@@ -76,7 +76,7 @@
 				</div>
 			</div>
 
-			<div class="absolute top-1/2 right-0 z-10 hidden -translate-y-1/2 pr-20 pointer-coarse:block">
+			<div class="absolute top-1/2 right-0 z-10 hidden -translate-y-1/2 pr-12 pointer-coarse:block">
 				<Wordmark />
 			</div>
 

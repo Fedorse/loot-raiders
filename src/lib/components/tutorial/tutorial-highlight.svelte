@@ -1,9 +1,34 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { linear, cubicOut } from 'svelte/easing';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { trackLayout, elementToPath } from '$lib/utils';
 
 	const { tutorial, overlay, inventory, device, loot } = getGameContext();
+
+	function traceDraw(
+		node: SVGPathElement,
+		{ speed = 2.5, easing = linear }: { speed?: number; easing?: (t: number) => number } = {}
+	) {
+		const len = node.getTotalLength();
+		return {
+			duration: len / speed,
+			easing,
+			css: (t: number) => `stroke-dasharray: 1 1; stroke-dashoffset: ${1 - t}`
+		};
+	}
+
+	type HoleShape = { id: string; d: string; cx: number; cy: number };
+
+	function iris(_node: Element, { cx, cy }: { cx: number; cy: number }) {
+		const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+		return {
+			duration: reduce ? 0 : 300,
+			easing: cubicOut,
+			css: (t: number) =>
+				`transform: translate(${cx}px, ${cy}px) scale(${t}) translate(${-cx}px, ${-cy}px)`
+		};
+	}
 
 	// Latch the quest-sheet open for the mobile 'open-quests' step, whose predicate completes on the
 	// subsequent close. The reactive sheet flag is the only "was opened" signal, so we bridge it here.
@@ -22,8 +47,8 @@
 
 	const EXCLUDE_RADIUS = 6;
 
-	let holes = $state<string[]>([]);
-	let frameHoles = $state<string[]>([]);
+	let holes = $state<HoleShape[]>([]);
+	let frameHoles = $state<HoleShape[]>([]);
 	let excludeHoles = $state<string[]>([]);
 	let rings = $state<string[]>([]);
 
@@ -44,10 +69,6 @@
 	// Resolve every referenced id by `data-tut`, re-measure on entry and on any layout shift.
 	// Only reveal ∪ pulse become interactive; excluded ids are measured but stay dimmed.
 	$effect(() => {
-		// Re-resolve when seeded items mount/unmount, so item rings catch elements that appear
-		// after step entry (e.g. fillStorage in setup()) — layout tracking alone can't see them.
-		// `loot.phase` covers drop items, which only render the slot (and its data-tut-item) once
-		// they finish the scan-in animation.
 		void inventory.items.length;
 		void loot.phase;
 
@@ -87,11 +108,28 @@
 				.filter((el): el is HTMLElement => !!el)
 				.map((el) => elementToPath(el, pad, forceRadius));
 
+		// Like pathsOf but keyed by target id and carrying each shape's viewport centre. The id keys
+		// the {#each} so the iris transition plays only for newly-revealed zones — zones that persist
+		// across steps keep their node and don't re-animate. Deduped so keys stay unique.
+		const shapesOf = (ids: string[], pad = 0, forceRadius?: number): HoleShape[] =>
+			Array.from(new Set(ids))
+				.map((id) => [id, resolved.get(id)] as const)
+				.filter((pair): pair is [string, HTMLElement] => !!pair[1])
+				.map(([id, el]) => {
+					const r = el.getBoundingClientRect();
+					return {
+						id,
+						d: elementToPath(el, pad, forceRadius),
+						cx: r.left + r.width / 2,
+						cy: r.top + r.height / 2
+					};
+				});
+
 		const ringPad = device.isCoarsePointer ? RING_PAD_MOBILE : RING_PAD;
 
 		const measure = () => {
-			holes = pathsOf(interactiveIds);
-			frameHoles = pathsOf(revealIds);
+			holes = shapesOf(interactiveIds);
+			frameHoles = shapesOf(revealIds);
 			excludeHoles = pathsOf(excludeIds, 0, EXCLUDE_RADIUS);
 			rings = [
 				...pathsOf(pulseIds, ringPad),
@@ -141,8 +179,10 @@
 
 			<mask id="tut-mask">
 				<rect width="100%" height="100%" fill="white" />
-				{#each holes as hole, i (i)}
-					<path d={hole} fill="black" />
+				{#each holes as hole (hole.id)}
+					<g in:iris={{ cx: hole.cx, cy: hole.cy }}>
+						<path d={hole.d} fill="black" />
+					</g>
 				{/each}
 				<!-- Carve excluded sub-regions back out: re-cover them with hatch, keep them dimmed. -->
 				{#each excludeHoles as ex, i (i)}
@@ -153,12 +193,16 @@
 			<!-- Frame band = union(reveal) minus erode(union(reveal)). Both layers are rasterised
 			     unions, so touching cuts merge with no internal line. -->
 			<mask id="tut-frame">
-				{#each frameHoles as hole, i (i)}
-					<path d={hole} fill="white" />
+				{#each frameHoles as hole (hole.id)}
+					<g in:iris={{ cx: hole.cx, cy: hole.cy }}>
+						<path d={hole.d} fill="white" />
+					</g>
 				{/each}
 				<g filter="url(#tut-erode)">
-					{#each frameHoles as hole, i (i)}
-						<path d={hole} fill="black" />
+					{#each frameHoles as hole (hole.id)}
+						<g in:iris={{ cx: hole.cx, cy: hole.cy }}>
+							<path d={hole.d} fill="black" />
+						</g>
 					{/each}
 				</g>
 			</mask>
@@ -169,34 +213,40 @@
 		<!-- Static frame around the combined revealed shape — matches the quest card border (bg-white/20). -->
 		<rect width="100%" height="100%" fill="#ffffff" fill-opacity="0.08" mask="url(#tut-frame)" />
 
-		<!-- Pulsing gold ring on the goal target(s) only — padded off the edge and softly glowing. -->
-		{#each rings as ring, i (i)}
-			<path
-				class="tut-ring"
-				d={ring}
-				fill="none"
-				stroke="#ffb800"
-				stroke-width="2.5"
-				filter="url(#tut-ring-glow)"
-			/>
-		{/each}
+		<!-- Pulsing gold ring on the goal target(s) only — padded off the edge and softly glowing.
+		     Keyed on the step index so each step entry tears the rings down and re-mounts them, letting
+		     `in:draw` trace the goal contour before the idle pulse takes over. -->
+		{#key tutorial.index}
+			{#each rings as ring, i (i)}
+				<path
+					class="tut-ring"
+					d={ring}
+					pathLength="1"
+					fill="none"
+					stroke="#ffb800"
+					stroke-width="1.5"
+					filter="url(#tut-ring-glow)"
+					in:traceDraw|global={{ speed: 2.5 }}
+				/>
+			{/each}
+		{/key}
 	</svg>
 {/if}
 
 <style>
 	.tut-ring {
-		animation: tut-ring-pulse 1.5s ease-in-out infinite;
+		animation: tut-ring-pulse 1.5s ease-in-out 0.46s infinite;
 	}
 
 	@keyframes tut-ring-pulse {
 		0%,
 		100% {
 			opacity: 0.55;
-			stroke-width: 2;
+			stroke-width: 1.25;
 		}
 		50% {
 			opacity: 1;
-			stroke-width: 4;
+			stroke-width: 2.5;
 		}
 	}
 </style>

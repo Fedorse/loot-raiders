@@ -95,6 +95,11 @@ export class Tutorial {
 	// signal may be non-zero on re-entry). Only one step is active at a time.
 	private baseline = 0;
 
+	// Guards setup() against re-running on the same step. The Coachmark effect re-fires enterStep()
+	// whenever `active` flips back to true (pause→resume toggles tutorial→paused→tutorial), so without
+	// this a resume would re-seed the live step — double-dropping items / resetting its baseline.
+	private lastSetupIndex = -1;
+
 	// Latches when the mobile 'open-quests' step's sheet is opened, so that step can complete
 	// on the subsequent CLOSE (its only "was opened" signal is the reactive sheet flag).
 	private questSheetOpened = $state(false);
@@ -198,10 +203,15 @@ export class Tutorial {
 
 	start() {
 		this.index = 0;
+		this.lastSetupIndex = -1;
 		this.gameLoop.startTutorial();
 	}
 
+	// Seeds the current step once. Idempotent across resumes: a step's setup() runs only the first
+	// time we enter that index, so resuming a paused tutorial restores the same board untouched.
 	enterStep() {
+		if (this.lastSetupIndex === this.index) return;
+		this.lastSetupIndex = this.index;
 		this.step?.setup?.();
 	}
 
@@ -226,6 +236,7 @@ export class Tutorial {
 	private finish() {
 		writeSeen();
 		this.index = 0;
+		this.lastSetupIndex = -1;
 		this.gameLoop.restart();
 	}
 

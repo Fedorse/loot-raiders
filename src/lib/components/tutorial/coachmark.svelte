@@ -4,7 +4,7 @@
 	import { trackLayout } from '$lib/utils';
 	import type { GestureKind } from '$lib/store/tutorial.svelte';
 
-	const { tutorial, audio, device, inventory, loot } = getGameContext();
+	const { tutorial, audio, device, inventory, loot, interaction } = getGameContext();
 
 	const GESTURE_LABEL: Record<GestureKind, string> = {
 		tap: 'Tap',
@@ -36,6 +36,19 @@
 		if (s.gestures?.length) return s.gestures;
 		return [badgeToGesture(s.badge)];
 	});
+
+	// Desktop badges that map to a mouse action get an animated mouse demo (mirroring the mobile
+	// gesture demos) instead of a text plaque. The single icon highlights the RIGHT button, so left
+	// click / drag flip it horizontally. Other badges (note, finish) keep the text plaque.
+	type MouseKind = 'left' | 'right' | 'drag';
+
+	const MOUSE_BADGE: Record<string, MouseKind> = {
+		click: 'left',
+		'right-click': 'right',
+		drag: 'drag'
+	};
+
+	const mouseKind = $derived(tutorial.step ? (MOUSE_BADGE[tutorial.step.badge] ?? null) : null);
 
 	const segments = $derived(Array.from({ length: tutorial.total }, (_, i) => i));
 
@@ -73,12 +86,15 @@
 	}
 
 	// Per-placement position of the diamond caret. `--c` (set inline) is the tip's offset along the
-	// card edge, toward the anchor; the −7px / negative margins tuck the 14px diamond half behind the card.
+	// card edge, toward the anchor; the −7px / negative margins straddle the 14px diamond on the edge.
+	// Each placement also borders only the two outward-facing sides of the rotated square, so the tip
+	// reads as a notch in the card outline (the diamond sits on top of the body, its fill hiding the
+	// card border segment behind it, and these two edges continue the outline out to the point).
 	const caretPos: Record<Placement, string> = {
-		right: '-left-[7px] top-[var(--c)] -mt-[7px]',
-		left: '-right-[7px] top-[var(--c)] -mt-[7px]',
-		bottom: '-top-[7px] left-[var(--c)] -ml-[7px]',
-		top: '-bottom-[7px] left-[var(--c)] -ml-[7px]'
+		right: '-left-[7px] top-[var(--c)] -mt-[7px] border-b-[0.5px] border-l-[0.5px]',
+		left: '-right-[7px] top-[var(--c)] -mt-[7px] border-t-[0.5px] border-r-[0.5px]',
+		bottom: '-top-[7px] left-[var(--c)] -ml-[7px] border-t-[0.5px] border-l-[0.5px]',
+		top: '-bottom-[7px] left-[var(--c)] -ml-[7px] border-r-[0.5px] border-b-[0.5px]'
 	};
 
 	// The card points at the step's GOAL (the pulsing element) when there is one, otherwise at
@@ -147,8 +163,12 @@
 		void tutorial.index;
 		// Re-measure when a seeded item mounts, so an item-anchored card finds its target. `loot.phase`
 		// covers drop items, which only render their slot once the scan-in animation finishes.
+		// `interaction.status` covers drag: the source slot swaps to EmptySlot while dragging and
+		// remounts a fresh data-tut-item node on drop, so without re-running here the card would stay
+		// hidden after an invalid/in-place drop (trackLayout keeps observing the removed node).
 		void inventory.items.length;
 		void loot.phase;
+		void interaction.status;
 		const card = cardEl;
 		if ((!id && !itemDef) || !card) {
 			pos = null;
@@ -234,9 +254,8 @@
 			style={posStyle}
 		>
 			{#if pos}
-				<!-- Diamond caret: only its two outward gold edges show past the opaque card body. -->
 				<span
-					class="absolute z-0 h-3.5 w-3.5 rotate-45 border-[1.5px] border-[#ffb800] bg-[#0e1422] {caretPos[
+					class="pointer-events-none absolute z-20 h-3.5 w-3.5 rotate-45 border-[#ffb800]/50 bg-[#0e1422] {caretPos[
 						pos.placement
 					]}"
 					style="--c:{pos.caret}px"
@@ -249,28 +268,33 @@
 				<div class="mb-2 flex items-center gap-2">
 					{@render progress()}
 				</div>
+				<div class="flex items-start justify-between gap-2 pr-1">
+					<div class="flex">
+						{#if mouseKind}
+							{@render mouseDemo(mouseKind)}
+						{/if}
 
-				<span
-					class="mb-1.5 inline-block rounded border border-[#56a8e0]/40 bg-[#56a8e0]/15 px-1.5 py-0.5 font-['Saira_Condensed'] text-[10px] font-bold tracking-[0.12em] text-[#8cc6f5] uppercase"
-					>{tutorial.step.badge}</span
-				>
+						<h2
+							class="font-['Saira_Condensed'] text-base font-extrabold tracking-wide text-white uppercase 2xl:text-lg"
+						>
+							{tutorial.step.title}
+						</h2>
+					</div>
+				</div>
 
-				<h2
-					class="font-['Saira_Condensed'] text-base font-extrabold tracking-wide text-white uppercase 2xl:text-lg"
-				>
-					{tutorial.step.title}
-				</h2>
 				<p class="mt-1 text-[11.5px] leading-snug text-[#9aa6b6] 2xl:text-[12px]">
 					{tutorial.step.description}
 				</p>
 
 				{#if tutorial.isActionStep}
-					<button
-						onclick={skip}
-						class="mt-2.5 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors hover:text-white/75"
-					>
-						Skip step ›
-					</button>
+					<div class="flex w-full justify-end">
+						<button
+							onclick={skip}
+							class="mt-2.5 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors hover:text-white/60"
+						>
+							Skip step ›
+						</button>
+					</div>
 				{:else}
 					<button
 						onclick={go}
@@ -297,6 +321,23 @@
 					: 'bg-white/12'}"
 			></span>
 		{/each}
+	</div>
+{/snippet}
+
+{#snippet mouseDemo(kind: MouseKind)}
+	<div class=" flex shrink-0 flex-col items-center gap-1 rounded-lg pr-2">
+		<div
+			class="overflow-hidden rounded-md p-1 {kind === 'right' ? '-scale-x-100' : ''} bg-gray-800"
+		>
+			<img
+				src="/assets/ui/icon-actions.webp"
+				alt=""
+				draggable="false"
+				class="block h-5 w-5 object-contain {kind === 'drag'
+					? 'tut-m-drag'
+					: 'tut-m-press'} motion-reduce:animate-none!"
+			/>
+		</div>
 	</div>
 {/snippet}
 
@@ -343,6 +384,36 @@
 <style>
 	/* Animated finger-gesture demos shown in place of the text badge on the mobile coachmark.
 	   Disabled under prefers-reduced-motion via `motion-reduce:animate-none!` on each element. */
+	.tut-m-press {
+		animation: tut-m-press 1.3s ease-in-out infinite;
+	}
+	.tut-m-drag {
+		animation: tut-m-drag 1.6s ease-in-out infinite;
+	}
+	@keyframes tut-m-press {
+		0%,
+		100% {
+			transform: translateY(0) scale(1);
+		}
+		30% {
+			transform: translateY(1px) scale(0.9);
+		}
+		55% {
+			transform: translateY(0) scale(1);
+		}
+	}
+	@keyframes tut-m-drag {
+		0% {
+			transform: translateX(-3px);
+		}
+		50% {
+			transform: translateX(3px);
+		}
+		100% {
+			transform: translateX(-3px);
+		}
+	}
+
 	.tut-g-tap {
 		animation: tut-g-tap 1.3s ease-in-out infinite;
 	}
