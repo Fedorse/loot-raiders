@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Slot from '$lib/components/slot.svelte';
+	import Slot from './slot.svelte';
 	import { getStorageConfig } from '$lib/config/storages';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { getAugmentUpgrade } from '$lib/config/augments';

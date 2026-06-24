@@ -1,17 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import DragLayer from '$lib/components/drag-layer.svelte';
-	import ContextMenu from '$lib/components/context-menu.svelte';
-	import TooltipOverlay from '$lib/components/tooltip-overlay.svelte';
-	import RecycleModal from '$lib/components/recycle-modal.svelte';
-	import AugmentPanel from '$lib/components/augment-panel.svelte';
+	import DragLayer from '$lib/components/inventory/drag-layer.svelte';
+	import ContextMenu from '$lib/components/inventory/context-menu.svelte';
+	import TooltipOverlay from '$lib/components/inventory/tooltip-overlay.svelte';
+	import RecycleModal from '$lib/components/inventory/recycle-modal.svelte';
+	import AugmentPanel from '$lib/components/augment/augment-panel.svelte';
 	import GameMenu from '$lib/components/menu/game-menu.svelte';
-	import Coachmark from '$lib/components/coachmark.svelte';
-	import TutorialHighlight from '$lib/components/tutorial-highlight.svelte';
-	import MobileGate from '$lib/components/mobile-gate.svelte';
-	import QuestBottomSheet from '$lib/components/quest-bottom-sheet.svelte';
-	import LeaderboardModal from '$lib/components/leaderboard-modal.svelte';
-	import Toasts from '$lib/components/toasts.svelte';
+	import Coachmark from '$lib/components/tutorial/coachmark.svelte';
+	import TutorialHighlight from '$lib/components/tutorial/tutorial-highlight.svelte';
+	import MobileGate from '$lib/components/hud/mobile-gate.svelte';
+	import QuestBottomSheet from '$lib/components/quest/quest-bottom-sheet.svelte';
+	import LeaderboardModal from '$lib/components/leaderboard/leaderboard-modal.svelte';
+	import Toasts from '$lib/components/hud/toasts.svelte';
 	import { Preloader } from '$lib/motion-core';
 	import { initGame } from '$lib/store/game.svelte';
 	import { assetLoader } from '$lib/store/asset-loader.svelte';

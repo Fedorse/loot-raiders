@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AttachmentSlot from '$lib/components/attachment-slot.svelte';
+	import AttachmentSlot from './attachment-slot.svelte';
 	import Scanner from './scanner.svelte';
 	import { getDef } from '$lib/config/items';
 	import { getRarityStyle } from '$lib/config/rarity';

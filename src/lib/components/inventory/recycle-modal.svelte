@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getDef } from '$lib/config/items';
-	import ItemCard from '$lib/components/item-card.svelte';
+	import ItemCard from './item-card.svelte';
 	import type { InstanceItem } from '$lib/types';
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Shortcuts from '$lib/components/shortcuts.svelte';
+	import Shortcuts from '$lib/components/hud/shortcuts.svelte';
 	import { getGameContext } from '$lib/store/game.svelte';
-	import StorageGrid from '$lib/components/storage-grid.svelte';
+	import StorageGrid from '$lib/components/inventory/storage-grid.svelte';
 	import { ElectricBorder } from '$lib/motion-core';
-	import QuestBar from '$lib/components/quest-bar.svelte';
-	import DropZone from '$lib/components/drop-zone.svelte';
-	import QuestWidget from '$lib/components/quest-widget.svelte';
+	import QuestBar from '$lib/components/quest/quest-bar.svelte';
+	import DropZone from '$lib/components/inventory/drop-zone.svelte';
+	import QuestWidget from '$lib/components/quest/quest-widget.svelte';
 	import Disclaimer from '$lib/components/menu/disclaimer.svelte';
 	import { formatTime } from '$lib/utils';
 
