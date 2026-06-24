@@ -1,14 +1,44 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
-	import { fly } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
+	import { trackLayout } from '$lib/utils';
+	import type { GestureKind } from '$lib/store/tutorial.svelte';
 
-	const { tutorial, audio } = getGameContext();
+	const { tutorial, audio, device, inventory, loot } = getGameContext();
+
+	const GESTURE_LABEL: Record<GestureKind, string> = {
+		tap: 'Tap',
+		drag: 'Drag',
+		'double-tap': '2× Tap',
+		hold: 'Hold'
+	};
+
+	// Map a step's badge to the finger gesture its action needs, so the mobile card animates the
+	// gesture instead of showing a text badge. Info/CTA steps (note, finish) fall back to a tap.
+	function badgeToGesture(badge: string): GestureKind {
+		switch (badge) {
+			case 'drag':
+				return 'drag';
+			case 'long-press':
+				return 'hold';
+			default:
+				return 'tap';
+		}
+	}
+
+	// Mobile never anchors the card to elements (it would cover the small landscape HUD); it sits in
+	// the corner, so the only spatial cue is the highlight overlay. The card just shows the gesture.
+	const isMobile = $derived(device.isCoarsePointer);
+
+	const mobileGestures = $derived.by<GestureKind[]>(() => {
+		const s = tutorial.step;
+		if (!s) return [];
+		if (s.gestures?.length) return s.gestures;
+		return [badgeToGesture(s.badge)];
+	});
 
 	const segments = $derived(Array.from({ length: tutorial.total }, (_, i) => i));
 
-	// Run the active step's setup() on entry (ADR-0004): seeds the scripted state before the
-	// player can act. Re-runs only when the step index changes, never on unrelated reads.
 	$effect(() => {
 		if (!tutorial.active) return;
 		void tutorial.index;
@@ -33,63 +63,396 @@
 		audio.play('click');
 		tutorial.skip();
 	}
+
+	type Placement = 'right' | 'left' | 'top' | 'bottom';
+	interface Pos {
+		x: number;
+		y: number;
+		placement: Placement;
+		caret: number;
+	}
+
+	// Per-placement position of the diamond caret. `--c` (set inline) is the tip's offset along the
+	// card edge, toward the anchor; the −7px / negative margins tuck the 14px diamond half behind the card.
+	const caretPos: Record<Placement, string> = {
+		right: '-left-[7px] top-[var(--c)] -mt-[7px]',
+		left: '-right-[7px] top-[var(--c)] -mt-[7px]',
+		bottom: '-top-[7px] left-[var(--c)] -ml-[7px]',
+		top: '-bottom-[7px] left-[var(--c)] -ml-[7px]'
+	};
+
+	// The card points at the step's GOAL (the pulsing element) when there is one, otherwise at
+	// the first revealed target. Info steps have neither → it stays centered at the bottom.
+	const anchorId = $derived(
+		tutorial.active ? (tutorial.step?.pulse?.[0] ?? tutorial.step?.targets?.[0] ?? null) : null
+	);
+
+	// When set, the card anchors to a live item (by defId, via `data-tut-item`) instead of a HUD
+	// element — used to park the card next to the specific item a step is about.
+	const itemAnchorDef = $derived(
+		tutorial.active ? (tutorial.step?.itemAnchor ?? tutorial.step?.itemPulse?.[0] ?? null) : null
+	);
+
+	let cardEl = $state<HTMLElement>();
+	let pos = $state<Pos | null>(null);
+
+	// Anchored steps wait one frame for the first measurement so the card never flashes at the
+	// fallback spot before snapping next to the target.
+	const ready = $derived((!anchorId && !itemAnchorDef) || pos !== null);
+	const posStyle = $derived(
+		pos
+			? `left:0;top:0;transform:translate(${pos.x}px,${pos.y}px)`
+			: 'left:50%;top:50%;transform:translate(-50%,-50%)'
+	);
+
+	function place(a: DOMRect, cw: number, ch: number): Pos {
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+		const M = 12;
+		const GAP = 16;
+		const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(v, hi));
+		const cx = a.left + a.width / 2;
+		const cy = a.top + a.height / 2;
+
+		let placement: Placement;
+		if (vw - a.right >= cw + GAP + M) placement = 'right';
+		else if (a.left >= cw + GAP + M) placement = 'left';
+		else if (vh - a.bottom >= ch + GAP + M) placement = 'bottom';
+		else placement = 'top';
+
+		let x: number;
+		let y: number;
+		let caret: number;
+		if (placement === 'right' || placement === 'left') {
+			x = placement === 'right' ? a.right + GAP : a.left - GAP - cw;
+			y = clamp(cy - ch / 2, M, vh - ch - M);
+			caret = clamp(cy - y, 16, ch - 16);
+		} else {
+			y = placement === 'bottom' ? a.bottom + GAP : a.top - GAP - ch;
+			x = clamp(cx - cw / 2, M, vw - cw - M);
+			caret = clamp(cx - x, 16, cw - 16);
+		}
+		return { x, y, placement, caret };
+	}
+
+	// Re-measure on step change and on any layout shift, mirroring the highlight overlay so the
+	// card and the cutout stay locked to the same moving target.
+	$effect(() => {
+		if (!tutorial.active || isMobile) {
+			pos = null;
+			return;
+		}
+		const id = anchorId;
+		const itemDef = itemAnchorDef;
+		void tutorial.index;
+		// Re-measure when a seeded item mounts, so an item-anchored card finds its target. `loot.phase`
+		// covers drop items, which only render their slot once the scan-in animation finishes.
+		void inventory.items.length;
+		void loot.phase;
+		const card = cardEl;
+		if ((!id && !itemDef) || !card) {
+			pos = null;
+			return;
+		}
+
+		const findAnchor = (): HTMLElement | null =>
+			itemDef
+				? document.querySelector<HTMLElement>(`[data-tut-item="${itemDef}"]`)
+				: document.querySelector<HTMLElement>(`[data-tut="${id}"]`);
+
+		const measure = () => {
+			const el = findAnchor();
+			if (!el) {
+				pos = null;
+				return;
+			}
+			const a = el.getBoundingClientRect();
+			const c = card.getBoundingClientRect();
+			pos = place(a, c.width, c.height);
+		};
+
+		return trackLayout(() => {
+			const el = findAnchor();
+			return el ? [card, el] : [card];
+		}, measure);
+	});
 </script>
 
 {#if tutorial.active && tutorial.step}
-	<div
-		class="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-6 pointer-coarse:pb-4"
-		transition:fly|global={{ y: 24, duration: 280 }}
-	>
+	{#if isMobile}
+		<!-- Mobile: a fixed, unanchored card pinned to the bottom-right corner. Anchoring to HUD
+		     elements covers the small landscape screen, so the highlight overlay is the spatial cue. -->
 		<div
-			class="pointer-events-auto w-full max-w-[440px] rounded-lg border border-[#2a2f4c] bg-[#0c101c]/90 p-5 shadow-[0_8px_30px_rgba(0,0,0,0.45)] backdrop-blur-md 2xl:max-w-[480px] 2xl:p-6 pointer-coarse:max-w-[380px] pointer-coarse:p-3.5"
+			class="fixed right-3 bottom-3 z-40 max-h-[calc(100dvh-1.5rem)] w-[min(480px,calc(100vw-1.5rem))] overflow-y-auto overscroll-contain rounded-xl border-[0.5px] border-[#ffb800]/50 bg-[#0e1422]/95 px-3.5 py-2.5 shadow-[0_14px_40px_rgba(0,0,0,0.6)] backdrop-blur-sm"
 		>
-			<div class="mb-3 flex items-center gap-3 pointer-coarse:mb-2 pointer-coarse:gap-2">
-				<span
-					class="rounded bg-primary/15 px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider text-primary uppercase 2xl:text-[11px] pointer-coarse:text-[9px]"
-					>{tutorial.step.badge}</span
-				>
-				<span
-					class="font-mono text-[10px] font-semibold tracking-wider text-muted uppercase tabular-nums 2xl:text-[11px] pointer-coarse:text-[9px]"
-					>Step {tutorial.stepNumber} of {tutorial.total}</span
-				>
-				<div class="ml-auto flex items-center gap-1">
-					{#each segments as i (i)}
-						<span
-							class="h-1 w-5 rounded-full transition-colors 2xl:w-6 pointer-coarse:w-4 {i <
-							tutorial.index
-								? 'bg-primary'
-								: 'bg-white/12'}"
-						></span>
-					{/each}
-				</div>
+			<div class="mb-2 flex items-center gap-2.5">
+				{@render progress()}
+				{#if tutorial.isActionStep}
+					<button
+						onclick={skip}
+						class="shrink-0 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors active:text-white/75"
+					>
+						Skip ›
+					</button>
+				{/if}
 			</div>
 
-			<h2
-				class="mb-1.5 text-lg font-extrabold tracking-wide text-white 2xl:text-xl pointer-coarse:mb-1 pointer-coarse:text-base"
-			>
-				{tutorial.step.title}
-			</h2>
-			<p
-				class="mb-4 text-sm leading-relaxed text-white/70 2xl:text-[15px] pointer-coarse:mb-3 pointer-coarse:text-[13px]"
-			>
-				{tutorial.step.description}
-			</p>
+			<div class="flex items-center gap-3">
+				<div class="flex shrink-0 items-start gap-2">
+					{#each mobileGestures as g (g)}
+						{@render gestureDemo(g)}
+					{/each}
+				</div>
 
-			{#if tutorial.isActionStep}
-				<button
-					onclick={skip}
-					class="flex w-full items-center justify-center gap-2 rounded-md border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-semibold tracking-wide text-white/60 transition-all hover:bg-white/10 hover:text-white/90 active:scale-[0.99] pointer-coarse:py-2 pointer-coarse:text-[13px]"
+				<div class="min-w-0 flex-1">
+					<h2
+						class="font-['Saira_Condensed'] text-base font-extrabold tracking-wide text-white uppercase"
+					>
+						{tutorial.step.title}
+					</h2>
+					<p class="mt-0.5 text-[11.5px] leading-snug text-[#9aa6b6]">
+						{tutorial.step.description}
+					</p>
+				</div>
+
+				{#if !tutorial.isActionStep}
+					<button
+						onclick={go}
+						class="shrink-0 self-center rounded-md bg-primary px-4 py-1.5 font-['Saira_Condensed'] text-sm font-extrabold tracking-wide whitespace-nowrap text-primary-foreground transition-all active:scale-[0.99]"
+					>
+						{tutorial.step.cta}
+					</button>
+				{/if}
+			</div>
+		</div>
+	{:else}
+		<div
+			bind:this={cardEl}
+			class="fixed z-40 w-[280px] transition-opacity duration-200 2xl:w-[310px] {ready
+				? 'pointer-events-auto opacity-100'
+				: 'pointer-events-none opacity-0'}"
+			style={posStyle}
+		>
+			{#if pos}
+				<!-- Diamond caret: only its two outward gold edges show past the opaque card body. -->
+				<span
+					class="absolute z-0 h-3.5 w-3.5 rotate-45 border-[1.5px] border-[#ffb800] bg-[#0e1422] {caretPos[
+						pos.placement
+					]}"
+					style="--c:{pos.caret}px"
+				></span>
+			{/if}
+
+			<div
+				class="relative z-10 rounded-xl border-[0.5px] border-[#ffb800]/50 bg-[#0e1422] p-3 shadow-[0_14px_40px_rgba(0,0,0,0.6)]"
+			>
+				<div class="mb-2 flex items-center gap-2">
+					{@render progress()}
+				</div>
+
+				<span
+					class="mb-1.5 inline-block rounded border border-[#56a8e0]/40 bg-[#56a8e0]/15 px-1.5 py-0.5 font-['Saira_Condensed'] text-[10px] font-bold tracking-[0.12em] text-[#8cc6f5] uppercase"
+					>{tutorial.step.badge}</span
 				>
-					Skip this step
-				</button>
+
+				<h2
+					class="font-['Saira_Condensed'] text-base font-extrabold tracking-wide text-white uppercase 2xl:text-lg"
+				>
+					{tutorial.step.title}
+				</h2>
+				<p class="mt-1 text-[11.5px] leading-snug text-[#9aa6b6] 2xl:text-[12px]">
+					{tutorial.step.description}
+				</p>
+
+				{#if tutorial.isActionStep}
+					<button
+						onclick={skip}
+						class="mt-2.5 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors hover:text-white/75"
+					>
+						Skip step ›
+					</button>
+				{:else}
+					<button
+						onclick={go}
+						class="mt-2.5 w-full rounded-md bg-primary px-4 py-1.5 font-['Saira_Condensed'] text-sm font-extrabold tracking-wide text-primary-foreground transition-all hover:bg-primary-hover active:scale-[0.99]"
+					>
+						{tutorial.step.cta}
+					</button>
+				{/if}
+			</div>
+		</div>
+	{/if}
+{/if}
+
+{#snippet progress()}
+	<span
+		class="shrink-0 font-['Saira_Condensed'] text-[10px] font-bold tracking-[0.16em] text-[#ffb800] uppercase"
+		>Step {tutorial.stepNumber}/{tutorial.total}</span
+	>
+	<div class="flex flex-1 items-center gap-1">
+		{#each segments as i (i)}
+			<span
+				class="h-1 flex-1 rounded-full transition-colors {i <= tutorial.index
+					? 'bg-[#ffb800]'
+					: 'bg-white/12'}"
+			></span>
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet gestureDemo(kind: GestureKind)}
+	{@const gold = kind === 'double-tap' || kind === 'hold'}
+	<div
+		class="flex flex-col items-center gap-1 rounded-lg border px-2.5 py-1.5 {gold
+			? 'border-[#ffb800]/35 bg-[#ffb800]/10'
+			: 'border-[#56a8e0]/35 bg-[#56a8e0]/10'}"
+	>
+		<div class="relative flex h-6 w-7 items-center justify-center">
+			{#if kind === 'tap'}
+				<span
+					class="tut-g-tapring absolute h-[22px] w-[22px] rounded-full border-2 border-[#8cc6f5] motion-reduce:animate-none!"
+				></span>
+				<span
+					class="tut-g-tap block h-4 w-4 rounded-full border-2 border-[#8cc6f5] bg-[#56a8e0]/25 motion-reduce:animate-none!"
+				></span>
+			{:else if kind === 'drag'}
+				<span
+					class="tut-g-drag block h-4 w-4 rounded-full border-2 border-[#8cc6f5] bg-[#56a8e0]/25 motion-reduce:animate-none!"
+				></span>
+			{:else if kind === 'double-tap'}
+				<span
+					class="tut-g-dtap block h-4 w-4 rounded-full border-2 border-[#ffb800] bg-[#ffb800]/20 motion-reduce:animate-none!"
+				></span>
 			{:else}
-				<button
-					onclick={go}
-					class="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 font-extrabold tracking-wide text-primary-foreground transition-all hover:bg-primary-hover active:scale-[0.99] 2xl:py-3.5 pointer-coarse:py-2.5 pointer-coarse:text-sm"
-				>
-					{tutorial.step.cta}
-				</button>
+				<span
+					class="tut-g-holdring absolute h-[22px] w-[22px] rounded-full border-2 border-[#ffb800] motion-reduce:animate-none!"
+				></span>
+				<span
+					class="tut-g-hold block h-4 w-4 rounded-full border-2 border-white/70 bg-white/15 motion-reduce:animate-none!"
+				></span>
 			{/if}
 		</div>
+		<span
+			class="font-['Saira_Condensed'] text-[8px] font-bold tracking-[0.12em] uppercase {gold
+				? 'text-[#ffb800]'
+				: 'text-[#8cc6f5]'}">{GESTURE_LABEL[kind]}</span
+		>
 	</div>
-{/if}
+{/snippet}
+
+<style>
+	/* Animated finger-gesture demos shown in place of the text badge on the mobile coachmark.
+	   Disabled under prefers-reduced-motion via `motion-reduce:animate-none!` on each element. */
+	.tut-g-tap {
+		animation: tut-g-tap 1.3s ease-in-out infinite;
+	}
+	.tut-g-tapring {
+		animation: tut-g-tapring 1.3s ease-in-out infinite;
+	}
+	.tut-g-drag {
+		animation: tut-g-drag 1.6s ease-in-out infinite;
+	}
+	.tut-g-dtap {
+		animation: tut-g-dtap 1.3s ease-in-out infinite;
+	}
+	.tut-g-hold {
+		animation: tut-g-hold 1.8s ease-in-out infinite;
+	}
+	.tut-g-holdring {
+		animation: tut-g-holdring 1.8s ease-in-out infinite;
+	}
+
+	@keyframes tut-g-tap {
+		0%,
+		100% {
+			transform: scale(1);
+			opacity: 0.85;
+		}
+		30% {
+			transform: scale(0.7);
+			opacity: 1;
+		}
+		55% {
+			transform: scale(1);
+			opacity: 0.85;
+		}
+	}
+	@keyframes tut-g-tapring {
+		0%,
+		20% {
+			opacity: 0;
+			transform: scale(0.5);
+		}
+		45% {
+			opacity: 0.8;
+			transform: scale(1);
+		}
+		75%,
+		100% {
+			opacity: 0;
+			transform: scale(1.3);
+		}
+	}
+	@keyframes tut-g-drag {
+		0% {
+			transform: translate(-7px, -5px);
+		}
+		50% {
+			transform: translate(7px, 5px);
+		}
+		100% {
+			transform: translate(-7px, -5px);
+		}
+	}
+	@keyframes tut-g-dtap {
+		0%,
+		100% {
+			transform: scale(1);
+			opacity: 0.85;
+		}
+		18% {
+			transform: scale(0.7);
+			opacity: 1;
+		}
+		36% {
+			transform: scale(1);
+		}
+		54% {
+			transform: scale(0.7);
+			opacity: 1;
+		}
+		72% {
+			transform: scale(1);
+			opacity: 0.85;
+		}
+	}
+	@keyframes tut-g-hold {
+		0%,
+		12% {
+			transform: scale(1);
+		}
+		45%,
+		72% {
+			transform: scale(0.82);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+	@keyframes tut-g-holdring {
+		0%,
+		12% {
+			opacity: 0;
+			transform: scale(0.5);
+		}
+		45% {
+			opacity: 0.9;
+			transform: scale(1);
+		}
+		80%,
+		100% {
+			opacity: 0;
+			transform: scale(1.25);
+		}
+	}
+</style>

@@ -137,6 +137,10 @@ export class Inventory {
 
 	// ---- Write accessors ----
 
+	placeItem(loc: ItemLocation, item: InstanceItem): void {
+		this.setItem(loc, item);
+	}
+
 	private setItem(loc: ItemLocation, item: InstanceItem | null): void {
 		if (loc.type === 'trash') return;
 		if (loc.type === 'slot') {

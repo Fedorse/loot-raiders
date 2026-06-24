@@ -5,11 +5,15 @@
 	import { getRarityStyleTooltip } from '$lib/config/rarity';
 	import { clickOutside } from '$lib/actions/actions';
 
-	const { overlay, inventory } = getGameContext();
+	const { overlay, inventory, tutorial } = getGameContext();
 	const menuData = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
 	const def = $derived(menuData ? getDef(menuData.slot.item.defId) : null);
+
+	// Drop is enabled only on its teaching step; recycle stays unlocked from its step onward.
+	const dropDisabled = $derived(!tutorial.canDropFromMenu);
+	const recycleDisabled = $derived(!tutorial.canRecycle);
 </script>
 
 {#if menuData && def}
@@ -67,7 +71,8 @@
 		<div class=" border-t border-modal-border"></div>
 
 		<button
-			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
+			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent disabled:cursor-not-allowed disabled:text-muted disabled:opacity-40 disabled:hover:bg-transparent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
+			disabled={dropDisabled}
 			onclick={() => {
 				inventory.removeItem(menuData.slot.location);
 				close();
@@ -78,7 +83,8 @@
 
 		{#if def.recycling?.length}
 			<button
-				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt disabled:cursor-not-allowed disabled:text-muted disabled:opacity-40 disabled:hover:bg-transparent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
+				disabled={recycleDisabled}
 				onclick={() => {
 					overlay.openRecycleModal(menuData.slot.item, menuData.slot.location);
 					close();

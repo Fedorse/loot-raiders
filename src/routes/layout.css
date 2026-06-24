@@ -174,12 +174,11 @@ body.dragging-weapon [data-slot-type='attachment'] {
 	pointer-events: none !important;
 }
 
-/* Если тащим аттачмент — они снова активны */
 body.dragging-attachment [data-slot-type='attachment'] {
 	pointer-events: auto !important;
 }
 
-/* Tutorial interaction gate (ADR-0005): the app root goes pointer-transparent while a
+/* Tutorial interaction gate  the app root goes pointer-transparent while a
  * step is active; only the step's resolved targets are clickable. Reuses the same idiom
  * as the dragging-weapon gate above and sidesteps the backdrop-blur stacking-context trap
  * (z-index promotion can't escape a panel's backdrop-filter context). */

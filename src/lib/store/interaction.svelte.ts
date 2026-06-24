@@ -4,6 +4,7 @@ import type { Inventory } from './inventory.svelte';
 import type { Overlay } from './overlay.svelte';
 import type { Selection } from './selection.svelte';
 import type { AudioManager } from './audio.svelte';
+import type { Tutorial } from './tutorial.svelte';
 import { validateDrop, getDropActionType } from '$lib/inventory-validation';
 
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
@@ -20,6 +21,8 @@ export class Interaction {
 	private selection!: Selection;
 	private audio!: AudioManager;
 
+	private tutorial?: Tutorial;
+
 	status = $state<InteractionStatus>('idle');
 	dragState = $state<DragState | null>(null);
 
@@ -32,11 +35,17 @@ export class Interaction {
 		return getDropActionType(this.dragState, this.hoveredSlot);
 	});
 
-	isValidDrop = $derived(
-		this.dragState && this.hoveredSlot
-			? validateDrop(this.dragState, this.hoveredSlot, this.inventory.getItem.bind(this.inventory))
-			: false
-	);
+	isValidDrop = $derived.by(() => {
+		if (!this.dragState || !this.hoveredSlot) return false;
+
+		if (this.hoveredSlot.location.type === 'trash' && !(this.tutorial?.canDrop ?? true))
+			return false;
+		return validateDrop(
+			this.dragState,
+			this.hoveredSlot,
+			this.inventory.getItem.bind(this.inventory)
+		);
+	});
 
 	dragType = $derived.by(() => {
 		if (!this.dragState) return null;
@@ -61,6 +70,10 @@ export class Interaction {
 		this.overlay = overlay;
 		this.selection = selection;
 		this.audio = audio;
+	}
+
+	setTutorial(tutorial: Tutorial) {
+		this.tutorial = tutorial;
 	}
 
 	startInteraction(slot: SlotState, e: PointerEvent, node: HTMLElement) {

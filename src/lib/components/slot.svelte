@@ -33,7 +33,10 @@
 	const showInvalidHint = $derived(interaction.shouldShowInvalidHint(slotState));
 </script>
 
-<div class="{className}  relative overflow-hidden rounded-lg">
+<div
+	class="{className}  relative overflow-hidden rounded-lg"
+	data-tut-slot={location.type === 'slot' ? `${location.storageId}-${location.index}` : null}
+>
 	{@render gradientBorder()}
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 

@@ -3,12 +3,13 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import type { SlotState, ItemLocation } from '$lib/types';
 
-	const { interaction } = getGameContext();
+	const { interaction, tutorial } = getGameContext();
 
 	const trashLocation: ItemLocation = { type: 'trash' };
 	const trashSlotState: SlotState = { location: trashLocation, item: null };
 
-	const isDragging = $derived(interaction.status === 'dragging');
+	// While the tutorial keeps drops locked, the zone shows no drag/hover border.
+	const isDragging = $derived(interaction.status === 'dragging' && tutorial.canDrop);
 	const isHovered = $derived(isDragging && interaction.isHovered(trashLocation));
 </script>
 

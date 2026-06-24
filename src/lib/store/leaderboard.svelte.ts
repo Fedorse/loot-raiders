@@ -1,7 +1,9 @@
+import { browser } from '$app/environment';
+
 const STORAGE_NICKNAME = 'lr:nickname:v1';
 
 function readNickname(): string {
-	if (typeof window === 'undefined') return '';
+	if (!browser) return '';
 	try {
 		return window.localStorage.getItem(STORAGE_NICKNAME) ?? '';
 	} catch {
@@ -10,7 +12,7 @@ function readNickname(): string {
 }
 
 function writeNickname(value: string) {
-	if (typeof window === 'undefined') return;
+	if (!browser) return;
 	try {
 		window.localStorage.setItem(STORAGE_NICKNAME, value);
 	} catch {

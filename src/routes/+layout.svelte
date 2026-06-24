@@ -43,7 +43,9 @@
 
 	$effect(() => {
 		if (!videoEl) return;
-		if (gameLoop.inSession) {
+		// Pause the backdrop during Tutorial Mode — keep the scene still while the player reads
+		// coachmarks; the intro loops only in a live run.
+		if (gameLoop.status === 'playing') {
 			videoEl.play().catch(() => {});
 		} else {
 			videoEl.pause();
@@ -105,7 +107,7 @@
 <TooltipOverlay />
 <RecycleModal />
 <AugmentPanel />
-<GameMenu {showPreloader} />
+<GameMenu />
 <TutorialHighlight />
 <Coachmark />
 <QuestBottomSheet />
@@ -113,7 +115,7 @@
 <MobileGate />
 <Toasts />
 
-{#if showPreloader && !device.isPortraitMobile}
+<!-- {#if showPreloader && !device.isPortraitMobile}
 	<Preloader
 		class="bg-background"
 		images={PRELOAD_IMAGES}
@@ -123,4 +125,4 @@
 			showPreloader = false;
 		}}
 	/>
-{/if}
+{/if} -->

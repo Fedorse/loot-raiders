@@ -35,7 +35,19 @@ export class Game {
 		this.augment
 	);
 	leaderboard = new Leaderboard();
-	tutorial = new Tutorial(this.gameLoop, this.loot, this.inventory, this.quest, this.augment);
+	tutorial = new Tutorial(
+		this.gameLoop,
+		this.loot,
+		this.inventory,
+		this.quest,
+		this.augment,
+		this.overlay,
+		this.device
+	);
+
+	constructor() {
+		this.interaction.setTutorial(this.tutorial);
+	}
 }
 
 const GAME_KEY = Symbol('GAME');

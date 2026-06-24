@@ -30,6 +30,7 @@
 
 <div
 	class="{className} h-full w-full"
+	data-tut-item={item.defId}
 	{@attach droppable(slotState)}
 	{@attach !isAugment && draggable(slotState)}
 >

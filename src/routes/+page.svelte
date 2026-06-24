@@ -30,6 +30,7 @@
 						<div
 							class="flex h-6 items-center gap-1.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
 							data-wide-short-bar
+							data-tut="header-loot"
 						>
 							<span
 								class="text-[8px] font-semibold tracking-wider uppercase xl:text-[9px] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-[12px]"
@@ -75,17 +76,18 @@
 						<div
 							class="z-10 flex flex-col gap-1 rounded-tr-lg rounded-br-lg rounded-bl-lg bg-background/50 p-1 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
 							data-wide-short-panel
+							data-tut="loot-drop"
 						>
-							<div class="grid grid-cols-4" data-tut="loot-drop">
+							<div class="grid grid-cols-4">
 								<StorageGrid
 									storageId="lootBack"
 									class="aspect-square h-11 w-11 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-22 xl:w-22 2xl:h-24 2xl:w-24 3xl:h-28 3xl:w-28 4xl:h-32 4xl:w-32 landscape-narrow:h-12 landscape-narrow:w-12 landscape-mid:h-14 landscape-mid:w-14 wide-short:h-22 wide-short:w-22"
 								/>
 							</div>
-							<div class="hidden md:block pointer-coarse:hidden">
+							<div class="hidden md:block pointer-coarse:hidden" data-tut="loot-dropzone">
 								<DropZone />
 							</div>
-							<div class="hidden pointer-coarse:block">
+							<div class="hidden pointer-coarse:block" data-tut="quest-widget">
 								<QuestWidget onclick={() => overlay.openQuestSheet()} />
 							</div>
 						</div>
@@ -96,6 +98,7 @@
 						<div
 							class="flex flex-col gap-1 rounded-lg rounded-tl-lg rounded-tr-none bg-background/50 p-1 backdrop-blur-md md:gap-2 md:p-2 lg:gap-3 lg:p-3 xl:gap-3.5 xl:p-3.5 2xl:gap-4 2xl:p-4 3xl:gap-5 3xl:p-5 4xl:gap-6 4xl:p-6"
 							data-wide-short-panel
+							data-tut="full-backpack"
 						>
 							<div
 								class="flex h-full w-full justify-center gap-1 md:gap-1 lg:gap-4 xl:gap-5 2xl:gap-8 3xl:gap-10"
@@ -175,6 +178,7 @@
 		{@const penaltyPct = Math.round((1 - inventory.weightMultiplier) * 100)}
 		<div
 			class="flex h-6 items-center gap-2.5 rounded-t-lg bg-background/50 px-3 backdrop-blur-md md:h-8 lg:gap-3 lg:px-4 xl:gap-3.5 xl:px-4.5 2xl:h-9 2xl:gap-4 2xl:px-5 3xl:h-10 3xl:gap-5 3xl:px-6 4xl:h-11 4xl:gap-6 4xl:px-7"
+			data-tut="header-backpak"
 			data-wide-short-bar
 		>
 			<button

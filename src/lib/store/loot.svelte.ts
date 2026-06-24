@@ -30,9 +30,6 @@ export class LootGenerator {
 	cooldown = $state(0);
 	chestsOpened = $state(0);
 
-	// Tutorial Mode override (ADR-0004): when set, next() emits this deterministic drop
-	// instead of a random roll, so the real "Open Now" button still works but its output
-	// is scripted per step. Cleared on reset() when a session tears down.
 	scriptedDrop: (() => InstanceItem[]) | null = null;
 
 	constructor(

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
-	import { toggleFullscreen } from '$lib/fullscreen';
+	import { toggleFullscreen, enterFullscreen, isTouchDevice } from '$lib/fullscreen';
 	import AudioSettings from './audio-settings.svelte';
 	import Video from '$lib/ui-icon/video.svelte';
 	import Fullscreen from '$lib/ui-icon/fullscreen.svelte';
@@ -18,6 +18,7 @@
 
 	function howToPlay() {
 		audio.play('click');
+		if (isTouchDevice()) enterFullscreen();
 		tutorial.start();
 	}
 </script>
