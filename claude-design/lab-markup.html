@@ -1,0 +1,119 @@
+<!--
+  Лаборатория WebGPU — разметка canvas + панели (без JS-логики).
+  Биндинги исходного прототипа оставлены как ОРИЕНТИР:
+    {{ value }}            — текст/значение из стейта
+    onX="{{ handler }}"    — обработчик события
+    ref="{{ name }}"       — ссылка на DOM-узел (в Svelte: bind:this)
+    <sc-if value>          — условный рендер  (в Svelte: {#if})
+    <sc-for list as>       — список           (в Svelte: {#each})
+  Замени их на свою Svelte 5 реализацию. Инлайн-стили и структура — как в проде.
+  Акцент: #a78bfa. Отличие от WebGL-разметки: метки WEBGPU/WGSL + блок-фолбэк gpuError.
+-->
+<div data-screen-label="Лаборатория WebGPU" onPointerMove="{{ onMove }}" style="position:relative; width:100%; aspect-ratio:16/9; max-height:100vh; margin:0 auto; overflow:hidden; background:#05060a; font-family:'DM Mono',monospace; cursor:crosshair;">
+
+  <canvas ref="{{ glcanvas }}" style="position:absolute; inset:0; width:100%; height:100%; display:block;"></canvas>
+
+  <!-- фолбэк, если WebGPU недоступен -->
+  <sc-if value="{{ gpuError }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; color:#cfd6e4; font-family:'DM Mono',monospace; padding:40px;">
+      <div>
+        <div style="font-size:18px; color:#a78bfa; margin-bottom:10px;">WebGPU недоступен</div>
+        <div style="font-size:12px; color:#9aa3b4; line-height:1.6;">Нужен Chrome/Edge 113+ (или Safari 18+) с включённым WebGPU.<br/>Открой WebGL-версию как фолбэк.</div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div ref="{{ badge }}" style="position:absolute; left:3%; top:5.5%; z-index:20; pointer-events:none;">
+    <div style="display:flex; align-items:center; gap:8px; font-size:11px; letter-spacing:0.2em; color:#a78bfa;"><span style="padding:2px 6px; border:1px solid rgba(167,139,250,0.5); border-radius:4px;">WEBGPU</span>{{ frameNum }} / 07</div>
+    <div style="font-size:clamp(20px,2.4vw,40px); font-weight:500; color:#fff; margin-top:7px; text-shadow:0 2px 16px rgba(0,0,0,0.7);">{{ frameName }}</div>
+  </div>
+
+  <sc-if value="{{ showPanel }}" hint-placeholder-val="{{ true }}">
+  <div ref="{{ panel }}" class="kt-scroll" style="position:absolute; top:18px; right:18px; z-index:50; width:288px; max-height:calc(100% - 36px); overflow-y:auto; border-radius:12px; background:rgba(8,11,18,0.82); border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 14px 50px rgba(0,0,0,0.5); color:#cfd6e4; font-size:11px;">
+
+    <div onPointerDown="{{ startDrag }}" style="position:sticky; top:0; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:9px 12px; cursor:grab; background:rgba(12,16,26,0.96); border-bottom:1px solid rgba(255,255,255,0.08);">
+      <span style="display:flex; align-items:center; gap:7px; letter-spacing:0.14em; color:#fff; font-weight:500;">
+        <span style="width:7px; height:7px; border-radius:50%; background:{{ stateDot }}; box-shadow:0 0 8px {{ stateDot }};"></span>
+        WEBGPU · WGSL
+      </span>
+      <span onClick="{{ togglePanel }}" style="cursor:pointer; color:#6b7488; padding:0 2px;">✕</span>
+    </div>
+
+    <div style="padding:12px 13px 14px;">
+      <div style="color:#6b7488; letter-spacing:0.18em; font-size:10px; margin-bottom:9px;">ВАРИАНТЫ</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:15px;">
+        <sc-for list="{{ presets }}" as="pr" hint-placeholder-count="7">
+          <button onClick="{{ pr.click }}" style="{{ pr.style }}">
+            <span style="font-size:9px; letter-spacing:0.14em; color:{{ pr.numColor }};">VARIANT {{ pr.num }}</span>
+            <span style="font-size:12px;">{{ pr.name }}</span>
+          </button>
+        </sc-for>
+      </div>
+
+      <div style="color:#6b7488; letter-spacing:0.18em; font-size:10px; margin-bottom:9px;">ПЕРЕХОД МЕЖДУ СЦЕНАМИ</div>
+      <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin-bottom:9px;">
+        <sc-for list="{{ trans }}" as="tr" hint-placeholder-count="5">
+          <button onClick="{{ tr.click }}" style="{{ tr.style }}">{{ tr.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Длительность</span><span style="color:#a78bfa;">{{ transDurLabel }}</span></div>
+      <input type="range" class="kt-rng" min="200" max="2200" step="100" value="{{ transDur }}" onChange="{{ setTransDur }}" style="margin-bottom:15px;" />
+
+      <div style="height:1px; background:rgba(255,255,255,0.08); margin:0 0 13px;"></div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; margin-bottom:12px;">
+        <div style="display:flex; flex-direction:column; gap:2px;"><span style="color:#6b7488; letter-spacing:0.1em;">FPS</span><span style="color:{{ fpsColor }}; font-size:15px;">{{ fps }}</span></div>
+        <div style="display:flex; flex-direction:column; gap:2px;"><span style="color:#6b7488; letter-spacing:0.1em;">ЧАСТИЦ</span><span style="color:#a78bfa; font-size:15px;">{{ particleCount }}</span></div>
+        <div style="display:flex; flex-direction:column; gap:2px;"><span style="color:#6b7488; letter-spacing:0.1em;">ЭФФЕКТОВ</span><span style="color:#a78bfa; font-size:15px;">{{ activeCount }}</span></div>
+        <div style="display:flex; flex-direction:column; gap:2px;"><span style="color:#6b7488; letter-spacing:0.1em;">РЕНДЕР</span><span style="color:#fff; font-size:15px;">GPU</span></div>
+      </div>
+
+      <div style="display:flex; gap:7px; margin-bottom:14px;">
+        <button onClick="{{ fire }}" style="flex:1; padding:8px 0; border-radius:8px; border:none; background:#a78bfa; color:#1a1033; font-family:inherit; font-size:11px; letter-spacing:0.06em; cursor:pointer; font-weight:500;">ГЛИТЧ (G)</button>
+        <button onClick="{{ clearAll }}" style="flex:1; padding:8px 0; border-radius:8px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.04); color:#cfd6e4; font-family:inherit; font-size:11px; letter-spacing:0.06em; cursor:pointer;">ОЧИСТИТЬ</button>
+      </div>
+
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="7">
+        <div style="margin-bottom:13px;">
+          <div style="color:#6b7488; letter-spacing:0.18em; font-size:10px; margin-bottom:8px;">{{ g.title }}</div>
+          <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+            <div onClick="{{ it.toggle }}" style="display:flex; align-items:center; justify-content:space-between; padding:5px 0; cursor:pointer;">
+              <span style="color:{{ it.labelColor }};">{{ it.label }}</span>
+              <span style="position:relative; width:30px; height:16px; border-radius:999px; background:{{ it.sw }}; transition:background .15s; flex:none;">
+                <span style="position:absolute; top:2px; left:2px; width:12px; height:12px; border-radius:50%; background:#0b1020; transform:{{ it.knob }}; transition:transform .15s;"></span>
+              </span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+
+      <div style="height:1px; background:rgba(255,255,255,0.08); margin:2px 0 13px;"></div>
+      <div style="color:#6b7488; letter-spacing:0.18em; font-size:10px; margin-bottom:10px;">ПАРАМЕТРЫ</div>
+
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Интервал глитча</span><span style="color:#a78bfa;">{{ intervalLabel }}</span></div>
+      <input type="range" class="kt-rng" min="800" max="8000" step="100" value="{{ glitchMs }}" onChange="{{ setGlitchMs }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Сила глитча</span><span style="color:#a78bfa;">{{ strength }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ strength }}" onChange="{{ setStrength }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Плотность частиц</span><span style="color:#a78bfa;">{{ intensity }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="150" step="5" value="{{ intensity }}" onChange="{{ setIntensity }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Объёмный туман</span><span style="color:#a78bfa;">{{ fogAmt }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ fogAmt }}" onChange="{{ setFog }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Свечение (bloom)</span><span style="color:#a78bfa;">{{ bloomAmt }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ bloomAmt }}" onChange="{{ setBloom }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Зерно</span><span style="color:#a78bfa;">{{ grainAmt }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ grainAmt }}" onChange="{{ setGrain }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Глубина резкости</span><span style="color:#a78bfa;">{{ dofAmt }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ dofAmt }}" onChange="{{ setDof }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Экспозиция</span><span style="color:#a78bfa;">{{ exposure }}</span></div>
+      <input type="range" class="kt-rng" min="50" max="200" step="5" value="{{ exposure }}" onChange="{{ setExposure }}" style="margin-bottom:12px;" />
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;"><span style="color:#9aa3b4;">Сила zoom-блюра</span><span style="color:#a78bfa;">{{ zoomAmt }}</span></div>
+      <input type="range" class="kt-rng" min="0" max="100" step="5" value="{{ zoomAmt }}" onChange="{{ setZoom }}" />
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ panelHidden }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ togglePanel }}" style="position:absolute; top:18px; right:18px; z-index:50; padding:7px 12px; border-radius:999px; background:rgba(8,11,18,0.6); border:1px solid rgba(255,255,255,0.1); color:#9aa3b4; font-size:11px; letter-spacing:0.12em; cursor:pointer; backdrop-filter:blur(10px);">FX ` </div>
+  </sc-if>
+
+</div>
