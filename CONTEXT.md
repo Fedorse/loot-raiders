@@ -20,6 +20,12 @@ _Avoid_: score, loot value, totalExtract (in prose)
 The state where the Loadout's weight exceeds capacity, applying a soft penalty that scales the Extract down (1% per 1% over, floored).
 _Avoid_: overloaded, encumbered
 
+## Ambience
+
+**Living Background**:
+The full-screen animated backdrop that sits behind the game UI everywhere — a photographic scene with procedural atmosphere (fog, particles, godrays) and post-processing, cycling between scenes with transitions. Purely decorative; it owns no game state and reads none.
+_Avoid_: wallpaper, skybox, splash, the canvas
+
 ## Onboarding
 
 **FTUE**:

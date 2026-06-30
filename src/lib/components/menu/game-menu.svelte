@@ -20,7 +20,7 @@
 
 {#if !gameLoop.inSession && !showPreloader}
 	<div
-		class="fixed inset-0 z-30 bg-gradient-to-r from-black/90 via-black/55 to-black/15 backdrop-blur-xs"
+		class="fixed inset-0 z-30 {gameLoop.status === 'idle' ? '' : ''}"
 		transition:fade|global={{ duration: gameLoop.status === 'idle' ? 300 : 0 }}
 	>
 		{#if gameLoop.status === 'over'}

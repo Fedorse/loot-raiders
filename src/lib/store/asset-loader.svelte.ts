@@ -1,5 +1,6 @@
 import { ITEM_DB } from '$lib/config/items';
 import { PRELOAD_URLS } from '$lib/config/preload';
+import { SCENE_IMAGE_URLS } from '$lib/components/backdrop/scenes';
 
 const UI_ASSETS: readonly string[] = [
 	'/assets/ui/icon-actions.webp',
@@ -37,6 +38,7 @@ class AssetLoader {
 		}
 		for (const url of PRELOAD_URLS) urls.add(url);
 		for (const url of UI_ASSETS) urls.add(url);
+		for (const url of SCENE_IMAGE_URLS) urls.add(url);
 
 		this.total = urls.size;
 

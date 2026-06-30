@@ -13,7 +13,12 @@
 		getGameContext();
 </script>
 
-<div class="flex h-full items-center justify-center" onpointerdown={() => selection.clear()}>
+<div
+	class="flex h-full items-center justify-center transition-opacity duration-300 {gameLoop.inSession
+		? ''
+		: 'pointer-events-none opacity-0'}"
+	onpointerdown={() => selection.clear()}
+>
 	<div
 		class="flex flex-col gap-3 md:gap-5 lg:gap-7 xl:gap-9 2xl:gap-12 3xl:gap-16"
 		data-wide-short-outer-col

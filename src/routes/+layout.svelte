@@ -12,10 +12,12 @@
 	import QuestBottomSheet from '$lib/components/quest/quest-bottom-sheet.svelte';
 	import LeaderboardModal from '$lib/components/leaderboard/leaderboard-modal.svelte';
 	import Toasts from '$lib/components/hud/toasts.svelte';
+	import LivingBackground from '$lib/components/backdrop/living-background.svelte';
 	import { Preloader } from '$lib/motion-core';
 	import { initGame } from '$lib/store/game.svelte';
 	import { assetLoader } from '$lib/store/asset-loader.svelte';
 	import { PRELOAD_IMAGES, PRELOAD_URLS } from '$lib/config/preload';
+	import { SCENES } from '$lib/components/backdrop/scenes';
 	import { handleGlobalKeydown } from '$lib/keyboard';
 
 	import './layout.css';
@@ -38,22 +40,12 @@
 			gameLoop.stop();
 		};
 	});
-
-	let videoEl: HTMLVideoElement | undefined = $state();
-
-	$effect(() => {
-		if (!videoEl) return;
-		// Pause the backdrop during Tutorial Mode — keep the scene still while the player reads
-		// coachmarks; the intro loops only in a live run.
-		if (gameLoop.status === 'playing') {
-			videoEl.play().catch(() => {});
-		} else {
-			videoEl.pause();
-		}
-	});
 </script>
 
 <svelte:head>
+	<!-- Menu scene image is prioritized: it's the first frame the preloader and menu backdrop paint. -->
+	<link rel="preload" as="image" href={SCENES.menu.image} fetchpriority="high" />
+	<link rel="preload" as="image" href={SCENES.session.image} />
 	{#each PRELOAD_URLS as url (url)}
 		<link rel="preload" as="image" href={url} type="image/webp" />
 	{/each}
@@ -68,38 +60,13 @@
 <svelte:window onkeydown={(e) => handleGlobalKeydown(e, game)} />
 
 <main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
-	<video
-		bind:this={videoEl}
-		poster="/assets/preload/intro.webp"
-		loop
-		muted
-		playsinline
-		disablepictureinpicture
-		aria-hidden="true"
-		class="pointer-events-none absolute inset-0 h-full w-full object-cover"
-	>
-		<source src="/assets/intro-bg-mobile-768.mp4" type="video/mp4" media="(max-height: 500px)" />
-		<source src="/assets/intro.mp4" type="video/mp4" />
-	</video>
-
-	{#if gameLoop.inSession}
-		<div class="absolute inset-0 h-full w-full bg-black/80"></div>
-	{/if}
+	<LivingBackground />
 
 	<div
 		class="relative z-10 h-full w-full pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
 	>
 		{@render children()}
 	</div>
-
-	{#if !gameLoop.inSession}
-		<img
-			src="/assets/preload/intro.webp"
-			alt=""
-			aria-hidden="true"
-			class="pointer-events-none absolute inset-0 z-20 h-full w-full object-cover"
-		/>
-	{/if}
 </main>
 
 <DragLayer />
@@ -115,7 +82,15 @@
 <MobileGate />
 <Toasts />
 
-<!-- {#if showPreloader && !device.isPortraitMobile}
+<!-- Dev-only backdrop tuning studio. import.meta.env.DEV is statically false in production, so the
+	branch and the lazily-imported component chunk are eliminated from the production build. -->
+{#if import.meta.env.DEV}
+	{#await import('$lib/components/backdrop/debug-studio.svelte') then { default: DebugStudio }}
+		<DebugStudio />
+	{/await}
+{/if}
+
+{#if showPreloader && !device.isPortraitMobile}
 	<Preloader
 		class="bg-background"
 		images={PRELOAD_IMAGES}
@@ -125,4 +100,4 @@
 			showPreloader = false;
 		}}
 	/>
-{/if} -->
+{/if}

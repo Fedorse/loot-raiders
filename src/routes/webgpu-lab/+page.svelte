@@ -1,4 +1,5 @@
 <script>
+	// @ts-nocheck — isolated prototype playground kept as-is; not type-checked (plain JS, like the engine core).
 	// Full port of the claude-design WebGPU "Лаборатория" prototype onto a route.
 	// Engine loaded as-is from /vendor/webgpu-lab.js (reference stays in claude-design/).
 	// WebGPU-only: no WebGL2 fallback — if navigator.gpu is missing we show a static poster.

@@ -22,6 +22,11 @@
 		 */
 		progress?: number;
 		/**
+		 * Full-screen cover image shown behind the animation. Set it to the same URL the next screen
+		 * paints so the preloader→app hand-off shows the same frame with no swap/flash.
+		 */
+		backdrop?: string;
+		/**
 		 * Callback function triggered when the preloading animation completes.
 		 */
 		onComplete?: () => void;
@@ -32,6 +37,7 @@
 		images,
 		class: className = '',
 		progress = 0,
+		backdrop,
 		onComplete,
 		...restProps
 	}: ComponentProps = $props();
@@ -138,6 +144,15 @@
 	class={cn('fixed inset-0 z-999 flex items-center justify-center overflow-hidden', className)}
 	{...restProps}
 >
+	{#if backdrop}
+		<img
+			src={backdrop}
+			alt=""
+			aria-hidden="true"
+			class="pointer-events-none absolute inset-0 h-full w-full object-cover"
+		/>
+	{/if}
+
 	<div
 		class="relative flex items-center justify-center"
 		style="mask-image: linear-gradient(to right, transparent, black 5em, black calc(100% - 5em), transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5em, black calc(100% - 5em), transparent);"

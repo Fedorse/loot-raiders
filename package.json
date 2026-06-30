@@ -12,6 +12,7 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"sim": "vite-node scripts/loot-sim.ts",
 		"tut": "vite-node scripts/tutorial-sim.ts",
+		"bg": "vite-node scripts/backdrop-sim.ts",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},
@@ -25,6 +26,7 @@
 		"@types/howler": "^2.2.12",
 		"@types/node": "^22",
 		"@vitejs/plugin-basic-ssl": "^2.3.0",
+		"@webgpu/types": "^0.1.71",
 		"eslint": "^9.39.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.13.1",
