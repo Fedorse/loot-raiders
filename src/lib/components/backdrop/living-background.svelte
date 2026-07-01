@@ -2,7 +2,7 @@
 	import type { Engine } from './engine';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { SCENES, togglesFromFx, type SceneId } from './scenes';
-	import { normalizeParams, resolveProfile, resolveSceneId } from './profile';
+	import { normalizeFxParams, normalizeParams, resolveProfile, resolveSceneId } from './profile';
 	import { studio } from './backdrop-debug.svelte';
 
 	const game = getGameContext();
@@ -22,6 +22,12 @@
 	// when a scene's image changes at runtime (the studio swapping in a preset with a new image — the
 	// engine caches textures by id and only preloads the two baked images at boot).
 	const loadedImg: Partial<Record<SceneId, string>> = {};
+
+	// Same, for each scene's optional depth map (uploaded under a `${id}:depth` texture key, sampled by
+	// the parallax effect). Scenes without a depth map never load one and fall back to the engine's
+	// stand-in.
+	const loadedDepth: Partial<Record<SceneId, string>> = {};
+	const depthKey = (id: SceneId) => `${id}:depth`;
 
 	// Dev-only studio override: while the tuning panel is open it supplies the scene being edited so
 	// edits show live on the real screen. `import.meta.env.DEV` is statically false in production, so
@@ -74,6 +80,12 @@
 			raf = requestAnimationFrame(loop);
 		};
 
+		// Global cursor → engine, normalized 0..1 (the backdrop is fullscreen + pointer-events-none, so
+		// track on window). Drives depth-parallax and ripple injection; a no-op when neither is active.
+		const onPointer = (e: PointerEvent) => {
+			eng?.setMouse(e.clientX / window.innerWidth, e.clientY / window.innerHeight);
+		};
+
 		// Hidden tab → cancel the rAF loop entirely (don't drain GPU/battery in the background).
 		// On return, reset `last` so the first visible frame's dt is small instead of jumping the
 		// scene forward by the whole hidden duration.
@@ -104,11 +116,16 @@
 				for (const s of Object.values(SCENES)) {
 					eng.loadTexture(s.id, s.image);
 					loadedImg[s.id] = s.image;
+					if (s.depth) {
+						eng.loadTexture(depthKey(s.id), s.depth);
+						loadedDepth[s.id] = s.depth;
+					}
 				}
 
 				last = performance.now();
 				if (!document.hidden) raf = requestAnimationFrame(loop);
 				document.addEventListener('visibilitychange', onVisibility);
+				window.addEventListener('pointermove', onPointer);
 
 				// Publish last so the apply-effect runs only once the engine is ready.
 				engine = eng;
@@ -122,6 +139,7 @@
 			dead = true;
 			cancelAnimationFrame(raf);
 			document.removeEventListener('visibilitychange', onVisibility);
+			window.removeEventListener('pointermove', onPointer);
 			eng?.dispose();
 			eng = undefined;
 			engine = undefined;
@@ -140,9 +158,15 @@
 			eng.loadTexture(s.id, s.image);
 			loadedImg[s.id] = s.image;
 		}
+		// Runtime depth swap (studio preset with a new depth map), same guard as the image above.
+		if (s.depth && loadedDepth[s.id] !== s.depth) {
+			eng.loadTexture(depthKey(s.id), s.depth);
+			loadedDepth[s.id] = s.depth;
+		}
+		eng.setDepth(s.depth ? depthKey(s.id) : null);
 		eng.setTransition(s.transition.mode, s.transition.dur);
 		eng.setToggles(togglesFromFx(s.fx));
-		eng.setParams(normalizeParams(s.params));
+		eng.setParams({ ...normalizeParams(s.params), ...normalizeFxParams(s.fxParams) });
 		eng.setActive(s.id);
 	});
 

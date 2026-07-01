@@ -32,24 +32,24 @@
 			type="button"
 			onclick={openModal}
 			aria-label="Legal disclaimer"
-			class="pointer-events-auto font-mono text-[8px] font-semibold text-white/40 uppercase transition-colors hover:text-primary active:scale-95 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
+			class="pointer-events-auto font-mono text-[8px] font-semibold text-[#6b6056] uppercase transition-colors hover:text-[#e0a63a] active:scale-95 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
 		>
 			Notice
 		</button>
 	{:else}
 		<p
-			class="flex items-center gap-1.5 font-mono text-[8px] text-white/40 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs pointer-coarse:text-[8px]"
+			class="flex items-center gap-1.5 font-mono text-[8px] text-[#6b6056] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs pointer-coarse:text-[8px]"
 		>
 			<span
 				>Unofficial fan project · Not affiliated with {@render embarkLink(
-					'pointer-events-auto text-white/55'
+					'pointer-events-auto text-[#8b8178]'
 				)}</span
 			>
 			<button
 				type="button"
 				onclick={openModal}
 				aria-label="Legal disclaimer"
-				class="pointer-events-auto flex size-4 shrink-0 items-center justify-center rounded-full text-white/80 transition-colors hover:text-primary active:scale-90 2xl:size-[18px] 4xl:size-5"
+				class="pointer-events-auto flex size-4 shrink-0 items-center justify-center rounded-full text-[#8b8178] transition-colors hover:text-[#e0a63a] active:scale-90 2xl:size-[18px] 4xl:size-5"
 			>
 				{@render infoIcon()}
 			</button>
@@ -135,7 +135,7 @@
 		href="https://www.embark-studios.com/"
 		target="_blank"
 		rel="noopener noreferrer"
-		class="underline decoration-white/25 underline-offset-2 transition-colors hover:text-primary hover:decoration-primary/60 {cls}"
+		class="underline decoration-white/25 underline-offset-2 transition-colors hover:text-[#e0a63a] hover:decoration-[#e0a63a]/60 {cls}"
 		>Embark Studios AB</a
 	>
 {/snippet}

@@ -46,15 +46,15 @@
 								in:fly|global={{ y: 8, duration: 280, delay: 80 }}
 							>
 								<span
-									class="h-0.5 w-7 rounded-full bg-gradient-to-r from-primary to-transparent 3xl:h-[3px] 3xl:w-9 4xl:w-12"
+									class="h-0.5 w-7 rounded-full bg-gradient-to-r from-[#e0a63a] to-transparent 3xl:h-[3px] 3xl:w-9 4xl:w-12"
 								></span>
 								<span
-									class="font-mono text-[9px] font-bold tracking-[0.3em] text-muted uppercase 3xl:text-[10px] 4xl:text-[11px]"
+									class="font-mono text-[9px] font-bold tracking-[0.3em] text-[#8b8178] uppercase 3xl:text-[10px] 4xl:text-[11px]"
 									>Run</span
 								>
-								{@render runStat('Time', runTime, 'text-white')}
-								{@render runStat('Loot', runLoot, 'text-primary')}
-								{@render runStat('Stage', runStage, 'text-white')}
+								{@render runStat('Time', runTime, 'text-[#ece4d6]')}
+								{@render runStat('Loot', runLoot, 'text-[#e0a63a]')}
+								{@render runStat('Stage', runStage, 'text-[#ece4d6]')}
 							</div>
 						{/if}
 					</div>
@@ -88,7 +88,7 @@
 {#snippet runStat(label: string, value: string, valueClass: string)}
 	<div class="flex items-center gap-1.5 3xl:gap-2">
 		<span
-			class="font-mono text-[9px] font-bold tracking-[0.25em] text-muted uppercase 3xl:text-[10px] 4xl:text-[11px]"
+			class="font-mono text-[9px] font-bold tracking-[0.25em] text-[#8b8178] uppercase 3xl:text-[10px] 4xl:text-[11px]"
 			>{label}</span
 		>
 		<span

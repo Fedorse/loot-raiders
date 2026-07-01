@@ -2,7 +2,7 @@
 
 import type { EngineParams } from './engine';
 import type { GameStatus } from '$lib/store/game-loop.svelte';
-import type { SceneId } from './scenes';
+import type { SceneFxParams, SceneId } from './scenes';
 import { STATUS_SCENE } from './scenes';
 
 // Phase→scene resolution. STATUS_SCENE (in scenes.ts) is the single source of truth; the map is
@@ -23,7 +23,19 @@ export interface PanelParams {
 	zoomAmt: number;
 }
 
-// Panel→engine normalization, mirroring the prototype wrapper.
+// Particle toggle keys, in engine PT order — per-type turbulence is keyed by these.
+export const PARTICLE_KEYS = [
+	'embers',
+	'ash',
+	'snow',
+	'rain',
+	'fireflies',
+	'sparks',
+	'dust'
+] as const;
+
+// Panel→engine normalization, mirroring the prototype wrapper. tonemapMode/turb come from fxParams
+// (normalizeFxParams) and are merged in by the wrapper, so defaults here keep the base params complete.
 export function normalizeParams(p: PanelParams): EngineParams {
 	return {
 		intensity: p.intensity / 100,
@@ -32,7 +44,33 @@ export function normalizeParams(p: PanelParams): EngineParams {
 		bloomAmt: (p.bloomAmt / 100) * 1.5,
 		dofAmt: p.dofAmt / 100,
 		exposure: p.exposure / 100,
-		zoomAmt: p.zoomAmt / 100
+		zoomAmt: p.zoomAmt / 100,
+		tonemapMode: 0,
+		focusMode: 0,
+		vhsAmt: 0,
+		turb: {},
+		parallaxAmt: 0.05
+	};
+}
+
+// Panel→engine normalization for per-effect params (Studio fxParams), mirroring normalizeParams. Only
+// the subset the engine reads today: tonemap curve index (raw passthrough), focus family mode (raw
+// passthrough), VHS strength (panel 0–100 → ×0.01, default 55 → 0.55, matching Studio), per-particle
+// turbulence (panel 0–100 → ×0.002, matching Studio), and depth-parallax reach (parallax.strength
+// 0–100 → ×0.001, default 50 → 0.05). Returns a full turb object over PARTICLE_KEYS so switching scenes
+// always clears the previous look's turbulence. Unknown fxParams keys are ignored.
+export function normalizeFxParams(
+	fxParams: SceneFxParams | undefined
+): Pick<EngineParams, 'tonemapMode' | 'focusMode' | 'vhsAmt' | 'turb' | 'parallaxAmt'> {
+	const fx = fxParams ?? {};
+	const turb: Record<string, number> = {};
+	for (const k of PARTICLE_KEYS) turb[k] = (fx[k]?.turbulence ?? 0) * 0.002;
+	return {
+		tonemapMode: fx.tonemap?.mode ?? 0,
+		focusMode: fx.focus?.mode ?? 0,
+		vhsAmt: (fx.vhs?.strength ?? 55) * 0.01,
+		turb,
+		parallaxAmt: (fx.parallax?.strength ?? 50) * 0.001
 	};
 }
 

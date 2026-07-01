@@ -4,14 +4,28 @@
 // wrapper applies through its existing apply-effect. The studio panel (debug-studio.svelte) is the
 // only consumer besides that DEV-guarded read, so this module drops out of production builds with it.
 
-import { SCENES, SCENE_PRESETS, type SceneDef, type SceneId, type ToggleKey } from './scenes';
+import {
+	SCENES,
+	SCENE_PRESETS,
+	type SceneDef,
+	type SceneFxParams,
+	type SceneId,
+	type ToggleKey
+} from './scenes';
+
+const cloneFxParams = (fx: SceneFxParams): SceneFxParams =>
+	Object.fromEntries(Object.entries(fx).map(([k, v]) => [k, { ...v }]));
 
 function cloneScene(s: SceneDef): SceneDef {
 	return {
 		id: s.id,
 		image: s.image,
+		// depth/fxParams are optional and must survive the clone, else the studio override path (drafts +
+		// loadPreset + exportConfig) would silently drop depth-parallax and the per-effect params.
+		...(s.depth !== undefined ? { depth: s.depth } : {}),
 		fx: [...s.fx],
 		params: { ...s.params },
+		...(s.fxParams !== undefined ? { fxParams: cloneFxParams(s.fxParams) } : {}),
 		transition: { ...s.transition },
 		dim: s.dim,
 		glitch: { ...s.glitch }
@@ -33,6 +47,45 @@ class BackdropStudio {
 	// The draft currently selected for editing.
 	get current(): SceneDef {
 		return this.drafts[this.editing];
+	}
+
+	// Depth-parallax cursor-shift strength (fxParams.parallax.strength, panel 0–100 → parallaxAmt
+	// strength×0.001). Flat accessor for the studio slider: reading falls back to the normalize default
+	// (50), writing lazily materializes the nested fxParams so a scene without it can still be tuned. The
+	// value rides into exportConfig (COPY CONFIG) like any other field. Only takes visible effect while
+	// the 'parallax' toggle is on and the scene has a depth map.
+	get parallaxStrength(): number {
+		return this.current.fxParams?.parallax?.strength ?? 50;
+	}
+	set parallaxStrength(v: number) {
+		const s = this.current;
+		if (!s.fxParams) s.fxParams = {};
+		if (!s.fxParams.parallax) s.fxParams.parallax = {};
+		s.fxParams.parallax.strength = v;
+	}
+
+	// Focus family mode (fxParams.focus.mode): 0 radial · 1 tilt-shift · 2 depth. Same lazy-materialize
+	// pattern as parallaxStrength; only visible while the 'focus' toggle is on (mode 2 also needs a depth map).
+	get focusMode(): number {
+		return this.current.fxParams?.focus?.mode ?? 0;
+	}
+	set focusMode(v: number) {
+		const s = this.current;
+		if (!s.fxParams) s.fxParams = {};
+		if (!s.fxParams.focus) s.fxParams.focus = {};
+		s.fxParams.focus.mode = v;
+	}
+
+	// VHS artifact strength (fxParams.vhs.strength, panel 0–100 → vhsAmt ×0.01). Only visible while the
+	// 'vhs' toggle is on. Same lazy-materialize pattern as parallaxStrength.
+	get vhsStrength(): number {
+		return this.current.fxParams?.vhs?.strength ?? 55;
+	}
+	set vhsStrength(v: number) {
+		const s = this.current;
+		if (!s.fxParams) s.fxParams = {};
+		if (!s.fxParams.vhs) s.fxParams.vhs = {};
+		s.fxParams.vhs.strength = v;
 	}
 
 	// What the backdrop should show: the edited draft while the panel is open (so tuning is visible

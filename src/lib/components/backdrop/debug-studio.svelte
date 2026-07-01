@@ -29,7 +29,10 @@
 	let selectedPreset = $state(studio.presetNames[0]);
 
 	// Engine transition modes, indexed as the engine expects them (engine.js setTransition).
-	const TRANSITIONS = ['Fade', 'Wipe', 'Dissolve', 'Glitch', 'Pixels'];
+	const TRANSITIONS = ['Fade', 'Wipe', 'Dissolve', 'Glitch', 'Pixels', 'Ripple'];
+
+	// Focus family modes, indexed as the engine's focusMode expects (engine.js COMP focus branch).
+	const FOCUS_MODES = ['Radial', 'Tilt-shift', 'Depth'];
 
 	// Effect toggles grouped for legibility; keys are the engine's ToggleKey set.
 	const GROUPS: { title: string; items: [ToggleKey, string][] }[] = [
@@ -53,14 +56,15 @@
 				['bloom', 'Bloom'],
 				['heat', 'Heat haze'],
 				['poster', 'Posterize'],
-				['dof', 'Depth of field']
+				['focus', 'Focus / DoF']
 			]
 		},
 		{
 			title: 'FILM',
 			items: [
 				['grain', 'Grain'],
-				['scan', 'Scanlines']
+				['scan', 'Scanlines'],
+				['vhs', 'VHS']
 			]
 		},
 		{ title: 'GLITCH', items: [['glitch', 'RGB glitch']] },
@@ -254,6 +258,52 @@
 					bind:value={studio.current.params[pm.key]}
 				/>
 			{/each}
+
+			<div class="sep"></div>
+			<div class="lbl">CURSOR SHIFT (needs Depth parallax + a depth map)</div>
+			<div class="prow">
+				<span>Strength</span>
+				<span class="val">{studio.parallaxStrength}</span>
+			</div>
+			<input
+				class="kt-rng"
+				type="range"
+				min="0"
+				max="100"
+				step="1"
+				value={studio.parallaxStrength}
+				oninput={(e) => (studio.parallaxStrength = e.currentTarget.valueAsNumber)}
+			/>
+
+			<div class="sep"></div>
+			<div class="lbl">FOCUS MODE (needs Focus toggle · Depth needs a depth map)</div>
+			<div class="trans">
+				{#each FOCUS_MODES as m, i (m)}
+					<button
+						class="tbtn"
+						class:on={studio.focusMode === i}
+						onclick={() => (studio.focusMode = i)}
+					>
+						{m}
+					</button>
+				{/each}
+			</div>
+
+			<div class="sep"></div>
+			<div class="lbl">VHS (needs the toggle above)</div>
+			<div class="prow">
+				<span>Strength</span>
+				<span class="val">{studio.vhsStrength}</span>
+			</div>
+			<input
+				class="kt-rng"
+				type="range"
+				min="0"
+				max="100"
+				step="1"
+				value={studio.vhsStrength}
+				oninput={(e) => (studio.vhsStrength = e.currentTarget.valueAsNumber)}
+			/>
 
 			<div class="sep"></div>
 			<div class="lbl">GLITCH (needs the toggle above)</div>

@@ -17,9 +17,10 @@ export const ALL_TOGGLE_KEYS = [
 	'bloom',
 	'heat',
 	'poster',
-	'dof',
+	'focus',
 	'grain',
 	'scan',
+	'vhs',
 	'glitch',
 	'fog',
 	'godrays',
@@ -46,13 +47,29 @@ export const ALL_TOGGLE_KEYS = [
 export type ToggleKey = (typeof ALL_TOGGLE_KEYS)[number];
 
 // Closed set of scene ids — like GameStatus, so a typo in STATUS_SCENE can't compile.
-export type SceneId = 'menu' | 'session' | 'test' | 'test-v2' | 'test-v3' | 'test-v4';
+export type SceneId =
+	| 'menu'
+	| 'session'
+	| 'test'
+	| 'test-v2'
+	| 'test-v3'
+	| 'test-v4'
+	| 'storm'
+	| 'ember-vhs'
+	| 'night-glow';
+
+// Per-effect params (Studio "fxParams"), panel scale. Permissive by design: unknown effect keys are
+// tolerated so a full Studio look pastes in unchanged — the engine reads only the subset it supports
+// today (tonemap.mode, per-particle {turbulence}). Normalized by normalizeFxParams at apply time.
+export type SceneFxParams = Record<string, Record<string, number>>;
 
 export interface SceneDef {
 	id: SceneId;
 	image: string; // background image URL
+	depth?: string; // optional depth-map URL; the 'parallax' effect samples its red channel
 	fx: ToggleKey[]; // enabled effect toggles
 	params: PanelParams; // PANEL scale, normalized at apply time
+	fxParams?: SceneFxParams; // optional per-effect params (Studio), normalized at apply time
 	transition: { mode: number; dur: number }; // default dissolve
 	dim: number; // 0..1 backdrop dimming, default 0
 	// Periodic glitch the wrapper schedules (panel scale: ms interval, 0..100 strength). It's a
@@ -78,6 +95,99 @@ export const SCENES: Record<SceneId, SceneDef> = {
 		transition: { mode: 2, dur: 0.8 },
 		dim: 0,
 		glitch: { intervalMs: 4000, strength: 15 }
+	},
+	// Studio look 'storm-filmic' ported (2026-07-01). Not phase-bound yet — a studio-only slot for
+	// visually QA'ing the depth-parallax + filmic-tonemap ports before promoting into menu/session.
+	// Dropped from the Studio config: teal-orange LUT (not ported) and the fxParams the game doesn't read
+	// (focus/fog.mode/trails/vhs/print/lensdirt/anamorphic/chromadesync). fog renders the game's single
+	// volumetric variant (= Studio fog.mode 0). Only the engine-consumed fxParams are kept below.
+	storm: {
+		id: 'storm',
+		image: '/assets/test-bg/stormwatch.png',
+		depth: '/assets/test-bg/stormwatch-depth.png',
+		fx: [
+			'scan',
+			'grade',
+			'ash',
+			'kenburns',
+			'parallax',
+			'tonemap',
+			'fog',
+			'vignette',
+			'warm',
+			'glitch'
+		],
+		params: {
+			intensity: 44,
+			fogAmt: 30,
+			grainAmt: 14,
+			bloomAmt: 16,
+			dofAmt: 50,
+			exposure: 106,
+			zoomAmt: 45
+		},
+		fxParams: {
+			parallax: { strength: 5 },
+			ash: { turbulence: 24 },
+			tonemap: { mode: 2 }
+		},
+		transition: { mode: 3, dur: 0.4 },
+		dim: 0,
+		glitch: { intervalMs: 5000, strength: 12 }
+	},
+	// Studio look 'ember-vhs' ported (2026-07-01). Studio-only slot (not phase-bound) — showcases the
+	// newly ported focus family (tilt-shift, mode 1) + VHS carrier over a depth-parallax ember scene.
+	// Pruned to engine-consumed fxParams only (like storm): dropped fog.mode (game renders its single
+	// volumetric variant), blockglitch, and the turbulence of particles not in `fx` (embers/ash/sparks).
+	'ember-vhs': {
+		id: 'ember-vhs',
+		image: '/assets/looks/ember-road.png',
+		depth: '/assets/depth/ember-road-depth.png',
+		fx: ['bloom', 'grade', 'warm', 'vignette', 'fog', 'kenburns', 'parallax', 'glitch', 'dust', 'vhs', 'focus'],
+		params: {
+			intensity: 21,
+			fogAmt: 16,
+			grainAmt: 12,
+			bloomAmt: 18,
+			dofAmt: 55,
+			exposure: 108,
+			zoomAmt: 40
+		},
+		fxParams: {
+			focus: { mode: 1 },
+			parallax: { strength: 6 },
+			vhs: { strength: 16 },
+			dust: { turbulence: 15 }
+		},
+		transition: { mode: 3, dur: 0.7 },
+		dim: 0,
+		glitch: { intervalMs: 6000, strength: 10 }
+	},
+	// Studio look 'night-glow' ported (2026-07-01). Studio-only slot (not phase-bound) — depth-parallax
+	// night scene with a halation/bloom glow stack. fxParams pruned to what the engine reads for this
+	// fx set: no focus/vhs/tonemap toggle here, so focus.mode/vhs/print/anamorphic and fog.mode are
+	// dropped; only parallax.strength (depth reach) and ash.turbulence survive.
+	'night-glow': {
+		id: 'night-glow',
+		image: '/assets/looks/night.jpeg',
+		depth: '/assets/depth/night-depth.png',
+		fx: ['kenburns', 'parallax', 'halation', 'glitch', 'vignette', 'scan', 'ash', 'warm', 'bloom'],
+		params: {
+			intensity: 22,
+			fogAmt: 26,
+			grainAmt: 40,
+			bloomAmt: 40,
+			dofAmt: 55,
+			exposure: 118,
+			zoomAmt: 41
+		},
+		fxParams: {
+			parallax: { strength: 6 },
+			ash: { turbulence: 12 }
+		},
+		transition: { mode: 2, dur: 0.8 },
+		dim: 0.05,
+		glitch: { intervalMs: 6000, strength: 10 }
 	},
 	'test-v4': {
 		id: 'test-v4',
@@ -220,7 +330,10 @@ export const SCENES: Record<SceneId, SceneDef> = {
 // entry, e.g. 'session test v2': { id: 'session', image: '…', fx: […], … }.
 export const SCENE_PRESETS: Record<string, SceneDef> = {
 	'menu · current': SCENES.menu,
-	'session · current': SCENES.session
+	'session · current': SCENES.session,
+	'storm · filmic': SCENES.storm,
+	'ember · vhs': SCENES['ember-vhs'],
+	'night · glow': SCENES['night-glow']
 };
 
 // Scene image URLs to warm on load, menu first so the menu backdrop is decoded before the rest.

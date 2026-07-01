@@ -21,7 +21,7 @@
 </script>
 
 <div
-	class="group flex w-full items-center gap-3 rounded-md border border-[#2a2f4c] bg-[#0c101c]/80 px-5 py-3.5 transition-all 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
+	class="group flex w-full items-center gap-3 rounded-md border border-[#e8e0d2]/15 bg-[#100c09]/60 px-5 py-3.5 transition-all 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
 >
 	<!-- speaker = mute toggle -->
 	<button
@@ -30,8 +30,8 @@
 		aria-label={audio.muted ? 'Unmute' : 'Mute'}
 		aria-pressed={audio.muted}
 		class="flex shrink-0 cursor-pointer items-center transition-colors {audio.muted
-			? 'text-white/30'
-			: 'text-primary'}"
+			? 'text-[#6b6056]'
+			: 'text-[#e8e0d2]'}"
 	>
 		<svg
 			viewBox="0 0 24 24"
@@ -56,7 +56,7 @@
 	</button>
 
 	<span
-		class="flex-1 text-[15px] font-semibold tracking-wider text-white/80 group-hover:text-white lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
+		class="flex-1 text-[15px] font-semibold tracking-wider text-[#c6bcb0] group-hover:text-[#ece4d6] lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
 		>Sound</span
 	>
 
@@ -69,13 +69,13 @@
 		oninput={onInput}
 		aria-label="Volume"
 		class="menu-slider h-2 w-32 cursor-pointer appearance-none 2xl:w-36 3xl:h-2.5 3xl:w-40 4xl:w-48 pointer-coarse:w-32"
-		style="background: linear-gradient(to right, var(--color-primary) {fill}%, #404455 {fill}%);"
+		style="background: linear-gradient(to right, #e8e0d2 {fill}%, #3a322b {fill}%);"
 	/>
 
 	<span
 		class="w-10 text-right text-[13px] font-semibold tabular-nums 2xl:text-sm 3xl:w-12 3xl:text-[15px] 4xl:w-14 4xl:text-base pointer-coarse:w-8 pointer-coarse:text-[11px] {audio.muted
-			? 'text-muted'
-			: 'text-white/80'}">{audio.muted ? 'OFF' : `${pct}%`}</span
+			? 'text-[#9a8e84]'
+			: 'text-[#c6bcb0]'}">{audio.muted ? 'OFF' : `${pct}%`}</span
 	>
 </div>
 
@@ -91,14 +91,14 @@
 		appearance: none;
 		width: 14px;
 		height: 14px;
-		background: #cfd3dd;
+		background: #cabfb2;
 		cursor: pointer;
 		border-radius: 0;
 	}
 	.menu-slider::-moz-range-thumb {
 		width: 14px;
 		height: 14px;
-		background: #cfd3dd;
+		background: #cabfb2;
 		border: none;
 		border-radius: 0;
 	}
