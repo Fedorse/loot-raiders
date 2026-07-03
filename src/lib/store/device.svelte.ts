@@ -5,6 +5,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 const PORTRAIT_MOBILE_QUERY = '(orientation: portrait) and (max-width: 1023px)';
 const COARSE_POINTER_QUERY = '(pointer: coarse)';
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 export class Device {
 	isIPhone = $state(false);
@@ -17,6 +18,9 @@ export class Device {
 		typeof window !== 'undefined' && window.matchMedia(COARSE_POINTER_QUERY).matches
 	);
 	isFullscreen = $state(typeof document !== 'undefined' && !!document.fullscreenElement);
+	prefersReducedMotion = $state(
+		typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches
+	);
 
 	private started = false;
 
@@ -41,6 +45,12 @@ export class Device {
 		this.isCoarsePointer = coarse.matches;
 		coarse.addEventListener('change', () => {
 			this.isCoarsePointer = coarse.matches;
+		});
+
+		const reducedMotion = window.matchMedia(REDUCED_MOTION_QUERY);
+		this.prefersReducedMotion = reducedMotion.matches;
+		reducedMotion.addEventListener('change', () => {
+			this.prefersReducedMotion = reducedMotion.matches;
 		});
 
 		this.isFullscreen = !!document.fullscreenElement;

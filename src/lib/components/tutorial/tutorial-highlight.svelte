@@ -21,7 +21,7 @@
 	type HoleShape = { id: string; d: string; cx: number; cy: number };
 
 	function iris(_node: Element, { cx, cy }: { cx: number; cy: number }) {
-		const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+		const reduce = device.prefersReducedMotion;
 		return {
 			duration: reduce ? 0 : 300,
 			easing: cubicOut,

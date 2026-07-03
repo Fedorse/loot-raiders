@@ -1,9 +1,9 @@
 /* eslint-disable */
 // @ts-nocheck
-// WebGPU effects engine (WGSL) — scene compositor + GPU particles + ripple sim + transitions + post-FX.
-// Frozen vendor core ported from the /webgpu-lab prototype: WGSL, render(), doBlur(), simRipple(),
-// the pipelines, the uniform-slot layout, resize() and texture loading are unchanged. Only the module
-// boundary (IIFE + window global → ES export) and dispose() were adapted. Typed via ./engine.d.ts.
+// WebGPU effects engine (WGSL) — scene compositor + GPU particles + transitions + post-FX.
+// Frozen vendor core: WGSL, render(), doBlur(), the pipelines, the uniform-slot layout, resize()
+// and texture loading are unchanged. Only the module boundary (IIFE + window global → ES export)
+// and dispose() were adapted. Typed via ./engine.d.ts.
 
   // ---- shared WGSL helpers ----
   const HELP = `
@@ -35,41 +35,34 @@
   @group(0) @binding(1) var samp:sampler;
   @group(0) @binding(2) var texCur:texture_2d<f32>;
   @group(0) @binding(3) var texPrev:texture_2d<f32>;
-  @group(0) @binding(4) var texRip:texture_2d<f32>;
-  @group(0) @binding(5) var texDepth:texture_2d<f32>;
+  @group(0) @binding(4) var texDepth:texture_2d<f32>;
   ${HELP}
   fn cover(imgA:f32, canA:f32, uv:vec2<f32>)->vec2<f32>{
     var b=uv;
     if(canA>imgA){ b.y=(uv.y-0.5)*(imgA/canA)+0.5; } else { b.x=(uv.x-0.5)*(canA/imgA)+0.5; }
     return b;
   }
-  fn sampleScene(tex:texture_2d<f32>, imgA:f32, canA:f32, fChroma:f32, off:vec2<f32>, uv:vec2<f32>)->vec3<f32>{
-    var b = cover(imgA,canA,uv) + off;
-    if(fChroma>0.5){
-      let dir=(uv-0.5); let amt=0.004+0.006*dot(dir,dir)*6.0;
-      return vec3<f32>(textureSample(tex,samp,b+dir*amt).r, textureSample(tex,samp,b).g, textureSample(tex,samp,b-dir*amt).b);
-    }
+  fn sampleScene(tex:texture_2d<f32>, imgA:f32, canA:f32, off:vec2<f32>, uv:vec2<f32>)->vec3<f32>{
+    let b = cover(imgA,canA,uv) + off;
     return textureSample(tex,samp,b).rgb;
   }
   struct VO { @builtin(position) pos:vec4<f32>, @location(0) uv:vec2<f32> };
   @fragment fn fs(in:VO)->@location(0) vec4<f32>{
     let time=U_.d[0].x; let canA=U_.d[0].y; let imgATo=U_.d[0].z; let imgAFrom=U_.d[0].w;
-    let mouse=vec2<f32>(U_.d[1].x,U_.d[1].y); let ripTexel=vec2<f32>(U_.d[1].z,U_.d[1].w);
+    let mouse=vec2<f32>(U_.d[1].x,U_.d[1].y);
     let trans=U_.d[2].x; let transMode=U_.d[2].y; let fogAmt=U_.d[2].z;
-    let fGrade=U_.d[3].x; let fWarm=U_.d[3].y; let fCool=U_.d[3].z; let fSepia=U_.d[3].w;
-    let fMono=U_.d[4].x; let fInvert=U_.d[4].y; let fChroma=U_.d[4].z; let fBarrel=U_.d[4].w;
-    let fHeat=U_.d[5].x; let fPoster=U_.d[5].y; let fFog=U_.d[5].z; let fGodrays=U_.d[5].w;
-    let fParallax=U_.d[6].x; let fRipple=U_.d[6].y; let fKenburns=U_.d[6].z; let parallaxAmt=U_.d[6].w;
+    // Survivors keep their original lanes (pruned effects left documented gaps at d[1].z–d[1].w,
+    // d[3].z–d[5].y, d[5].w, d[6].y).
+    let fGrade=U_.d[3].x; let fWarm=U_.d[3].y;
+    let fFog=U_.d[5].z;
+    let fParallax=U_.d[6].x; let fKenburns=U_.d[6].z; let parallaxAmt=U_.d[6].w;
 
     var uv=in.uv;
-    if(fBarrel>0.5){ let cc=uv-0.5; let r2=dot(cc,cc); uv=0.5+cc*(1.0+0.18*r2); }
     var off=vec2<f32>(0.0,0.0);
     // Depth parallax (ported from Studio, issue 12): shift each pixel by its sampled depth so planes
     // move at different rates as the pointer moves — foreground drifts, background stays put. parallaxAmt
     // scales the reach. Needs the depth map (setDepth); with the flat/absent stand-in it degrades to ~none.
     if(fParallax>0.5){ let dpt=clamp(textureSample(texDepth,samp,uv).r,0.0,1.0); off=off+(mouse-0.5)*parallaxAmt*dpt; }
-    if(fHeat>0.5){ let band=smoothstep(0.0,0.7,1.0-uv.y); off=off+vec2<f32>((fbm(vec2<f32>(uv.x*8.0,uv.y*5.0-time*0.6))-0.5)*0.012,(fbm(vec2<f32>(uv.y*7.0+time*0.5,uv.x*6.0))-0.5)*0.02)*band; }
-    if(fRipple>0.5){ let hL=textureSample(texRip,samp,uv-vec2<f32>(ripTexel.x,0.0)).r; let hR=textureSample(texRip,samp,uv+vec2<f32>(ripTexel.x,0.0)).r; let hU=textureSample(texRip,samp,uv-vec2<f32>(0.0,ripTexel.y)).r; let hD=textureSample(texRip,samp,uv+vec2<f32>(0.0,ripTexel.y)).r; off=off+vec2<f32>(hR-hL,hD-hU)*0.9; }
     var suv=uv;
     if(fKenburns>0.5){ let z=1.0+0.05*(0.5+0.5*sin(time*0.05)); let pan=vec2<f32>(sin(time*0.045)*0.018,cos(time*0.037)*0.014); suv=(uv-0.5)/z+0.5+pan; }
 
@@ -86,20 +79,13 @@
       else if(md==5){ let dir=uv-0.5; let d=length(dir*vec2<f32>(canA,1.0)); let maxR=length(vec2<f32>(0.5*canA,0.5))+0.05; let edge=trans*maxR-d; let ring=sin(edge*55.0-time*2.0)*exp(-abs(edge)*7.0)*(1.0-abs(trans*2.0-1.0)); let warp=normalize(dir+vec2<f32>(1e-5,1e-5))*ring*0.03; uvTo=suv+warp; uvFrom=suv+warp; m=smoothstep(-0.015,0.015,edge); }
       else { let cell=mix(2.0,90.0,sin(trans*3.14159)); let px=(floor(suv*cell)+0.5)/cell; uvTo=px; uvFrom=px; m=trans; }
     }
-    let colTo=sampleScene(texCur,imgATo,canA,fChroma,off,uvTo);
-    let colFrom=sampleScene(texPrev,imgAFrom,canA,fChroma,off,uvFrom);
+    let colTo=sampleScene(texCur,imgATo,canA,off,uvTo);
+    let colFrom=sampleScene(texPrev,imgAFrom,canA,off,uvFrom);
     var col=mix(colFrom,colTo,m);
     // hardcoded: fog tint — warm-brown low vec3(0.62,0.30,0.26) → desaturated rose high vec3(0.78,0.66,0.62), lerped by height.
     if(fFog>0.5){ let h=smoothstep(0.05,0.85,1.0-uv.y); let f=pow(clamp(fbm(vec2<f32>(uv.x*3.0+time*0.05,uv.y*2.2-time*0.03)),0.0,1.0),1.4); let fogCol=mix(vec3<f32>(0.62,0.30,0.26),vec3<f32>(0.78,0.66,0.62),uv.y); col=mix(col,fogCol,clamp(f*h*fogAmt,0.0,0.85)); }
-    // hardcoded: godrays sun position vec2(0.5,1.05) — horizontally centered, just above the top edge (off-screen).
-    if(fGodrays>0.5){ let sun=vec2<f32>(0.5,1.05); let d=uv-sun; let ang=atan2(d.x,-d.y); let rays=pow(clamp(fbm(vec2<f32>(ang*6.0,length(d)*2.0-time*0.1)),0.0,1.0),2.0); col=col+vec3<f32>(1.0,0.85,0.6)*rays*smoothstep(1.2,0.1,length(d))*0.28; }
     if(fGrade>0.5){ col=(col-0.5)*1.12+0.5; let l=lum(col); col=mix(vec3<f32>(l),col,1.18); col=col*1.02; }
     if(fWarm>0.5){ col=col*vec3<f32>(1.10,1.0,0.86); let l=lum(col); col=mix(vec3<f32>(l),col,1.18); }
-    if(fCool>0.5){ col=col*vec3<f32>(0.88,0.98,1.14); }
-    if(fSepia>0.5){ let l=lum(col); col=mix(col,vec3<f32>(l)*vec3<f32>(1.07,0.86,0.62),0.72); }
-    if(fMono>0.5){ col=vec3<f32>(lum(col)); }
-    if(fInvert>0.5){ col=vec3<f32>(1.0)-col; }
-    if(fPoster>0.5){ col=floor(col*5.0)/5.0; }
     return vec4<f32>(max(col,vec3<f32>(0.0)),1.0);
   }`;
 
@@ -118,12 +104,8 @@
     let r1=h11(id); let r2=h11(id+11.7); let r3=h11(id+23.3); let r4=h11(id+41.1);
     let ty=i32(typef+0.5); let t=time;
     var pos:vec2<f32>; var size=2.0; var col=vec3<f32>(1.0); var alpha=1.0;
-    if(ty==0){ let sp=0.03+r2*0.07; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3+sin(life*6.28+r1*30.0)*0.04+wind*life*0.25),1.0-life); size=1.5+r4*3.5; col=vec3<f32>(1.0,0.45+0.35*r2,0.12); alpha=(1.0-life)*(0.5+0.5*sin(t*8.0+id))*0.9; }
-    else if(ty==1){ let sp=0.02+r2*0.04; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3+sin(life*4.0+r1*20.0)*0.05+wind*life*0.4),life); size=1.2+r4*2.6; col=vec3<f32>(0.22,0.20,0.19); alpha=0.5+0.4*r2; }
-    else if(ty==2){ let sp=0.015+r2*0.03; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3+sin(life*3.0+r1*16.0)*0.03),life); size=1.5+r4*2.5; col=vec3<f32>(0.93,0.96,1.0); alpha=0.5+0.4*r4; }
-    else if(ty==3){ let sp=0.5+r2*0.5; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3-life*0.06),life); size=4.0+r4*5.0; col=vec3<f32>(0.72,0.80,0.92); alpha=0.18+0.22*r2; }
-    else if(ty==4){ let a1=t*(0.2+r2*0.4)+r1*6.28; let a2=t*(0.15+r3*0.3)+r4*6.28; pos=vec2<f32>(fract(r1+sin(a1)*0.06),0.25+r3*0.6+cos(a2)*0.06); size=2.0+r4*2.0; col=vec3<f32>(0.75,1.0,0.45); alpha=(0.2+0.8*max(0.0,sin(t*1.5+id)))*0.9; }
-    else if(ty==5){ let sp=0.15+r2*0.25; let life=fract(r1+t*sp); let arc=sin(life*3.14); pos=vec2<f32>(fract(r3+(r1-0.5)*0.4*life),0.85-arc*0.5*r4); size=1.0+r4*2.0; col=vec3<f32>(1.0,0.8,0.4); alpha=(1.0-life)*0.9; }
+    // Two surviving types (PT order): 0 = ash (drifting alpha flecks), 1 = dust (slow additive motes).
+    if(ty==0){ let sp=0.02+r2*0.04; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3+sin(life*4.0+r1*20.0)*0.05+wind*life*0.4),life); size=1.2+r4*2.6; col=vec3<f32>(0.22,0.20,0.19); alpha=0.5+0.4*r2; }
     else { let sp=0.008+r2*0.02; let life=fract(r1+t*sp); pos=vec2<f32>(fract(r3+sin(t*0.2+r1*10.0)*0.04+wind*0.1),fract(r4+sin(t*0.1+r3*8.0)*0.03)); size=1.0+r4*1.6; col=vec3<f32>(1.0,0.95,0.85); alpha=0.10+0.20*r2; }
     // Turbulent wind (ported from Studio, C3): a swirl of organic offset scaled by the per-type strength
     // (0 = original drift). Set per particle type via fPart[3] from state.params.turb in render().
@@ -159,28 +141,6 @@
     return vec4<f32>(c,1.0);
   }`;
 
-  // ---- RIPPLE ----
-  const RIP_WGSL = `
-  struct U { d: array<vec4<f32>, 2> };
-  @group(0) @binding(0) var<uniform> U_:U;
-  @group(0) @binding(1) var samp:sampler;
-  @group(0) @binding(2) var tex:texture_2d<f32>;
-  struct VO { @builtin(position) pos:vec4<f32>, @location(0) uv:vec2<f32> };
-  @fragment fn fs(in:VO)->@location(0) vec4<f32>{
-    let texel=vec2<f32>(U_.d[0].x,U_.d[0].y); let injPos=vec2<f32>(U_.d[0].z,U_.d[0].w); let injAmt=U_.d[1].x; let damp=U_.d[1].y;
-    let uv=in.uv;
-    let c=textureSample(tex,samp,uv).r-0.5;
-    let p=textureSample(tex,samp,uv).g-0.5;
-    let l=textureSample(tex,samp,uv-vec2<f32>(texel.x,0.0)).r-0.5;
-    let r=textureSample(tex,samp,uv+vec2<f32>(texel.x,0.0)).r-0.5;
-    let u=textureSample(tex,samp,uv-vec2<f32>(0.0,texel.y)).r-0.5;
-    let dn=textureSample(tex,samp,uv+vec2<f32>(0.0,texel.y)).r-0.5;
-    var nx=((l+r+u+dn)*0.5-p)*damp;
-    let dist=length(uv-injPos);
-    nx=nx+injAmt*exp(-dist*dist*900.0);
-    return vec4<f32>(clamp(nx+0.5,0.0,1.0), clamp(c+0.5,0.0,1.0), 0.0, 1.0);
-  }`;
-
   // ---- COMPOSITE ----
   const COMP_WGSL = `
   struct U { d: array<vec4<f32>, 7> };
@@ -204,35 +164,29 @@
   fn filmic(x:vec3<f32>)->vec3<f32>{ let w=hable(vec3<f32>(11.2)); return clamp(hable(x*2.0)/w,vec3<f32>(0.0),vec3<f32>(1.0)); }
   struct VO { @builtin(position) pos:vec4<f32>, @location(0) uv:vec2<f32> };
   @fragment fn fs(in:VO)->@location(0) vec4<f32>{
-    let time=U_.d[0].x; let glitch=U_.d[0].y; let grainAmt=U_.d[0].z; let bloomAmt=U_.d[0].w;
-    let dofAmt=U_.d[1].x; let exposure=U_.d[1].y; let zoomAmt=U_.d[1].z;
+    let time=U_.d[0].x; let glitch=U_.d[0].y; let bloomAmt=U_.d[0].w;
+    let dofAmt=U_.d[1].x; let exposure=U_.d[1].y;
     let texelF=vec2<f32>(U_.d[2].x,U_.d[2].y); let tonemapMode=U_.d[2].z; let focusMode=U_.d[2].w;
+    // Survivors keep their original lanes (pruned effects left documented gaps at d[0].z, d[1].z,
+    // d[4].x, d[4].z, d[5].x–d[5].w, d[6].x).
     let fBloom=U_.d[3].x; let fFocus=U_.d[3].y; let fVignette=U_.d[3].z; let fScan=U_.d[3].w;
-    let fGrain=U_.d[4].x; let fTonemap=U_.d[4].y; let fFlare=U_.d[4].z; let fHalation=U_.d[4].w;
-    let fSharpen=U_.d[5].x; let fCrt=U_.d[5].y; let fDither=U_.d[5].z; let fEdge=U_.d[5].w;
-    let fZoomblur=U_.d[6].x; let fVhs=U_.d[6].y; let vhsAmt=U_.d[6].z;
+    let fTonemap=U_.d[4].y; let fHalation=U_.d[4].w;
+    let fVhs=U_.d[6].y; let vhsAmt=U_.d[6].z;
     let uv=in.uv;
     var gsh=vec2<f32>(0.0,0.0); let g=glitch;
     if(g>0.01){ let row=floor(uv.y*48.0); gsh.x=(h2(vec2<f32>(row,floor(time*18.0)))-0.5)*0.06*g; }
     var col:vec3<f32>;
-    if(fZoomblur>0.5){ col=vec3<f32>(0.0); for(var i=0;i<8;i=i+1){ let s=1.0-f32(i)*zoomAmt*0.012; col=col+textureSample(texScene,samp,(uv-0.5)*s+0.5+gsh).rgb; } col=col/8.0; }
-    else if(g>0.01){ let ca=0.008*g; col=vec3<f32>(textureSample(texScene,samp,uv+vec2<f32>(gsh.x+ca,0.0)).r, textureSample(texScene,samp,uv+gsh).g, textureSample(texScene,samp,uv+vec2<f32>(gsh.x-ca,0.0)).b); }
+    if(g>0.01){ let ca=0.008*g; col=vec3<f32>(textureSample(texScene,samp,uv+vec2<f32>(gsh.x+ca,0.0)).r, textureSample(texScene,samp,uv+gsh).g, textureSample(texScene,samp,uv+vec2<f32>(gsh.x-ca,0.0)).b); }
     else { col=textureSample(texScene,samp,uv).rgb; }
-    if(fSharpen>0.5){ let n=(textureSample(texScene,samp,uv+vec2<f32>(texelF.x,0.0)).rgb+textureSample(texScene,samp,uv-vec2<f32>(texelF.x,0.0)).rgb+textureSample(texScene,samp,uv+vec2<f32>(0.0,texelF.y)).rgb+textureSample(texScene,samp,uv-vec2<f32>(0.0,texelF.y)).rgb)*0.25; col=col+(col-n)*0.8; }
-    if(fEdge>0.5){ let tl=lum(textureSample(texScene,samp,uv+vec2<f32>(-texelF.x,-texelF.y)).rgb); let tt=lum(textureSample(texScene,samp,uv+vec2<f32>(0.0,-texelF.y)).rgb); let tr=lum(textureSample(texScene,samp,uv+vec2<f32>(texelF.x,-texelF.y)).rgb); let llp=lum(textureSample(texScene,samp,uv+vec2<f32>(-texelF.x,0.0)).rgb); let rr=lum(textureSample(texScene,samp,uv+vec2<f32>(texelF.x,0.0)).rgb); let bl=lum(textureSample(texScene,samp,uv+vec2<f32>(-texelF.x,texelF.y)).rgb); let bb=lum(textureSample(texScene,samp,uv+vec2<f32>(0.0,texelF.y)).rgb); let br=lum(textureSample(texScene,samp,uv+vec2<f32>(texelF.x,texelF.y)).rgb); let gx=tl+2.0*llp+bl-tr-2.0*rr-br; let gy=tl+2.0*tt+tr-bl-2.0*bb-br; let e=clamp(length(vec2<f32>(gx,gy))*1.2,0.0,1.0); col=mix(col,vec3<f32>(0.0),e*0.4)+vec3<f32>(e)*0.35; }
     // Focus family (ported from Studio): one blurred copy (texDof), focusMode picks where it wins.
     // Radial (0) — blur grows toward the frame edge (classic centre-focus). Tilt-shift (1) — sharp
     // horizontal band, blurred above/below. Depth (2) — the depth map's red channel is the blur mask.
     if(fFocus>0.5){ let b=textureSample(texDof,samp,uv).rgb; var blur:f32; if(focusMode<0.5){ blur=smoothstep(0.25,0.95,length(uv-0.5)); } else if(focusMode<1.5){ blur=smoothstep(0.12,0.45,abs(uv.y-0.5)); } else { blur=textureSample(texDepth,samp,uv).r; } col=mix(col,b,clamp(blur,0.0,1.0)*dofAmt); }
     if(fBloom>0.5){ col=col+textureSample(texBloom,samp,uv).rgb*bloomAmt; }
-    if(fFlare>0.5){ var st=vec3<f32>(0.0); for(var i=1;i<=6;i=i+1){ let o=f32(i)*0.022; st=st+textureSample(texBloom,samp,uv+vec2<f32>(o,0.0)).rgb; st=st+textureSample(texBloom,samp,uv-vec2<f32>(o,0.0)).rgb; } col=col+st/12.0*vec3<f32>(0.45,0.7,1.0)*1.3; }
     if(fHalation>0.5){ col=col+textureSample(texBloom,samp,uv).rgb*vec3<f32>(0.55,0.12,0.06)*1.4; }
     if(fTonemap>0.5){ let e=col*exposure; let tm=i32(tonemapMode+0.5); if(tm==2){ col=filmic(e); } else if(tm==3){ col=reinhard(e); } else { col=aces(e); } }
     if(fScan>0.5){ col=col*(0.92+0.08*sin(uv.y*1600.0)); }
-    if(fCrt>0.5){ let cc=uv-0.5; col=col*(1.0-0.16*dot(cc,cc)*2.0); let sub=modf2(in.pos.x,3.0); let mr=select(0.65,1.25,sub<1.0); let mg=select(0.65,1.25,(sub>=1.0&&sub<2.0)); let mb=select(0.65,1.25,sub>=2.0); col=col*vec3<f32>(mr,mg,mb); col=col*(0.9+0.1*sin(uv.y*900.0)); }
     if(fVignette>0.5){ col=col*mix(1.0,smoothstep(1.18,0.35,length((uv-0.5)*vec2<f32>(1.05,1.0))),0.85); }
-    if(fGrain>0.5){ col=col+(h2(uv*vec2<f32>(1280.0,720.0)+fract(time))-0.5)*grainAmt; }
-    if(fDither>0.5){ let b=h2(floor(in.pos.xy)); col=floor(col*24.0+b)/24.0; }
     // VHS (ported from Studio): one strength (vhsAmt 0..1) drives the whole magnetic-tape look — per-row
     // horizontal jitter, RGB tape bleed, a rolling dropout band of noise, and a fine scanline shimmer.
     if(fVhs>0.5){ let a=vhsAmt; let jl=floor(uv.y*80.0); let jitter=(h2(vec2<f32>(jl,floor(time*8.0)))-0.5)*0.04*a; let su=uv+vec2<f32>(jitter,0.0); let bleed=0.02*a; let r=textureSample(texScene,samp,su+vec2<f32>(bleed,0.0)).r; let gg=textureSample(texScene,samp,su).g; let bb=textureSample(texScene,samp,su-vec2<f32>(bleed,0.0)).b; var v=vec3<f32>(r,gg,bb); let band=smoothstep(0.9,0.98,uv.y+(h2(vec2<f32>(floor(time*3.0),0.0))-0.5)*0.06); let ns=h2(uv*vec2<f32>(320.0,240.0)+fract(time)); v=mix(v,vec3<f32>(ns),band*a*0.8); v=v*(0.9+0.1*sin(uv.y*640.0+time*30.0)); col=mix(col,v,a); }
@@ -252,7 +206,7 @@
 
     const mod = (code) => device.createShaderModule({ code });
     const mFull = mod(VS_FULL);
-    const mScene = mod(SCENE_WGSL), mPart = mod(PART_WGSL), mBlur = mod(BLUR_WGSL), mRip = mod(RIP_WGSL), mComp = mod(COMP_WGSL);
+    const mScene = mod(SCENE_WGSL), mPart = mod(PART_WGSL), mBlur = mod(BLUR_WGSL), mComp = mod(COMP_WGSL);
 
     function fsPipeline(fragMod, targetFormat, blend) {
       return device.createRenderPipeline({
@@ -264,7 +218,6 @@
     }
     const pScene = fsPipeline(mScene, OFF);
     const pBlur = fsPipeline(mBlur, OFF);
-    const pRip = fsPipeline(mRip, OFF);
     const pComp = fsPipeline(mComp, format);
     const ADD_BLEND = { color: { srcFactor: 'src-alpha', dstFactor: 'one', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one', operation: 'add' } };
     const ALPHA_BLEND = { color: { srcFactor: 'src-alpha', dstFactor: 'one-minus-src-alpha', operation: 'add' }, alpha: { srcFactor: 'one', dstFactor: 'one-minus-src-alpha', operation: 'add' } };
@@ -287,20 +240,14 @@
     // ARCHITECTURE.md. The vec4 count, the Float32Array length, and buf(n) must stay in lockstep;
     // adding a uniform past the free pad lanes means growing all three together.
     const buf = (n) => device.createBuffer({ size: n * 16, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
-    const ubScene = buf(7), ubComp = buf(7), ubPart = buf(2), ubBlur = buf(2), ubRip = buf(2);
-    const fScene = new Float32Array(28), fComp = new Float32Array(28), fPart = new Float32Array(8), fBlur = new Float32Array(8), fRip = new Float32Array(8);
+    const ubScene = buf(7), ubComp = buf(7), ubPart = buf(2), ubBlur = buf(2);
+    const fScene = new Float32Array(28), fComp = new Float32Array(28), fPart = new Float32Array(8), fBlur = new Float32Array(8);
 
     // render targets
     let W = 1, H = 1, dpr = Math.min(window.devicePixelRatio || 1, 1.5); // hardcoded: dpr cap 1.5 (GPU budget)
-    const RW = 256, RH = 144; // hardcoded: ripple sim grid resolution (fixed; independent of canvas size)
-    let sceneTex, bloomA, bloomB, dofA, dofB, ripA, ripB;
+    let sceneTex, bloomA, bloomB, dofA, dofB;
     function mkTarget(w, h) { return device.createTexture({ size: [w, h], format: OFF, usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST }); }
     function destroyT(t) { if (t) t.destroy(); }
-    function clearRip(t) {
-      const enc = device.createCommandEncoder();
-      enc.beginRenderPass({ colorAttachments: [{ view: t.createView(), loadOp: 'clear', storeOp: 'store', clearValue: { r: 0.5, g: 0.5, b: 0, a: 1 } }] }).end();
-      device.queue.submit([enc.finish()]);
-    }
     function resize() {
       const rc = canvas.getBoundingClientRect();
       W = Math.max(2, Math.round(rc.width * dpr)); H = Math.max(2, Math.round(rc.height * dpr));
@@ -308,7 +255,6 @@
       [sceneTex, bloomA, bloomB, dofA, dofB].forEach(destroyT);
       const hw = Math.max(2, W >> 1), hh = Math.max(2, H >> 1);
       sceneTex = mkTarget(W, H); bloomA = mkTarget(hw, hh); bloomB = mkTarget(hw, hh); dofA = mkTarget(hw, hh); dofB = mkTarget(hw, hh);
-      if (!ripA) { ripA = mkTarget(RW, RH); ripB = mkTarget(RW, RH); clearRip(ripA); clearRip(ripB); }
     }
     resize();
     const ro = new ResizeObserver(() => resize()); ro.observe(canvas);
@@ -321,8 +267,8 @@
       return t;
     }
     // Persistent 1×1 stand-in bound to the scene pass's depth slot whenever a scene has no depth map.
-    // The 'auto' layout requires binding 5 every frame; parallax reads ~0 depth from it so it degrades
-    // to no shift (and no shipped scene toggles parallax, so this is inert until a depth look ships).
+    // The 'auto' layout requires the depth binding every frame; parallax reads ~0 depth from it so it
+    // degrades to no shift (and no shipped scene toggles parallax, so this is inert until a depth look ships).
     const noTex = placeholderTex();
     function loadTexture(key, url) {
       const e = { tex: placeholderTex(), aspect: 16 / 9 };
@@ -342,18 +288,17 @@
 
     // hardcoded: particle config, indexed by type (PT). COUNTS are instance counts scaled by
     // params.intensity at draw; ADDITIVE picks add vs alpha blend; ROUND picks the soft-disc vs
-    // streak fragment shape.
-    //              embers  ash   snow  rain  fireflies sparks dust
-    const COUNTS = [3000,   2500, 4000, 5000, 500,      600,   3000];
-    const ADDITIVE = [true, false, false, false, true, true, true];
-    const ROUND = [1, 1, 1, 0, 1, 1, 1];
-    const PT = ['embers', 'ash', 'snow', 'rain', 'fireflies', 'sparks', 'dust'];
+    // streak fragment shape. The index into these arrays is the `ty` the particle shader branches on.
+    //              ash   dust
+    const COUNTS = [2500, 3000];
+    const ADDITIVE = [false, true];
+    const ROUND = [1, 1];
+    const PT = ['ash', 'dust'];
 
     let curTex = null, prevTex = null, trans = 1.0, transMode = 0, transDur = 0.8;
     // Key into `textures` of the active scene's depth map (loaded via loadTexture like any image), or null.
     let depthKey = null;
-    const state = { time: 0, mouse: [0.5, 0.5], wind: 0.15, glitch: 0, toggles: {}, params: { intensity: 0.8, fogAmt: 0.6, grainAmt: 0.08, bloomAmt: 0.7, dofAmt: 0.3, exposure: 1.0, zoomAmt: 0.5, tonemapMode: 0, focusMode: 0, vhsAmt: 0.55, turb: {}, parallaxAmt: 0.05 } };
-    let prevMouse = [0.5, 0.5];
+    const state = { time: 0, mouse: [0.5, 0.5], wind: 0.15, glitch: 0, toggles: {}, params: { intensity: 0.8, fogAmt: 0.6, bloomAmt: 0.7, dofAmt: 0.3, exposure: 1.0, tonemapMode: 0, focusMode: 0, vhsAmt: 0.55, turb: {}, parallaxAmt: 0.05 } };
     function tf(k) { return state.toggles[k] ? 1 : 0; }
     function bg(pipeline, entries) { return device.createBindGroup({ layout: pipeline.getBindGroupLayout(0), entries }); }
 
@@ -377,40 +322,28 @@
       renderTo(dst.createView(), pBlur, group, true);
     }
 
-    function simRipple() {
-      const dx = state.mouse[0] - prevMouse[0], dy = state.mouse[1] - prevMouse[1];
-      const vel = Math.min(0.4, Math.hypot(dx, dy) * 6.0);
-      fRip[0] = 1 / RW; fRip[1] = 1 / RH; fRip[2] = state.mouse[0]; fRip[3] = state.mouse[1]; fRip[4] = vel; fRip[5] = 0.985;
-      device.queue.writeBuffer(ubRip, 0, fRip);
-      const group = bg(pRip, [{ binding: 0, resource: { buffer: ubRip } }, { binding: 1, resource: samp }, { binding: 2, resource: ripA.createView() }]);
-      renderTo(ripB.createView(), pRip, group, true);
-      const t = ripA; ripA = ripB; ripB = t;
-    }
-
     // render pass order (one frame):
-    //   1. (opt) ripple fluid sim  — simRipple(), ping-pongs ripA/ripB at RW×RH
-    //   2. scene + particles       — SCENE_WGSL to sceneTex (full res); particles drawn in the SAME pass
-    //   3. (opt) bloom / dof blur  — doBlur() separable Gaussian into half-res bloomA / dofA
-    //   4. composite               — COMP_WGSL post-FX to the swapchain (canvas)
+    //   1. scene + particles       — SCENE_WGSL to sceneTex (full res); particles drawn in the SAME pass
+    //   2. (opt) bloom / dof blur  — doBlur() separable Gaussian into half-res bloomA / dofA
+    //   3. composite               — COMP_WGSL post-FX to the swapchain (canvas)
     function render() {
       const t = state.time;
-      if (state.toggles.ripple) simRipple();
 
       // scene uniforms — ubScene slot map (fScene index → meaning):
       //   d[0] 0:time 1:canvasAspect(W/H) 2:curImgAspect 3:prevImgAspect
-      //   d[1] 4:mouse.x 5:mouse.y 6:ripTexel.x(1/RW) 7:ripTexel.y(1/RH)
+      //   d[1] 4:mouse.x 5:mouse.y 6:— 7:—
       //   d[2] 8:trans 9:transMode 10:fogAmt 11:—
-      //   d[3] 12:grade 13:warm 14:cool 15:sepia     | d[4] 16:mono 17:invert 18:chroma 19:barrel
-      //   d[5] 20:heat 21:poster 22:fog 23:godrays   | d[6] 24:parallax 25:ripple 26:kenburns 27:parallaxAmt
+      //   d[3] 12:grade 13:warm 14:— 15:—     | d[4] 16:— 17:— 18:— 19:—
+      //   d[5] 20:— 21:— 22:fog 23:—          | d[6] 24:parallax 25:— 26:kenburns 27:parallaxAmt
+      // (6–7, 14–21, 23, 25 are documented gaps — pruned effects' lanes, left 0 rather than renumbered.)
       const cur = curTex || { tex: placeholderTex(), aspect: 16 / 9 };
       const prv = prevTex || cur;
       fScene[0] = t; fScene[1] = W / H; fScene[2] = cur.aspect; fScene[3] = prv.aspect;
-      fScene[4] = state.mouse[0]; fScene[5] = state.mouse[1]; fScene[6] = 1 / RW; fScene[7] = 1 / RH;
+      fScene[4] = state.mouse[0]; fScene[5] = state.mouse[1];
       fScene[8] = trans; fScene[9] = transMode; fScene[10] = state.params.fogAmt; fScene[11] = 0;
-      fScene[12] = tf('grade'); fScene[13] = tf('warm'); fScene[14] = tf('cool'); fScene[15] = tf('sepia');
-      fScene[16] = tf('mono'); fScene[17] = tf('invert'); fScene[18] = tf('chroma'); fScene[19] = tf('barrel');
-      fScene[20] = tf('heat'); fScene[21] = tf('poster'); fScene[22] = tf('fog'); fScene[23] = tf('godrays');
-      fScene[24] = tf('parallax'); fScene[25] = tf('ripple'); fScene[26] = tf('kenburns'); fScene[27] = state.params.parallaxAmt;
+      fScene[12] = tf('grade'); fScene[13] = tf('warm');
+      fScene[22] = tf('fog');
+      fScene[24] = tf('parallax'); fScene[26] = tf('kenburns'); fScene[27] = state.params.parallaxAmt;
       device.queue.writeBuffer(ubScene, 0, fScene);
       // Active scene's depth map (or the 1×1 stand-in). Bound every frame (auto layout requires it),
       // but parallax samples it only while the 'parallax' toggle is on.
@@ -418,8 +351,8 @@
       const depthView = (depthEntry?.tex ?? noTex).createView();
       const sceneGroup = bg(pScene, [
         { binding: 0, resource: { buffer: ubScene } }, { binding: 1, resource: samp },
-        { binding: 2, resource: cur.tex.createView() }, { binding: 3, resource: prv.tex.createView() }, { binding: 4, resource: ripA.createView() },
-        { binding: 5, resource: depthView },
+        { binding: 2, resource: cur.tex.createView() }, { binding: 3, resource: prv.tex.createView() },
+        { binding: 4, resource: depthView },
       ]);
 
       // scene + particles in one pass
@@ -441,24 +374,24 @@
       device.queue.submit([enc.finish()]);
 
       // bloom / dof
-      const doBloom = state.toggles.bloom || state.toggles.flare || state.toggles.halation;
+      const doBloom = state.toggles.bloom || state.toggles.halation;
       const hw = Math.max(2, W >> 1), hh = Math.max(2, H >> 1);
       if (doBloom) doBlur(sceneTex, bloomB, bloomA, 1.0, hw, hh);
       const doDof = state.toggles.focus;
       if (doDof) doBlur(sceneTex, dofB, dofA, 0.0, hw, hh);
 
       // composite to swapchain — ubComp slot map (fComp index → meaning):
-      //   d[0] 0:time 1:glitch 2:grainAmt 3:bloomAmt   | d[1] 4:dofAmt 5:exposure 6:zoomAmt 7:—
+      //   d[0] 0:time 1:glitch 2:— 3:bloomAmt   | d[1] 4:dofAmt 5:exposure 6:— 7:—
       //   d[2] 8:texelF.x(1/W) 9:texelF.y(1/H) 10:tonemapMode 11:focusMode
-      //   d[3] 12:bloom 13:focus 14:vignette 15:scan   | d[4] 16:grain 17:tonemap 18:flare 19:halation
-      //   d[5] 20:sharpen 21:crt 22:dither 23:edge     | d[6] 24:zoomblur 25:vhs 26:vhsAmt 27:FREE
-      fComp[0] = t; fComp[1] = state.glitch; fComp[2] = state.params.grainAmt; fComp[3] = state.params.bloomAmt;
-      fComp[4] = state.params.dofAmt; fComp[5] = state.params.exposure; fComp[6] = state.params.zoomAmt; fComp[7] = 0;
+      //   d[3] 12:bloom 13:focus 14:vignette 15:scan   | d[4] 16:— 17:tonemap 18:— 19:halation
+      //   d[5] 20:— 21:— 22:— 23:—                     | d[6] 24:— 25:vhs 26:vhsAmt 27:FREE
+      // (2, 6, 16, 18, 20–24 are documented gaps — pruned effects' lanes, left 0 rather than renumbered.)
+      fComp[0] = t; fComp[1] = state.glitch; fComp[3] = state.params.bloomAmt;
+      fComp[4] = state.params.dofAmt; fComp[5] = state.params.exposure;
       fComp[8] = 1 / W; fComp[9] = 1 / H; fComp[10] = state.params.tonemapMode; fComp[11] = state.params.focusMode;
       fComp[12] = tf('bloom'); fComp[13] = tf('focus'); fComp[14] = tf('vignette'); fComp[15] = tf('scan');
-      fComp[16] = tf('grain'); fComp[17] = tf('tonemap'); fComp[18] = tf('flare'); fComp[19] = tf('halation');
-      fComp[20] = tf('sharpen'); fComp[21] = tf('crt'); fComp[22] = tf('dither'); fComp[23] = tf('edge');
-      fComp[24] = tf('zoomblur'); fComp[25] = tf('vhs'); fComp[26] = state.params.vhsAmt; fComp[27] = 0;
+      fComp[17] = tf('tonemap'); fComp[19] = tf('halation');
+      fComp[25] = tf('vhs'); fComp[26] = state.params.vhsAmt;
       device.queue.writeBuffer(ubComp, 0, fComp);
       const compGroup = bg(pComp, [
         { binding: 0, resource: { buffer: ubComp } }, { binding: 1, resource: samp },
@@ -468,8 +401,6 @@
         { binding: 5, resource: depthView },
       ]);
       renderTo(ctx.getCurrentTexture().createView(), pComp, compGroup, true);
-
-      prevMouse[0] = state.mouse[0]; prevMouse[1] = state.mouse[1];
     }
 
     return {
@@ -494,8 +425,8 @@
         ro.disconnect();
         for (const k in textures) destroyT(textures[k]?.tex);
         destroyT(noTex);
-        [sceneTex, bloomA, bloomB, dofA, dofB, ripA, ripB].forEach(destroyT);
-        [ubScene, ubComp, ubPart, ubBlur, ubRip].forEach((b) => b.destroy());
+        [sceneTex, bloomA, bloomB, dofA, dofB].forEach(destroyT);
+        [ubScene, ubComp, ubPart, ubBlur].forEach((b) => b.destroy());
         device.destroy();
       },
     };

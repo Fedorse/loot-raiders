@@ -5,11 +5,9 @@
 export interface EngineParams {
 	intensity: number;
 	fogAmt: number;
-	grainAmt: number;
 	bloomAmt: number;
 	dofAmt: number;
 	exposure: number;
-	zoomAmt: number;
 	// Tonemap curve index: 0 ACES · 2 filmic · 3 Reinhard (1/AgX not ported). Defaults 0.
 	tonemapMode: number;
 	// Focus family mode (only read while the 'focus' toggle is on): 0 radial (centre) · 1 tilt-shift ·

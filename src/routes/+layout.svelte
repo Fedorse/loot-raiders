@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import DragLayer from '$lib/components/inventory/drag-layer.svelte';
 	import ContextMenu from '$lib/components/inventory/context-menu.svelte';
 	import TooltipOverlay from '$lib/components/inventory/tooltip-overlay.svelte';
@@ -82,22 +83,16 @@
 <MobileGate />
 <Toasts />
 
-<!-- Dev-only backdrop tuning studio. import.meta.env.DEV is statically false in production, so the
-	branch and the lazily-imported component chunk are eliminated from the production build. -->
-{#if import.meta.env.DEV}
-	{#await import('$lib/components/backdrop/debug-studio.svelte') then { default: DebugStudio }}
-		<DebugStudio />
-	{/await}
-{/if}
-
 {#if showPreloader && !device.isPortraitMobile}
-	<Preloader
-		class="bg-background"
-		images={PRELOAD_IMAGES}
-		progress={assetLoader.progress}
-		onComplete={async () => {
-			await assetLoader.readyPromise;
-			showPreloader = false;
-		}}
-	/>
+	<div class="fixed inset-0 z-999" out:fade={{ duration: 400 }}>
+		<Preloader
+			class="bg-background"
+			images={PRELOAD_IMAGES}
+			progress={assetLoader.progress}
+			onComplete={async () => {
+				await assetLoader.readyPromise;
+				showPreloader = false;
+			}}
+		/>
+	</div>
 {/if}
