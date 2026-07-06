@@ -61,7 +61,7 @@
 <svelte:window onkeydown={(e) => handleGlobalKeydown(e, game)} />
 
 <main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
-	<LivingBackground />
+	<LivingBackground revealed={!showPreloader} />
 
 	<div
 		class="relative z-10 h-full w-full pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)]"
@@ -78,7 +78,9 @@
 <GameMenu />
 <TutorialHighlight />
 <Coachmark />
+
 <QuestBottomSheet />
+
 <LeaderboardModal />
 <MobileGate />
 <Toasts />

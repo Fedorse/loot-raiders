@@ -8,9 +8,11 @@ export interface PreloadImage {
 export const PRELOAD_IMAGES: PreloadImage[] = [
 	{ src: '/assets/preload/slide-1.webp', alt: '' },
 	{ src: '/assets/preload/slide-2.webp', alt: '' },
-	// The middle slide scales up to fill the screen as the preloader's final frame; pointing it at
-	// the menu scene image lands the preloader→menu hand-off on the same picture.
-	{ src: SCENES.menu.image, alt: '' },
+	// The middle slide scales up to fill the screen as the preloader's final frame; pointing it at the
+	// menu scene's graded still (not the raw `image`) makes the reveal cross-fade from a graded frame
+	// into the already-graded live canvas, so the raw→graded exposure pop disappears. As a .webp it also
+	// now qualifies for the typed preload link and the asset-loader's tracked set.
+	{ src: SCENES.menu.staticImage ?? SCENES.menu.image, alt: '' },
 	{ src: '/assets/preload/slide-3.webp', alt: '' },
 	{ src: '/assets/preload/slide-4.webp', alt: '' }
 ];

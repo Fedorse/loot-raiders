@@ -34,7 +34,7 @@
 				>
 					<div>
 						<div
-							class="hidden pl-12 md:block pointer-coarse:hidden"
+							class="hidden pl-20 md:block pointer-coarse:hidden"
 							in:fly|global={{ y: -10, duration: 300 }}
 						>
 							<Wordmark />
@@ -42,7 +42,7 @@
 
 						{#if gameLoop.status === 'paused'}
 							<div
-								class="mt-4 flex items-center gap-4 lg:gap-5 2xl:mt-5 3xl:mt-6 3xl:gap-6 4xl:mt-8 4xl:gap-7"
+								class="mt-4 flex items-center gap-4 pl-12 lg:gap-5 2xl:mt-5 3xl:mt-6 3xl:gap-6 4xl:mt-8 4xl:gap-7"
 								in:fly|global={{ y: 8, duration: 280, delay: 80 }}
 							>
 								<span

@@ -9,6 +9,8 @@
 		resolveScene
 	} from './backdrop-params';
 
+	let { revealed = false }: { revealed?: boolean } = $props();
+
 	const game = getGameContext();
 
 	const reducedMotion = game.device.prefersReducedMotion;
@@ -42,22 +44,25 @@
 			last = now;
 			if (dt > 0.1) dt = 0.1;
 
+			const edt = revealed ? dt : 0;
+
 			if (eng && game.gameLoop.status !== 'tutorial') {
 				if (scene.fx.includes('glitch')) {
-					glitchAcc += dt;
+					glitchAcc += edt;
 					if (glitchAcc >= glitchNext) {
 						glitchNext = Math.max(0.4, (GLITCH.intervalMs / 1000) * (0.7 + Math.random() * 0.6));
 						fireGlitch(GLITCH.strength);
 					}
 				}
-				if (glitchAmp > 0) glitchAmp = Math.max(0, glitchAmp - dt * 3.0);
+				if (glitchAmp > 0) glitchAmp = Math.max(0, glitchAmp - edt * 3.0);
 				eng.setGlitch(glitchAmp);
-				eng.tick(dt);
+				eng.tick(edt);
 			}
 			raf = requestAnimationFrame(loop);
 		};
 
 		const onPointer = (e: PointerEvent) => {
+			if (!revealed) return;
 			eng?.setMouse(e.clientX / window.innerWidth, e.clientY / window.innerHeight);
 		};
 
@@ -127,7 +132,7 @@
 
 {#if useStatic}
 	<img
-		src={scene.image}
+		src={scene.staticImage ?? scene.image}
 		alt=""
 		aria-hidden="true"
 		class="pointer-events-none absolute inset-0 h-full w-full object-cover"

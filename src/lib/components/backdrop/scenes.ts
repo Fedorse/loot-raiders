@@ -34,7 +34,8 @@ export interface SceneFxParams {
 
 export interface SceneDef {
 	id: SceneId;
-	image: string; // background image URL
+	image: string; // background image URL — the engine's texture source; the grade is applied to this
+	staticImage?: string; // optional graded still for the non-animated path; falls back to `image` when unset
 	depth?: string; // optional depth-map URL; the 'parallax' effect samples its red channel
 	fx: ToggleKey[]; // enabled effect toggles
 	params: PanelParams; // PANEL scale, normalized at apply time
@@ -49,6 +50,9 @@ export const SCENES: Record<SceneId, SceneDef> = {
 	menu: {
 		id: 'menu',
 		image: '/assets/looks/ember-road.png',
+		// Graded still of the menu look (captured from the canvas' GPU buffer, plain sRGB). Serves the
+		// non-animated fallback and the preloader's fullscreen final frame; never fed back as a texture.
+		staticImage: '/assets/preload/menu-graded.webp',
 		depth: '/assets/depth/ember-road-depth.png',
 		fx: [
 			'bloom',
