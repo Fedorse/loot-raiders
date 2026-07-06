@@ -85,6 +85,7 @@ export class LootGenerator {
 		this.scanIndex = 0;
 		this.phase = 'loading';
 		this.chestsOpened++;
+		this.audio.play('chest');
 	}
 
 	private generateRandomDrop(): InstanceItem[] {

@@ -20,8 +20,9 @@
 		if (panelData && panelRef) {
 			const rect = panelRef.getBoundingClientRect();
 			const vh = window.innerHeight;
+			const vw = window.innerWidth;
 
-			adjustedX = panelData.x + PADDING;
+			adjustedX = Math.min(panelData.x + PADDING, vw - rect.width - PADDING);
 
 			const rawY = panelData.y + rect.height > vh ? vh - rect.height - PADDING : panelData.y;
 			adjustedY = Math.max(TAB_HEIGHT + 4, rawY);

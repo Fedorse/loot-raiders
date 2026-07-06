@@ -277,7 +277,7 @@ export class Inventory {
 			if (weaponSlot) {
 				this.removeItem(loc);
 				this.setItem(weaponSlot, item);
-				this.audio.play('swap');
+				this.audio.play('drop');
 				return true;
 			}
 		}
@@ -301,7 +301,7 @@ export class Inventory {
 
 		if (item.count === 0) {
 			this.removeItem(loc);
-			this.audio.play('swap');
+			this.audio.play('drop');
 			return true;
 		}
 
@@ -309,7 +309,7 @@ export class Inventory {
 		if (emptySlot) {
 			this.removeItem(loc);
 			this.setItem(emptySlot, item);
-			this.audio.play('swap');
+			this.audio.play('drop');
 			return true;
 		}
 

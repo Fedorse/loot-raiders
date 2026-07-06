@@ -1,9 +1,9 @@
 import { Howl } from 'howler';
-import { SOUNDS, type SoundKey } from '$lib/config/sounds';
+import { SOUNDS, type SoundKey, type SoundConfig } from '$lib/config/sounds';
 
 export class AudioManager {
-	volume = $state(2);
-	muted = $state(true);
+	volume = $state(1);
+	muted = $state(false);
 	private howls = new Map<SoundKey, Howl>();
 	private bgm: Howl | null = null;
 
@@ -12,21 +12,24 @@ export class AudioManager {
 	}
 
 	private preload() {
-		for (const [key, config] of Object.entries(SOUNDS)) {
+		for (const [key, config] of Object.entries(SOUNDS) as [SoundKey, SoundConfig][]) {
 			const howl = new Howl({
 				src: [config.src],
 				volume: config.volume ?? this.volume,
 				loop: config.loop ?? false
 			});
-			this.howls.set(key as SoundKey, howl);
+			this.howls.set(key, howl);
 		}
 		this.bgm = this.howls.get('bgm') ?? null;
 	}
 	play(key: SoundKey) {
 		const howl = this.howls.get(key);
 		if (!howl || this.muted) return;
-		howl.volume((SOUNDS[key].volume ?? 1) * this.volume);
-		howl.play();
+		const cfg = SOUNDS[key] as SoundConfig;
+		howl.volume((cfg.volume ?? 1) * this.volume);
+		const id = howl.play();
+
+		if (cfg.offset) howl.seek(cfg.offset / 1000, id);
 	}
 	playBGM() {
 		if (!this.bgm || this.muted) return;
@@ -34,7 +37,7 @@ export class AudioManager {
 		this.bgm.play();
 	}
 	duckBGM() {
-		this.bgm?.fade(this.bgm.volume(), SOUNDS.bgm.volume * this.volume * 0.3, 400);
+		this.bgm?.fade(this.bgm.volume(), SOUNDS.bgm.volume * this.volume * 0.25, 400);
 	}
 
 	unduckBGM() {

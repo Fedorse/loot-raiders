@@ -31,6 +31,8 @@
 
 	const isHovered = $derived(interaction.isHovered(location));
 	const showInvalidHint = $derived(interaction.shouldShowInvalidHint(slotState));
+
+	let augmentTapWasOpen = false;
 </script>
 
 <div
@@ -47,6 +49,7 @@
 			</div>
 		</div>
 	{:else}
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<div
 			class="relative z-20 h-full w-full p-[1.5px] md:p-[2px] lg:p-[3.5px]"
 			onpointerdowncapture={(e) => {
@@ -54,6 +57,7 @@
 					if (!item) selection.clear();
 					overlay.closeContextMenu();
 				}
+				augmentTapWasOpen = isAugmentSlot && overlay.augmentPanel !== null;
 			}}
 			oncontextmenu={(e) => {
 				e.preventDefault();
@@ -63,6 +67,11 @@
 					overlay.openContextMenu(e.clientX, e.clientY, slotState);
 					selection.select(slotState.item.uid);
 				}
+			}}
+			onclick={(e) => {
+				if (!isAugmentSlot || augmentTapWasOpen) return;
+				const rect = e.currentTarget.getBoundingClientRect();
+				overlay.openAugmentUpgrade(rect.right, rect.top);
 			}}
 			onpointerenter={(e) => {
 				if (e.pointerType === 'touch') return;

@@ -5,7 +5,7 @@
 	import { getRarityStyleTooltip } from '$lib/config/rarity';
 	import { clickOutside } from '$lib/actions/actions';
 
-	const { overlay, inventory, tutorial } = getGameContext();
+	const { overlay, inventory, tutorial, audio } = getGameContext();
 	const menuData = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
@@ -75,6 +75,7 @@
 			disabled={dropDisabled}
 			onclick={() => {
 				inventory.removeItem(menuData.slot.location);
+				audio.play('drop');
 				close();
 			}}
 		>
