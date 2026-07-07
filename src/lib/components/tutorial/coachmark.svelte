@@ -13,8 +13,6 @@
 		hold: 'Hold'
 	};
 
-	// Map a step's badge to the finger gesture its action needs, so the mobile card animates the
-	// gesture instead of showing a text badge. Info/CTA steps (note, finish) fall back to a tap.
 	function badgeToGesture(badge: string): GestureKind {
 		switch (badge) {
 			case 'drag':
@@ -26,8 +24,6 @@
 		}
 	}
 
-	// Mobile never anchors the card to elements (it would cover the small landscape HUD); it sits in
-	// the corner, so the only spatial cue is the highlight overlay. The card just shows the gesture.
 	const isMobile = $derived(device.isCoarsePointer);
 
 	const mobileGestures = $derived.by<GestureKind[]>(() => {
@@ -37,9 +33,6 @@
 		return [badgeToGesture(s.badge)];
 	});
 
-	// Desktop badges that map to a mouse action get an animated mouse demo (mirroring the mobile
-	// gesture demos) instead of a text plaque. The single icon highlights the RIGHT button, so left
-	// click / drag flip it horizontally. Other badges (note, finish) keep the text plaque.
 	type MouseKind = 'left' | 'right' | 'drag';
 
 	const MOUSE_BADGE: Record<string, MouseKind> = {
@@ -85,11 +78,6 @@
 		caret: number;
 	}
 
-	// Per-placement position of the diamond caret. `--c` (set inline) is the tip's offset along the
-	// card edge, toward the anchor; the −7px / negative margins straddle the 14px diamond on the edge.
-	// Each placement also borders only the two outward-facing sides of the rotated square, so the tip
-	// reads as a notch in the card outline (the diamond sits on top of the body, its fill hiding the
-	// card border segment behind it, and these two edges continue the outline out to the point).
 	const caretPos: Record<Placement, string> = {
 		right: '-left-[7px] top-[var(--c)] -mt-[7px] border-b-[0.5px] border-l-[0.5px]',
 		left: '-right-[7px] top-[var(--c)] -mt-[7px] border-t-[0.5px] border-r-[0.5px]',
@@ -97,14 +85,10 @@
 		top: '-bottom-[7px] left-[var(--c)] -ml-[7px] border-r-[0.5px] border-b-[0.5px]'
 	};
 
-	// The card points at the step's GOAL (the pulsing element) when there is one, otherwise at
-	// the first revealed target. Info steps have neither → it stays centered at the bottom.
 	const anchorId = $derived(
 		tutorial.active ? (tutorial.step?.pulse?.[0] ?? tutorial.step?.targets?.[0] ?? null) : null
 	);
 
-	// When set, the card anchors to a live item (by defId, via `data-tut-item`) instead of a HUD
-	// element — used to park the card next to the specific item a step is about.
 	const itemAnchorDef = $derived(
 		tutorial.active ? (tutorial.step?.itemAnchor ?? tutorial.step?.itemPulse?.[0] ?? null) : null
 	);
@@ -112,8 +96,6 @@
 	let cardEl = $state<HTMLElement>();
 	let pos = $state<Pos | null>(null);
 
-	// Anchored steps wait one frame for the first measurement so the card never flashes at the
-	// fallback spot before snapping next to the target.
 	const ready = $derived((!anchorId && !itemAnchorDef) || pos !== null);
 	const posStyle = $derived(
 		pos
@@ -161,11 +143,7 @@
 		const id = anchorId;
 		const itemDef = itemAnchorDef;
 		void tutorial.index;
-		// Re-measure when a seeded item mounts, so an item-anchored card finds its target. `loot.phase`
-		// covers drop items, which only render their slot once the scan-in animation finishes.
-		// `interaction.status` covers drag: the source slot swaps to EmptySlot while dragging and
-		// remounts a fresh data-tut-item node on drop, so without re-running here the card would stay
-		// hidden after an invalid/in-place drop (trackLayout keeps observing the removed node).
+
 		void inventory.items.length;
 		void loot.phase;
 		void interaction.status;
@@ -200,17 +178,15 @@
 
 {#if tutorial.active && tutorial.step}
 	{#if isMobile}
-		<!-- Mobile: a fixed, unanchored card pinned to the bottom-right corner. Anchoring to HUD
-		     elements covers the small landscape screen, so the highlight overlay is the spatial cue. -->
 		<div
-			class="fixed right-3 bottom-3 z-40 max-h-[calc(100dvh-1.5rem)] w-[min(480px,calc(100vw-1.5rem))] overflow-y-auto overscroll-contain rounded-xl border-[0.5px] border-[#ffb800]/50 bg-[#0e1422]/95 px-3.5 py-2.5 shadow-[0_14px_40px_rgba(0,0,0,0.6)] backdrop-blur-sm"
+			class="fixed right-3 bottom-3 z-40 max-h-[calc(100dvh-1.5rem)] w-[min(480px,calc(100vw-1.5rem))] overflow-y-auto overscroll-contain rounded-2xl border border-accent/40 bg-gradient-to-b from-panel-top to-panel-bottom px-3.5 py-3 shadow-[0_24px_60px_rgba(0,0,0,0.55)] backdrop-blur-sm"
 		>
 			<div class="mb-2 flex items-center gap-2.5">
 				{@render progress()}
 				{#if tutorial.isActionStep}
 					<button
 						onclick={skip}
-						class="shrink-0 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors active:text-white/75"
+						class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-accent uppercase transition-colors active:text-accent/70"
 					>
 						Skip ›
 					</button>
@@ -230,7 +206,7 @@
 					>
 						{tutorial.step.title}
 					</h2>
-					<p class="mt-0.5 text-[11.5px] leading-snug text-[#9aa6b6]">
+					<p class="mt-0.5 text-[11.5px] leading-snug text-[#a9b6c6]">
 						{tutorial.step.description}
 					</p>
 				</div>
@@ -255,7 +231,7 @@
 		>
 			{#if pos}
 				<span
-					class="pointer-events-none absolute z-20 h-3.5 w-3.5 rotate-45 border-[#ffb800]/50 bg-[#0e1422] {caretPos[
+					class="pointer-events-none absolute z-20 h-3.5 w-3.5 rotate-45 border-accent/40 bg-panel-top {caretPos[
 						pos.placement
 					]}"
 					style="--c:{pos.caret}px"
@@ -263,7 +239,7 @@
 			{/if}
 
 			<div
-				class="relative z-10 rounded-xl border-[0.5px] border-[#ffb800]/50 bg-[#0e1422] p-3 shadow-[0_14px_40px_rgba(0,0,0,0.6)]"
+				class="relative z-10 rounded-2xl border border-accent/40 bg-gradient-to-b from-panel-top to-panel-bottom p-3.5 shadow-[0_24px_60px_rgba(0,0,0,0.55)]"
 			>
 				<div class="mb-2 flex items-center gap-2">
 					{@render progress()}
@@ -282,7 +258,7 @@
 					</div>
 				</div>
 
-				<p class="mt-1 text-[11.5px] leading-snug text-[#9aa6b6] 2xl:text-[12px]">
+				<p class="mt-1 text-[11.5px] leading-snug text-[#a9b6c6] 2xl:text-[12px]">
 					{tutorial.step.description}
 				</p>
 
@@ -290,7 +266,7 @@
 					<div class="flex w-full justify-end">
 						<button
 							onclick={skip}
-							class="mt-2.5 font-['Saira_Condensed'] text-[10px] font-semibold tracking-[0.12em] text-white/40 uppercase transition-colors hover:text-white/60"
+							class="mt-2.5 font-mono text-[10px] font-medium tracking-[0.1em] text-accent uppercase transition-colors hover:text-accent/70"
 						>
 							Skip step ›
 						</button>
@@ -309,16 +285,15 @@
 {/if}
 
 {#snippet progress()}
-	<span
-		class="shrink-0 font-['Saira_Condensed'] text-[10px] font-bold tracking-[0.16em] text-[#ffb800] uppercase"
+	<span class="shrink-0 font-mono text-[10px] font-medium tracking-[0.16em] text-accent uppercase"
 		>Step {tutorial.stepNumber}/{tutorial.total}</span
 	>
-	<div class="flex flex-1 items-center gap-1">
+	<div class="flex flex-1 items-center gap-[5px]">
 		{#each segments as i (i)}
 			<span
-				class="h-1 flex-1 rounded-full transition-colors {i <= tutorial.index
-					? 'bg-[#ffb800]'
-					: 'bg-white/12'}"
+				class="h-[5px] flex-1 rounded-full transition-colors {i <= tutorial.index
+					? 'bg-accent'
+					: 'bg-[rgba(190,205,225,0.16)]'}"
 			></span>
 		{/each}
 	</div>

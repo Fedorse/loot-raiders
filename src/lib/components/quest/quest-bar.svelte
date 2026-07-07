@@ -52,13 +52,17 @@
 	{#if collected}
 		<div class="absolute inset-x-0 bottom-0 z-20 h-0.5 bg-white/5 2xl:h-1 4xl:h-1.5">
 			<div
-				class="h-full transition-all duration-300 {item.matched
-					? 'bg-emerald-400'
+				class="quest-fill relative h-full overflow-hidden transition-[width] duration-500 ease-out {item.matched
+					? 'bg-emerald-400 text-emerald-400'
 					: pct > 0
-						? 'bg-cyan-400'
+						? 'bg-cyan-400 text-cyan-400'
 						: ''}"
 				style="width: {pct}%"
-			></div>
+			>
+				{#if !item.matched}
+					<span class="quest-shimmer absolute inset-0"></span>
+				{/if}
+			</div>
 		</div>
 	{/if}
 {/snippet}
@@ -227,6 +231,30 @@
 </div>
 
 <style>
+	.quest-fill {
+		box-shadow: 0 0 6px color-mix(in srgb, currentColor 40%, transparent);
+	}
+
+	.quest-shimmer {
+		background: linear-gradient(
+			90deg,
+			transparent 0%,
+			rgba(255, 255, 255, 0.55) 50%,
+			transparent 100%
+		);
+		animation: quest-shimmer 1.6s ease-in-out infinite;
+	}
+
+	@keyframes quest-shimmer {
+		0% {
+			transform: translateX(-100%);
+		}
+		60%,
+		100% {
+			transform: translateX(100%);
+		}
+	}
+
 	.stage-item {
 		animation: stage-item-in 360ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
 		animation-delay: calc(var(--i, 0) * 70ms);
@@ -262,6 +290,11 @@
 		.stage-item,
 		.stage-name {
 			animation: none;
+		}
+
+		.quest-shimmer {
+			animation: none;
+			opacity: 0;
 		}
 	}
 </style>

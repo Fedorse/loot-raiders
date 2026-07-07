@@ -4,7 +4,7 @@
 	import { getLeaderboard } from '$lib/leaderboard/leaderboard.remote';
 	import { formatTime } from '$lib/utils';
 	import Cross from '$lib/ui-icon/cross.svelte';
-	import LeaderboardIcon from '$lib/ui-icon/leaderboard.svelte';
+	import Trophy from '$lib/ui-icon/trophy.svelte';
 
 	const { overlay, audio } = getGameContext();
 
@@ -52,12 +52,14 @@
 		});
 	});
 
-	const rankColor = (rank: number) => {
-		if (rank === 1) return 'text-amber-400';
-		if (rank === 2) return 'text-white/80';
-		if (rank === 3) return 'text-orange-400';
-		return 'text-white/40';
-	};
+	const medalGradient = (rank: number) =>
+		rank === 1
+			? 'from-rank-1-from to-rank-1-to'
+			: rank === 2
+				? 'from-rank-2-from to-rank-2-to'
+				: 'from-rank-3-from to-rank-3-to';
+
+	const pad2 = (n: number) => String(n).padStart(2, '0');
 </script>
 
 {#if overlay.leaderboard}
@@ -69,17 +71,20 @@
 		onclick={handleClose}
 	>
 		<div
-			class="flex max-h-[88dvh] w-[calc(100vw-1rem)] max-w-[460px] flex-col overflow-hidden rounded-md bg-background/95 shadow-[0_30px_80px_rgba(0,0,0,0.65)] ring-1 ring-white/10 md:max-w-[560px] lg:max-w-[640px]"
+			class="flex max-h-[88dvh] w-[calc(100vw-1rem)] max-w-[520px] flex-col overflow-hidden rounded-md border border-accent/20 bg-gradient-to-b from-panel-top to-panel-bottom font-sans text-fg-body shadow-[0_40px_100px_rgba(0,0,0,0.6)] lg:max-w-[800px]"
 			transition:scale={{ duration: 200, start: 0.95 }}
 			onclick={(e) => e.stopPropagation()}
 		>
-			<div
-				class="flex items-center justify-between border-b border-white/10 px-4 py-3 md:px-5 md:py-4"
-			>
-				<div class="flex items-center gap-2.5 text-amber-400">
-					<LeaderboardIcon />
+			<!-- header -->
+			<div class="flex items-center justify-between border-b border-hairline px-5 py-3 lg:py-3.5">
+				<div class="flex items-center gap-3">
 					<span
-						class="font-mono text-[11px] font-extrabold tracking-[0.36em] uppercase md:text-[12px]"
+						class="flex size-8 items-center justify-center rounded-lg border border-accent/40 bg-gradient-to-b from-accent/20 to-accent/5 text-accent md:size-10"
+					>
+						<Trophy class="size-4.5 lg:size-5.5" />
+					</span>
+					<span
+						class="font-sans text-[13px] font-extrabold tracking-[0.22em] text-fg uppercase md:text-[16px]"
 					>
 						Leaderboard
 					</span>
@@ -87,101 +92,140 @@
 				<button
 					type="button"
 					aria-label="Close"
-					class="flex size-7 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-transform hover:bg-white/10 active:scale-90"
+					class="flex size-8 items-center justify-center rounded-full border border-hairline bg-white/5 text-[#c6bcb0] transition-colors hover:border-accent/40 hover:text-accent active:scale-90"
 					onclick={handleClose}
 				>
 					<Cross />
 				</button>
 			</div>
 
+			<!-- your-rank banner -->
 			{#if myRank !== null}
 				<div
-					class="flex items-center justify-between border-b border-white/8 px-5 py-2 font-mono text-[10px] font-extrabold tracking-[0.3em] text-white uppercase"
+					class="flex items-center justify-between border-b border-hairline bg-gradient-to-r from-accent/10 to-transparent px-5 py-1.5 lg:py-2.5"
 				>
-					<span>Your rank</span>
-					<span class="text-base font-black tracking-normal text-amber-400 tabular-nums">
+					<span
+						class="font-mono text-[9px] font-medium tracking-[0.22em] text-accent uppercase lg:text-[11px]"
+					>
+						Your rank
+					</span>
+					<span
+						class="font-sans text-[16px] font-extrabold text-accent tabular-nums lg:text-[20px]"
+					>
 						#{myRank}
 					</span>
 				</div>
 			{/if}
 
+			<!-- column header -->
 			<div
-				class="grid grid-cols-[40px_1fr_90px_64px] gap-3 border-b border-white/8 px-4 py-2 font-mono text-[9px] font-extrabold tracking-[0.3em] text-white/40 uppercase md:grid-cols-[48px_1fr_110px_80px] md:px-5"
+				class="grid grid-cols-[34px_1fr_72px_50px] items-center gap-3 border-b border-hairline px-6.5 pt-2.5 pb-2 font-mono text-[9px] tracking-[0.2em] text-fg-faint uppercase lg:grid-cols-[48px_1fr_100px_68px] lg:px-7.5 lg:text-[10px]"
 			>
-				<div class="text-center">#</div>
-				<div>Nickname</div>
+				<div>#</div>
+				<div>Raider</div>
 				<div class="text-right">Loot</div>
 				<div class="text-right">Time</div>
 			</div>
 
-			<div bind:this={listEl} class="flex-1 overflow-y-auto px-2 py-1 md:px-3">
+			<!-- rows -->
+			<div
+				bind:this={listEl}
+				class="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-2 md:px-4"
+			>
 				{#if isLoading}
 					{#each skeletonRows as i (i)}
 						<div
-							class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 px-2 py-2.5 md:grid-cols-[48px_1fr_110px_80px] md:px-3"
+							class="grid grid-cols-[34px_1fr_72px_50px] items-center gap-3 rounded-md bg-row px-3.5 py-3 md:grid-cols-[48px_1fr_100px_68px]"
 						>
-							<div class="mx-auto h-3 w-3.5 animate-pulse rounded bg-white/10"></div>
-							<div class="h-3 w-2/3 animate-pulse rounded bg-white/10"></div>
-							<div class="ml-auto h-3 w-12 animate-pulse rounded bg-white/10"></div>
-							<div class="ml-auto h-3 w-8 animate-pulse rounded bg-white/10"></div>
+							<div class="size-7 animate-pulse rounded-md bg-white/10 md:size-9"></div>
+							<div class="h-3.5 w-2/3 animate-pulse rounded bg-white/10"></div>
+							<div class="ml-auto h-3.5 w-12 animate-pulse rounded bg-white/10"></div>
+							<div class="ml-auto h-3.5 w-8 animate-pulse rounded bg-white/10"></div>
 						</div>
 					{/each}
 				{:else}
 					{#each displayRows as row (row.placeholder ? `empty-${row.rank}` : row.entry.playerId)}
 						{#if row.placeholder}
 							<div
-								class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 rounded-sm px-2 py-2 opacity-35 md:grid-cols-[48px_1fr_110px_80px] md:px-3"
+								class="grid grid-cols-[34px_1fr_72px_50px] items-center gap-3 rounded-md border border-transparent bg-[rgba(24,28,34,0.32)] px-3.5 py-2.5 opacity-40 md:grid-cols-[48px_1fr_100px_68px]"
 							>
-								<div
-									class="text-center font-mono text-[13px] font-black tabular-nums {rankColor(
-										row.rank
-									)}"
-								>
-									{row.rank}
-								</div>
-								<div class="text-[13px] font-bold tracking-wide text-white/25 uppercase">—</div>
-								<div class="text-right font-mono text-[13px] font-black text-white/20 tabular-nums">
+								<span class="pl-1 font-mono text-[12px] text-fg-faint tabular-nums md:text-[15px]">
+									{pad2(row.rank)}
+								</span>
+								<div class="text-[12px] tracking-wide text-fg-faint uppercase md:text-[15px]">
 									—
 								</div>
-								<div class="text-right font-mono text-[11px] text-white/20 tabular-nums">—</div>
-							</div>
-						{:else}
-							<div
-								data-entry-id={row.entry.playerId}
-								class="grid grid-cols-[40px_1fr_90px_64px] items-center gap-3 rounded-sm px-2 py-2 transition-colors md:grid-cols-[48px_1fr_110px_80px] md:px-3"
-								class:bg-amber-400-soft={row.isMine}
-								class:ring-1={row.isMine}
-								class:ring-amber-400-soft={row.isMine}
-							>
 								<div
-									class="text-center font-mono text-[13px] font-black tabular-nums {rankColor(
-										row.rank
-									)}"
+									class="text-right font-mono text-[12px] text-fg-faint tabular-nums md:text-[15px]"
 								>
-									{row.rank}
+									—
 								</div>
 								<div
-									class="truncate text-[13px] font-bold tracking-wide uppercase md:text-[14px]"
-									class:text-amber-300={row.isMine}
-									class:text-white={!row.isMine && row.rank <= 3}
-									class:text-white-80={!row.isMine && row.rank > 3}
+									class="text-right font-mono text-[10px] text-fg-faint tabular-nums md:text-[12px]"
 								>
-									{row.entry.nickname}
+									—
+								</div>
+							</div>
+						{:else}
+							{@const rowClass = row.isMine
+								? `relative bg-gradient-to-r from-accent/15 to-accent/5 border border-accent/50 before:absolute before:left-0 before:top-2.5 before:bottom-2.5 before:w-[3px] before:rounded-r before:bg-accent before:content-['']`
+								: row.rank <= 3
+									? 'bg-row border border-white/[0.06]'
+									: 'bg-[rgba(24,28,34,0.32)] border border-transparent'}
+							{@const nameClass = row.isMine
+								? 'text-[#f6efe1] font-extrabold'
+								: row.rank <= 3
+									? 'text-fg-body font-bold'
+									: 'text-[#c6bcb0] font-semibold'}
+							{@const podium = row.isMine || row.rank <= 3}
+							<div
+								data-entry-id={row.entry.playerId}
+								class="grid grid-cols-[34px_1fr_72px_50px] items-center gap-3 rounded-md px-3.5 py-1.5 transition-colors md:grid-cols-[48px_1fr_100px_68px] lg:py-2.5 {rowClass}"
+							>
+								<div class="flex items-center">
+									{#if row.rank <= 3}
+										<span
+											class="inline-flex size-8 items-center justify-center rounded-md bg-gradient-to-b {medalGradient(
+												row.rank
+											)} text-[14px] font-extrabold text-[#12140f] tabular-nums md:text-[15px] lg:size-9"
+										>
+											{row.rank}
+										</span>
+									{:else}
+										<span
+											class="pl-1 font-mono text-[14px] text-fg-muted tabular-nums md:text-[15px]"
+										>
+											{pad2(row.rank)}
+										</span>
+									{/if}
+								</div>
+
+								<div class="flex min-w-0 items-center gap-2">
+									<span
+										class="truncate text-[12.5px] tracking-wide uppercase md:text-[15px] {nameClass}"
+									>
+										{row.entry.nickname}
+									</span>
 									{#if row.isMine}
 										<span
-											class="ml-1 font-mono text-[8px] font-extrabold tracking-[0.2em] text-amber-400/70 uppercase"
+											class="shrink-0 rounded bg-accent px-1.5 py-0.5 font-mono text-[8px] font-bold tracking-[0.14em] text-[#12140f] uppercase"
 										>
 											you
 										</span>
 									{/if}
 								</div>
+
 								<div
-									class="text-right font-mono text-[13px] font-black text-amber-400 tabular-nums md:text-[14px]"
+									class="text-right font-mono text-[12px] font-medium tabular-nums md:text-[15px] {podium
+										? 'text-accent'
+										: 'text-[#c6a969]'}"
 								>
 									{row.entry.extract.toLocaleString('en-US')}
 								</div>
 								<div
-									class="text-right font-mono text-[11px] text-white/60 tabular-nums md:text-[12px]"
+									class="text-right font-mono text-[10px] tabular-nums md:text-[12px] {podium
+										? 'text-fg-body'
+										: 'text-fg-muted'}"
 								>
 									{formatTime(row.entry.time)}
 								</div>
@@ -191,23 +235,14 @@
 				{/if}
 			</div>
 
+			<!-- footer -->
 			<div
-				class="border-t border-white/8 px-5 py-3 text-center font-mono text-[9px] font-bold tracking-[0.3em] text-white/30 uppercase"
+				class=":text-[11px] flex items-center justify-center gap-2 border-t border-hairline py-3 font-mono text-[8px] tracking-[0.2em] text-fg-faint uppercase"
 			>
-				Top runs · all time
+				<span class="text-fg-muted">Top runs</span>
+				<span class="text-accent">·</span>
+				<span>All time</span>
 			</div>
 		</div>
 	</div>
 {/if}
-
-<style>
-	.bg-amber-400-soft {
-		background-color: rgb(251 191 36 / 0.08);
-	}
-	.ring-amber-400-soft {
-		--tw-ring-color: rgb(251 191 36 / 0.3);
-	}
-	.text-white-80 {
-		color: rgb(255 255 255 / 0.75);
-	}
-</style>

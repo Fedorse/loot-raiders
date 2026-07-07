@@ -3,16 +3,18 @@
 
 	const { audio } = getGameContext();
 
-	const MAX = 2; // audio.volume range is 0..2
-	const pct = $derived(Math.round((audio.volume / MAX) * 100));
-	// заполнение трека: при муте — пусто
-	const fill = $derived(audio.muted ? 0 : pct);
-	// волны динамика: 0 = mute, 1 = тихо, 2 = громко
+	const MAX = 2;
+	const STEPS = 10;
+
+	const pct = $derived(audio.muted ? 0 : Math.round((audio.volume / MAX) * 100));
+	const onCount = $derived(Math.round((pct / 100) * STEPS));
 	const level = $derived(audio.muted ? 0 : audio.volume / MAX < 0.5 ? 1 : 2);
+
+	const fillOpacity = $derived(0.35 + 0.65 * (pct / 100));
 
 	function onInput(e: Event) {
 		audio.setVolume(Number((e.currentTarget as HTMLInputElement).value));
-		if (audio.muted) audio.toggleMute(); // снять mute при движении ползунка
+		if (audio.muted) audio.toggleMute();
 	}
 	function toggleMute() {
 		audio.play('click');
@@ -21,7 +23,7 @@
 </script>
 
 <div
-	class="group flex w-full items-center gap-3 rounded-md border border-[#e8e0d2]/15 bg-[#100c09]/60 px-5 py-3.5 transition-all 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
+	class="group flex w-full items-center gap-3 rounded-md border border-hairline bg-row px-5 py-3.5 transition-all hover:bg-accent-tint 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
 >
 	<!-- speaker = mute toggle -->
 	<button
@@ -29,13 +31,13 @@
 		onclick={toggleMute}
 		aria-label={audio.muted ? 'Unmute' : 'Mute'}
 		aria-pressed={audio.muted}
-		class="flex shrink-0 cursor-pointer items-center transition-colors {audio.muted
-			? 'text-[#6b6056]'
-			: 'text-[#e8e0d2]'}"
+		class="group flex shrink-0 cursor-pointer items-center transition-colors {audio.muted
+			? 'text-fg-faint'
+			: 'text-fg'}"
 	>
 		<svg
 			viewBox="0 0 24 24"
-			class="h-5 w-5 2xl:h-[22px] 2xl:w-[22px] 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7 pointer-coarse:h-4 pointer-coarse:w-4"
+			class="h-5 w-5 text-fg-muted group-hover:text-fg 2xl:h-[22px] 2xl:w-[22px] 3xl:h-6 3xl:w-6 4xl:h-7 4xl:w-7 pointer-coarse:h-4 pointer-coarse:w-4"
 			fill="none"
 			stroke="currentColor"
 			stroke-width="1.7"
@@ -55,51 +57,40 @@
 		</svg>
 	</button>
 
-	<span
-		class="flex-1 text-[15px] font-semibold tracking-wider text-[#c6bcb0] group-hover:text-[#ece4d6] lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
-		>Sound</span
+	<div
+		onclick={toggleMute}
+		class="text-[15px] font-semibold tracking-wider text-fg-body group-hover:text-fg lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
 	>
+		Sound
+	</div>
 
-	<input
-		type="range"
-		min="0"
-		max="2"
-		step="0.1"
-		value={audio.volume}
-		oninput={onInput}
-		aria-label="Volume"
-		class="menu-slider h-2 w-32 cursor-pointer appearance-none 2xl:w-36 3xl:h-2.5 3xl:w-40 4xl:w-48 pointer-coarse:w-32"
-		style="background: linear-gradient(to right, #e8e0d2 {fill}%, #3a322b {fill}%);"
-	/>
+	<div class="relative flex h-8 flex-1 items-center 3xl:h-9 pointer-coarse:h-5">
+		<div class="pointer-events-none flex w-full items-center gap-1">
+			{#each { length: STEPS }, i (i)}
+				<span
+					class="h-[20px] flex-1 rounded-[3px] transition-[background-color,opacity] pointer-coarse:h-[17.5px] {i <
+					onCount
+						? 'bg-accent'
+						: 'bg-[rgba(190,205,225,0.16)]/40'}"
+					style={i < onCount ? `opacity: ${fillOpacity}` : undefined}
+				></span>
+			{/each}
+		</div>
+		<input
+			type="range"
+			min="0"
+			max="2"
+			step="0.2"
+			value={audio.volume}
+			oninput={onInput}
+			aria-label="Volume"
+			class="absolute inset-0 m-0 h-full w-full cursor-pointer opacity-0"
+		/>
+	</div>
 
 	<span
-		class="w-10 text-right text-[13px] font-semibold tabular-nums 2xl:text-sm 3xl:w-12 3xl:text-[15px] 4xl:w-14 4xl:text-base pointer-coarse:w-8 pointer-coarse:text-[11px] {audio.muted
-			? 'text-[#9a8e84]'
-			: 'text-[#c6bcb0]'}">{audio.muted ? 'OFF' : `${pct}%`}</span
+		class="w-10 text-right font-mono text-[13px] font-semibold tabular-nums 2xl:text-sm 3xl:w-12 3xl:text-[15px] 4xl:w-14 4xl:text-base pointer-coarse:w-8 pointer-coarse:text-[11px] {audio.muted
+			? 'text-fg-faint'
+			: 'text-accent'}">{audio.muted ? 'OFF' : `${pct}%`}</span
 	>
 </div>
-
-<style>
-	@reference "tailwindcss";
-
-	.menu-slider {
-		-webkit-appearance: none;
-		appearance: none;
-	}
-	.menu-slider::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		appearance: none;
-		width: 14px;
-		height: 14px;
-		background: #cabfb2;
-		cursor: pointer;
-		border-radius: 0;
-	}
-	.menu-slider::-moz-range-thumb {
-		width: 14px;
-		height: 14px;
-		background: #cabfb2;
-		border: none;
-		border-radius: 0;
-	}
-</style>

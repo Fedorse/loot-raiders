@@ -136,12 +136,12 @@
 </script>
 
 {#snippet breakdownCell(label: string, value: string)}
-	<div class="rounded-xs border border-white/8 bg-white/[0.04] px-3 py-1.5 lg:px-3.5 lg:py-3">
-		<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-white/50 uppercase">
+	<div class="rounded-xs border border-hairline bg-row px-3 py-1.5 lg:px-3.5 lg:py-3">
+		<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-fg-muted uppercase">
 			{label}
 		</div>
 		<div
-			class="mt-1 font-mono text-[18px] leading-none font-black tracking-[-0.01em] text-white/90 tabular-nums md:text-[22px] 3xl:text-[26px]"
+			class="mt-1 font-mono text-[18px] leading-none font-black tracking-[-0.01em] text-fg-body tabular-nums md:text-[22px] 3xl:text-[26px]"
 		>
 			{value}
 		</div>
@@ -150,17 +150,17 @@
 
 <div
 	in:fade|global={{ duration: 240 }}
-	class="relative w-[calc(100vw-1rem)] max-w-[420px] rounded-md bg-background/50 font-sans text-white/90 shadow-[0_30px_80px_rgba(0,0,0,0.65),inset_0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-md md:max-w-[680px] lg:max-w-[760px] 3xl:max-w-[840px] pointer-coarse:border pointer-coarse:border-white/15 landscape-narrow:max-w-[540px] landscape-mid:max-w-[620px]"
+	class="relative w-[calc(100vw-1rem)] max-w-[420px] overflow-hidden rounded-md border border-accent/20 bg-gradient-to-b from-panel-top to-panel-bottom font-sans text-fg-body md:max-w-[680px] lg:max-w-[760px] 3xl:max-w-[840px] landscape-narrow:max-w-[540px] landscape-mid:max-w-[620px]"
 >
-	<div class="flex items-center justify-between gap-3 border-b border-white/8 px-5 py-3">
+	<div class="flex items-center justify-between gap-3 border-b border-hairline px-5 py-3">
 		{#if leaderboard.hasNickname && !showNicknameForm}
-			<span class="font-mono text-[9px] font-bold tracking-[0.24em] text-white/35 uppercase">
-				<span class="font-extrabold text-amber-400/80 uppercase">{leaderboard.nickname}</span>
-				·
+			<span class="font-mono text-[9px] font-bold tracking-[0.24em] uppercase">
+				<span class="font-extrabold text-[#c6a969] uppercase">{leaderboard.nickname}</span>
+				<span class="text-fg-faint">·</span>
 				<button
 					type="button"
 					onclick={onChangeNickname}
-					class="underline decoration-dotted underline-offset-2 hover:text-white/70"
+					class="text-fg-muted underline decoration-dotted underline-offset-[3px] hover:text-fg-body"
 				>
 					edit
 				</button>
@@ -170,15 +170,15 @@
 		{/if}
 
 		<span
-			class="flex items-center gap-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-amber-400 uppercase"
+			class="flex items-center gap-2 font-mono text-[10px] font-extrabold tracking-[0.22em] text-accent uppercase"
 		>
-			<span class="size-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_#ffb800]"></span>
+			<span class="size-1.5 rounded-full bg-accent shadow-[0_0_8px_#ebbb4e]"></span>
 			Run Report
 		</span>
 	</div>
 
 	<div
-		class="grid grid-cols-[110px_1fr] items-center gap-4 border-b border-white/8 px-4 py-2 md:grid-cols-[140px_1fr] md:gap-5 md:px-5 md:py-3 lg:grid-cols-[170px_1fr] lg:gap-7 lg:px-6 lg:py-6 landscape-narrow:grid-cols-[120px_1fr] landscape-mid:grid-cols-[130px_1fr]"
+		class="grid grid-cols-[110px_1fr] items-center gap-4 border-b border-hairline px-4 py-2 md:grid-cols-[140px_1fr] md:gap-5 md:px-5 md:py-3 lg:grid-cols-[170px_1fr] lg:gap-7 lg:px-6 lg:py-6 landscape-narrow:grid-cols-[120px_1fr] landscape-mid:grid-cols-[130px_1fr]"
 		in:fly|global={{ y: 8, duration: 420, delay: 80 }}
 	>
 		<div
@@ -219,37 +219,37 @@
 		<div class="flex flex-col gap-0.5 lg:gap-2.5">
 			<div>
 				<h1
-					class="text-2xl leading-none font-black tracking-[-0.02em] text-white uppercase md:text-3xl lg:text-[32px] 3xl:text-[36px]"
+					class="text-2xl leading-none font-black tracking-[-0.02em] text-fg uppercase md:text-3xl lg:text-[32px] 3xl:text-[36px]"
 				>
 					{tier.title}
 				</h1>
-				<p class="mt-1.5 max-w-xs font-serif text-xs leading-relaxed text-white/50 italic">
+				<p class="mt-1.5 max-w-xs font-serif text-xs leading-relaxed text-fg-muted italic">
 					"{tier.description}"
 				</p>
 			</div>
 
 			<div
-				class="mt-0.5 flex items-end justify-between gap-5 border-t border-dashed border-white/8 pt-1.5 lg:mt-1.5 lg:pt-3"
+				class="mt-0.5 flex items-end justify-between gap-5 border-t border-dashed border-hairline pt-1.5 lg:mt-1.5 lg:pt-3"
 			>
 				<div>
-					<div class="font-mono text-[9px] font-extrabold tracking-[0.4em] text-white/50 uppercase">
+					<div class="font-mono text-[9px] font-extrabold tracking-[0.4em] text-fg-muted uppercase">
 						Loot Value
 					</div>
 					<div class="mt-1 flex items-center gap-2">
 						<span
-							class="font-mono text-[32px] leading-none font-black tracking-[-0.04em] text-amber-400 tabular-nums drop-shadow-[0_0_20px_rgba(255,184,0,0.3)] md:text-[40px] lg:text-[48px] 3xl:text-[56px] landscape-mid:text-[36px]"
+							class="font-mono text-[32px] leading-none font-black tracking-[-0.04em] text-accent tabular-nums drop-shadow-[0_0_20px_rgba(235,187,78,0.3)] md:text-[40px] lg:text-[48px] 3xl:text-[56px] landscape-mid:text-[36px]"
 						>
 							{fmt(extract.current)}
 						</span>
 						<img
 							src="/assets/ui/Coins.webp"
 							alt="credits"
-							class="size-8 object-contain drop-shadow-[0_0_12px_rgba(255,184,0,0.35)] md:size-9"
+							class="size-8 object-contain drop-shadow-[0_0_12px_rgba(235,187,78,0.35)] md:size-9"
 						/>
 					</div>
 					{#if overweightPenalty > 0}
 						<div
-							class="mt-1 font-mono text-[10px] font-extrabold tracking-[0.2em] text-red-400/90 uppercase"
+							class="mt-1 font-mono text-[10px] font-extrabold tracking-[0.2em] text-danger/90 uppercase"
 						>
 							−{overweightPenalty}% overweight
 						</div>
@@ -271,18 +271,18 @@
 		>
 			<div class="flex justify-between">
 				<div
-					class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-white/50 uppercase"
+					class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-fg-muted uppercase"
 				>
 					Nickname
 				</div>
 				{#if nicknameInput.length > 0 && nickError}
-					<div class="font-sans text-[11px] text-red-400/80 md:text-xs">{nickError}</div>
+					<div class="font-sans text-[11px] text-danger/80 md:text-xs">{nickError}</div>
 				{:else}
-					<div class="font-sans text-[11px] text-white/30 md:text-xs">Public on leaderboard</div>
+					<div class="font-sans text-[11px] text-fg-faint md:text-xs">Public on leaderboard</div>
 				{/if}
 			</div>
 			<form
-				class="relative flex h-[40px] items-stretch rounded-md border border-white/20 shadow-[0_0_0_1px_rgba(255,184,0,0.09),0_0_16px_rgba(255,184,0,0.08),0_0_45px_rgba(255,184,0,0.03),0_10px_28px_rgba(0,0,0,0.45)] transition-shadow duration-200 ease-out focus-within:shadow-[0_0_0_1px_rgba(255,184,0,0.26),0_0_20px_rgba(255,184,0,0.22),0_0_55px_rgba(255,184,0,0.1),0_10px_28px_rgba(0,0,0,0.45)] md:h-[50px]"
+				class="relative flex h-[40px] items-stretch rounded-md border border-accent/40 shadow-[0_0_0_1px_rgba(235,187,78,0.09),0_0_16px_rgba(235,187,78,0.08),0_0_45px_rgba(235,187,78,0.03),0_10px_28px_rgba(0,0,0,0.45)] transition-shadow duration-200 ease-out focus-within:shadow-[0_0_0_1px_rgba(235,187,78,0.26),0_0_20px_rgba(235,187,78,0.22),0_0_55px_rgba(235,187,78,0.1),0_10px_28px_rgba(0,0,0,0.45)] md:h-[50px]"
 				onsubmit={onSaveNickname}
 			>
 				<input
@@ -293,11 +293,11 @@
 					spellcheck="false"
 					maxlength={NICK_MAX}
 					aria-label="Choose your nickname"
-					class="min-w-0 flex-1 border-0 bg-transparent px-4 font-sans text-base font-semibold tracking-[0.02em] text-white caret-[#ffb800] outline-none placeholder:text-white/20 md:px-4.5 md:text-[19px]"
+					class="min-w-0 flex-1 border-0 bg-transparent px-4 font-sans text-base font-semibold tracking-[0.02em] text-fg caret-accent outline-none placeholder:text-fg-faint md:px-4.5 md:text-[19px]"
 				/>
 
 				<div
-					class="flex items-center px-3 font-mono text-[11px] font-semibold tracking-[0.04em] text-white/30 tabular-nums md:px-3.5 md:text-xs"
+					class="flex items-center px-3 font-mono text-[11px] font-semibold tracking-[0.04em] text-fg-faint tabular-nums md:px-3.5 md:text-xs"
 				>
 					{nicknameInput.length} / {NICK_MAX}
 				</div>
@@ -305,7 +305,7 @@
 				<button
 					type="button"
 					onclick={onCancelNickname}
-					class="my-1.5 flex items-center gap-2 rounded-md border border-white/15 bg-transparent px-3 font-sans text-[12px] font-bold tracking-[0.04em] text-white/55 transition-all hover:bg-white/5 hover:text-white/80 active:scale-[0.98] md:px-4 md:text-[13px]"
+					class="my-1.5 flex items-center gap-2 rounded-md border border-hairline bg-transparent px-3 font-sans text-[12px] font-bold tracking-[0.04em] text-fg-muted transition-all hover:bg-white/5 hover:text-fg active:scale-[0.98] md:px-4 md:text-[13px]"
 				>
 					<span>Cancel</span>
 				</button>
@@ -313,7 +313,7 @@
 				<button
 					type="submit"
 					disabled={!canSubmit}
-					class="m-1.5 flex items-center gap-2 rounded-md border-none bg-amber-400 px-4 font-sans text-[12px] font-bold tracking-[0.04em] text-[#1a0e02] transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 md:px-5.5 md:text-[13px]"
+					class="m-1.5 flex items-center gap-2 rounded-md border-none bg-gradient-to-b from-primary-top to-primary-bottom px-4 font-sans text-[12px] font-bold tracking-[0.04em] text-primary-ink transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 md:px-5.5 md:text-[13px]"
 				>
 					<span>Save</span>
 				</button>
@@ -326,7 +326,7 @@
 			inert={showNicknameForm}
 		>
 			<div
-				class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-white/50 uppercase"
+				class="mb-2 font-mono text-[10px] font-extrabold tracking-[0.36em] text-fg-muted uppercase"
 			>
 				Run Breakdown
 			</div>
@@ -335,15 +335,13 @@
 				{@render breakdownCell('Time', formatTime(time.current))}
 				{@render breakdownCell('Stages', `${fmt(stages.current)}/${STAGES.length}`)}
 				{@render breakdownCell('Chests', fmt(chests.current))}
-				<div class="rounded-xs border border-white/8 bg-white/[0.04] px-3 py-2.5 md:px-3.5 md:py-3">
-					<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-white/50 uppercase">
+				<div class="rounded-xs border border-hairline bg-row px-3 py-2.5 md:px-3.5 md:py-3">
+					<div class="font-mono text-[9px] font-bold tracking-[0.32em] text-fg-muted uppercase">
 						Augment
 					</div>
 					<div
 						class="mt-1 font-mono text-base leading-none font-black tracking-[0.1em] uppercase"
-						style="color: {augmentRarity
-							? `var(--rarity-${augmentRarity})`
-							: 'rgba(255,255,255,0.3)'};"
+						style="color: {augmentRarity ? `var(--rarity-${augmentRarity})` : 'var(--text-faint)'};"
 					>
 						{augmentRarity?.toUpperCase() ?? 'NONE'}
 					</div>
@@ -352,20 +350,25 @@
 		</div>
 	</div>
 
-	<div class="grid grid-cols-2" in:fly|global={{ y: 8, duration: 350, delay: 460 }}>
+	<div
+		class="grid grid-cols-2 border-t border-hairline"
+		in:fly|global={{ y: 8, duration: 350, delay: 460 }}
+	>
 		<button
 			type="button"
 			onclick={restartGame}
-			class="flex items-center justify-center gap-2.5 rounded-bl-md border border-white/5 bg-[#0c101c] py-2 text-white/80 transition-colors hover:bg-[#161927] active:scale-[0.99] md:py-2.5 lg:py-4"
+			class="group flex items-center justify-center gap-2.5 border-r border-hairline bg-row py-2 text-fg transition-colors hover:bg-white/5 active:scale-[0.99] md:py-2.5 lg:py-4"
 		>
-			<Restart />
+			<Restart
+				class="size-3 flex-none text-fg-muted group-hover:text-fg 2xl:size-[18px] 3xl:size-4 4xl:size-5 pointer-coarse:size-4"
+			/>
 			<span class="text-[10px] font-black tracking-[0.28em] uppercase">Retry</span>
 		</button>
 		{#if submitted}
 			<button
 				type="button"
 				onclick={onOpenLeaderboard}
-				class="flex items-center justify-center gap-2.5 rounded-br-md bg-amber-400 py-2 text-[#1a0e02] transition-colors hover:bg-amber-300 active:scale-[0.99] md:py-2.5 lg:py-4"
+				class="flex items-center justify-center gap-2.5 bg-gradient-to-b from-primary-top to-primary-bottom py-2 text-primary-ink transition-[filter] hover:brightness-105 active:scale-[0.99] md:py-2.5 lg:py-4"
 			>
 				<Leaderboard />
 				<span class="text-[13px] font-black tracking-[0.28em] uppercase">Leaderboard</span>
@@ -374,7 +377,7 @@
 			<button
 				type="button"
 				onclick={onSubmitClick}
-				class="flex items-center justify-center gap-2.5 rounded-br-md border border-white/5 bg-amber-400/70 py-2 text-[#1a0e02] transition-colors hover:bg-amber-300 active:scale-[0.99] md:py-2.5 lg:py-4"
+				class="flex items-center justify-center gap-2.5 bg-gradient-to-b from-primary-top to-primary-bottom py-2 text-primary-ink transition-[filter] hover:brightness-105 active:scale-[0.99] md:py-2.5 lg:py-4"
 			>
 				<Leaderboard />
 				<span class="text-[10px] font-black tracking-[0.28em] uppercase">Submit Score</span>

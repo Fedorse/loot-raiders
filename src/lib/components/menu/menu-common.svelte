@@ -26,19 +26,19 @@
 {#if canReplay}
 	<button
 		onclick={howToPlay}
-		class="group flex w-full items-center gap-3 rounded-md border border-[#e8e0d2]/15 bg-[#100c09]/60 px-5 py-3.5 text-left transition-all hover:bg-[#1a120c]/75 active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
+		class="group flex w-full items-center gap-3 rounded-md border border-hairline bg-row px-5 py-3.5 text-left transition-all hover:bg-accent-tint active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
 	>
 		<Video
-			class="size-5 flex-none text-[#cabfb2] 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
+			class="size-5 flex-none text-fg-muted group-hover:text-fg 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
 		/>
 		<span
-			class="flex-1 text-[15px] font-semibold tracking-wider text-[#c6bcb0] group-hover:text-[#ece4d6] lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
+			class="flex-1 text-[15px] font-semibold tracking-wider text-fg-body group-hover:text-fg lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
 			>How to Play</span
 		>
 	</button>
 
 	<div
-		class="my-0.5 hidden h-px w-full bg-[#e8e0d2]/10 md:my-0.5 md:block 2xl:my-1.5 pointer-coarse:hidden"
+		class="my-0.5 hidden h-px w-full bg-hairline md:my-0.5 md:block 2xl:my-0 pointer-coarse:hidden"
 	></div>
 {/if}
 
@@ -46,17 +46,17 @@
 
 <button
 	onclick={onFullscreen}
-	class="group flex w-full items-center gap-3 rounded-md border border-[#e8e0d2]/15 bg-[#100c09]/60 px-5 py-3.5 text-left transition-all hover:bg-[#1a120c]/75 active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
+	class="group flex w-full items-center gap-3 rounded-md border border-hairline bg-row px-5 py-3.5 text-left transition-all hover:bg-accent-tint active:scale-[0.99] 2xl:gap-3.5 2xl:px-6 2xl:py-4 3xl:gap-4 3xl:px-7 3xl:py-4.5 4xl:px-8 4xl:py-5 pointer-coarse:gap-2 pointer-coarse:px-3.5 pointer-coarse:py-2.5"
 >
 	<Fullscreen
-		class="size-5 flex-none text-[#cabfb2] group-hover:text-[#ece4d6] 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
+		class="size-5 flex-none text-fg-muted group-hover:text-fg 2xl:size-[22px] 3xl:size-6 4xl:size-7 pointer-coarse:size-4"
 	/>
 	<span
-		class="flex-1 text-[15px] font-semibold tracking-wider text-[#c6bcb0] group-hover:text-[#ece4d6] lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
+		class="flex-1 text-[15px] font-semibold tracking-wider text-fg-body group-hover:text-fg lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
 		>Fullscreen</span
 	>
 	<span
-		class="font-mono text-[11px] font-bold tracking-wide text-[#9a8e84] uppercase 2xl:text-xs 3xl:text-[13px] 4xl:text-sm pointer-coarse:text-[10px]"
+		class="font-mono text-[11px] font-bold tracking-wide text-fg-faint uppercase 2xl:text-xs 3xl:text-[13px] 4xl:text-sm pointer-coarse:text-[10px]"
 		>{device.isFullscreen ? 'On' : 'Off'}</span
 	>
 </button>

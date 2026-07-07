@@ -20,8 +20,8 @@
 	--primary-foreground: #111418;
 	--secondary: #626262;
 	--secondary-hover: #7a7a7a;
-	--accent: #ffab00;
-	--accent-alt: #e69a00;
+	--accent: #ebbb4e;
+	--accent-alt: #e0a836;
 
 	/* Muted */
 	--muted: #8c8c8c;
@@ -57,6 +57,48 @@
 	--rarity-legendary-alt: #eab308;
 	--rarity-legendary-glow: #fde047;
 	--rarity-gradient-end: #334155;
+
+	/* Surfaces */
+	--bg: #0a0708; /* target app background (not yet applied globally) */
+	--panel-top: #181b20; /* modal/panel gradient top */
+	--panel-bottom: #101216; /* modal/panel gradient bottom */
+	--row: rgba(22, 26, 32, 0.73); /* list rows, cards */
+	--hairline: rgba(190, 205, 225, 0.1); /* hairline borders (ref: --border) */
+	--accent-tint: rgba(235, 187, 78, 0.1); /* highlighted / active row bg */
+
+	/* Primary button (Play / Resume / Submit) */
+	--primary-top: #f0e9dc;
+	--primary-bottom: #dccdb4;
+	--primary-ink: #1a120c; /* text on primary */
+
+	/* Accent gradient (fills, sliders, indicators) — flat accent reuses --accent */
+	--accent-grad-top: #f0c24a;
+	--accent-grad-bottom: #e0a836;
+
+	/* Semantic */
+	--danger: #e0453a; /* Grade-F, fail, critical */
+
+	/* Text scale */
+	--text: #f4f7fb; /* headings / primary */
+	--text-body: #e8edf3; /* body */
+	--text-muted: #8b96a6; /* labels, meta */
+	--text-faint: #6f7a89; /* hints, disabled */
+
+	/* Rank medals (gradients) */
+	--rank-1-top: #f4d27a;
+	--rank-1-bottom: #e0a63a; /* gold */
+	--rank-2-top: #dde4ec;
+	--rank-2-bottom: #b3bece; /* silver */
+	--rank-3-top: #c99a63;
+	--rank-3-bottom: #9c6f3e; /* bronze */
+
+	/* Cold branch (inventory HUD context) */
+	--cyan: #41d0e0;
+	--cyan-grad-top: #4fdcec;
+	--cyan-grad-bottom: #2fb6ce;
+	--rarity-green: #5fd47a;
+	--slate-top: #171b22;
+	--slate-bottom: #0e1218;
 }
 
 @theme {
@@ -118,6 +160,35 @@
 	--color-rarity-legendary-alt: var(--rarity-legendary-alt);
 	--color-rarity-legendary-glow: var(--rarity-legendary-glow);
 	--color-rarity-gradient-end: var(--rarity-gradient-end);
+
+	/* ── Design refresh tokens ── */
+	--color-panel-top: var(--panel-top);
+	--color-panel-bottom: var(--panel-bottom);
+	--color-row: var(--row);
+	--color-hairline: var(--hairline);
+	--color-accent-tint: var(--accent-tint);
+	--color-primary-top: var(--primary-top);
+	--color-primary-bottom: var(--primary-bottom);
+	--color-primary-ink: var(--primary-ink);
+	--color-accent-from: var(--accent-grad-top);
+	--color-accent-to: var(--accent-grad-bottom);
+	--color-danger: var(--danger);
+	--color-fg: var(--text);
+	--color-fg-body: var(--text-body);
+	--color-fg-muted: var(--text-muted);
+	--color-fg-faint: var(--text-faint);
+	--color-rank-1-from: var(--rank-1-top);
+	--color-rank-1-to: var(--rank-1-bottom);
+	--color-rank-2-from: var(--rank-2-top);
+	--color-rank-2-to: var(--rank-2-bottom);
+	--color-rank-3-from: var(--rank-3-top);
+	--color-rank-3-to: var(--rank-3-bottom);
+	--color-cyan: var(--cyan);
+	--color-cyan-from: var(--cyan-grad-top);
+	--color-cyan-to: var(--cyan-grad-bottom);
+	--color-rarity-green: var(--rarity-green);
+	--color-slate-top: var(--slate-top);
+	--color-slate-bottom: var(--slate-bottom);
 }
 
 @layer base {

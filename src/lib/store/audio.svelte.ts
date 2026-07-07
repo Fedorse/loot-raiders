@@ -1,11 +1,18 @@
 import { Howl } from 'howler';
 import { SOUNDS, type SoundKey, type SoundConfig } from '$lib/config/sounds';
 
+const DUCK = 0.3;
+
 export class AudioManager {
 	volume = $state(1);
 	muted = $state(false);
+	private ducked = false;
 	private howls = new Map<SoundKey, Howl>();
 	private bgm: Howl | null = null;
+
+	private bgmTarget(): number {
+		return SOUNDS.bgm.volume * this.volume * (this.ducked ? DUCK : 1);
+	}
 
 	constructor() {
 		this.preload();
@@ -33,15 +40,17 @@ export class AudioManager {
 	}
 	playBGM() {
 		if (!this.bgm || this.muted) return;
-		this.bgm.volume(SOUNDS.bgm.volume * this.volume);
+		this.bgm.volume(this.bgmTarget());
 		this.bgm.play();
 	}
 	duckBGM() {
-		this.bgm?.fade(this.bgm.volume(), SOUNDS.bgm.volume * this.volume * 0.25, 400);
+		this.ducked = true;
+		this.bgm?.fade(this.bgm.volume(), this.bgmTarget(), 400);
 	}
 
 	unduckBGM() {
-		this.bgm?.fade(this.bgm.volume(), SOUNDS.bgm.volume * this.volume, 400);
+		this.ducked = false;
+		this.bgm?.fade(this.bgm.volume(), this.bgmTarget(), 400);
 	}
 
 	stopBGM() {
@@ -52,7 +61,7 @@ export class AudioManager {
 	setVolume(v: number) {
 		this.volume = v;
 		if (this.bgm?.playing()) {
-			this.bgm.volume(SOUNDS.bgm.volume * v);
+			this.bgm.volume(this.bgmTarget());
 		}
 	}
 
