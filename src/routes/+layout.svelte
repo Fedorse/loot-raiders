@@ -6,7 +6,7 @@
 	import TooltipOverlay from '$lib/components/inventory/tooltip-overlay.svelte';
 	import RecycleModal from '$lib/components/inventory/recycle-modal.svelte';
 	import AugmentPanel from '$lib/components/augment/augment-panel.svelte';
-	import GameMenu from '$lib/components/menu/game-menu.svelte';
+	import MenuOverlay from '$lib/components/menu/menu-overlay.svelte';
 	import Coachmark from '$lib/components/tutorial/coachmark.svelte';
 	import TutorialHighlight from '$lib/components/tutorial/tutorial-highlight.svelte';
 	import MobileGate from '$lib/components/hud/mobile-gate.svelte';
@@ -75,7 +75,7 @@
 <TooltipOverlay />
 <RecycleModal />
 <AugmentPanel />
-<GameMenu />
+<MenuOverlay />
 <TutorialHighlight />
 <Coachmark />
 

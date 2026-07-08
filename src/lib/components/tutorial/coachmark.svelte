@@ -70,6 +70,11 @@
 		tutorial.skip();
 	}
 
+	function skipAll() {
+		audio.play('click');
+		tutorial.skipTutorial();
+	}
+
 	type Placement = 'right' | 'left' | 'top' | 'bottom';
 	interface Pos {
 		x: number;
@@ -133,8 +138,6 @@
 		return { x, y, placement, caret };
 	}
 
-	// Re-measure on step change and on any layout shift, mirroring the highlight overlay so the
-	// card and the cutout stay locked to the same moving target.
 	$effect(() => {
 		if (!tutorial.active || isMobile) {
 			pos = null;
@@ -188,7 +191,7 @@
 						onclick={skip}
 						class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-accent uppercase transition-colors active:text-accent/70"
 					>
-						Skip ›
+						Skip step ›
 					</button>
 				{/if}
 			</div>
@@ -219,6 +222,15 @@
 						{tutorial.step.cta}
 					</button>
 				{/if}
+			</div>
+
+			<div class="mt-1 flex justify-start">
+				<button
+					onclick={skipAll}
+					class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-[#8291a3] uppercase underline decoration-dotted underline-offset-2 transition-colors active:text-[#c3ccd8]"
+				>
+					Skip tutorial
+				</button>
 			</div>
 		</div>
 	{:else}
@@ -261,24 +273,29 @@
 				<p class="mt-1 text-[11.5px] leading-snug text-[#a9b6c6] 2xl:text-[12px]">
 					{tutorial.step.description}
 				</p>
-
-				{#if tutorial.isActionStep}
-					<div class="flex w-full justify-end">
+				<div class="mt-2.5 flex w-full items-center justify-between gap-2">
+					<button
+						onclick={skipAll}
+						class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-[#8291a3] uppercase underline decoration-dotted underline-offset-2 transition-colors hover:text-[#c3ccd8]"
+					>
+						Skip tutorial
+					</button>
+					{#if tutorial.isActionStep}
 						<button
 							onclick={skip}
-							class="mt-2.5 font-mono text-[10px] font-medium tracking-[0.1em] text-accent uppercase transition-colors hover:text-accent/70"
+							class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-accent uppercase transition-colors hover:text-accent/70"
 						>
 							Skip step ›
 						</button>
-					</div>
-				{:else}
-					<button
-						onclick={go}
-						class="mt-2.5 w-full rounded-md bg-primary px-4 py-1.5 font-['Saira_Condensed'] text-sm font-extrabold tracking-wide text-primary-foreground transition-all hover:bg-primary-hover active:scale-[0.99]"
-					>
-						{tutorial.step.cta}
-					</button>
-				{/if}
+					{:else}
+						<button
+							onclick={go}
+							class="shrink-0 rounded-md bg-primary px-4 py-1.5 font-['Saira_Condensed'] text-sm font-extrabold tracking-wide text-primary-foreground transition-all hover:bg-primary-hover active:scale-[0.99]"
+						>
+							{tutorial.step.cta}
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 	{/if}
@@ -357,8 +374,6 @@
 {/snippet}
 
 <style>
-	/* Animated finger-gesture demos shown in place of the text badge on the mobile coachmark.
-	   Disabled under prefers-reduced-motion via `motion-reduce:animate-none!` on each element. */
 	.tut-m-press {
 		animation: tut-m-press 1.3s ease-in-out infinite;
 	}

@@ -4,7 +4,8 @@ export function handleGlobalKeydown(e: KeyboardEvent, game: Game): void {
 	const { gameLoop, loot, overlay, audio } = game;
 
 	if (e.key === 'Escape') {
-		if (gameLoop.status === 'playing' || gameLoop.status === 'tutorial') {
+		if (gameLoop.status === 'tutorial') return;
+		if (gameLoop.status === 'playing') {
 			gameLoop.pause();
 		} else if (gameLoop.status === 'paused') {
 			gameLoop.resume();

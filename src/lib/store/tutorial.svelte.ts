@@ -233,6 +233,12 @@ export class Tutorial {
 		}
 	}
 
+	// Bail out of the whole FTUE: mark it seen so it won't auto-appear again, then hand off into a
+	// normal run — the same end state as finishing the last step. Replayable later via How to Play.
+	skipTutorial() {
+		this.finish();
+	}
+
 	private finish() {
 		writeSeen();
 		this.index = 0;

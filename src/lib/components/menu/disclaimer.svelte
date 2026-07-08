@@ -2,19 +2,22 @@
 	import { fade, scale } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import Cross from '$lib/ui-icon/cross.svelte';
+	import Info from '$lib/ui-icon/info.svelte';
 
-	let { class: className = '', minimal = false }: { class?: string; minimal?: boolean } = $props();
+	let { minimal = false }: { minimal?: boolean } = $props();
 
 	const { audio, device } = getGameContext();
 
 	let open = $state(false);
 
 	const wrapperPos = $derived(
-		minimal && device.isCoarsePointer
-			? 'bottom-2 left-3'
-			: device.isCoarsePointer
-				? 'bottom-2 right-3'
+		!device.isCoarsePointer
+			? minimal
+				? 'bottom-3 right-4 z-20'
 				: 'bottom-3 right-4'
+			: minimal
+				? 'bottom-2 left-3 z-20'
+				: 'bottom-[max(24px,env(safe-area-inset-bottom))] left-[max(24px,env(safe-area-inset-left))]'
 	);
 
 	function openModal() {
@@ -26,32 +29,32 @@
 	}
 </script>
 
-<div class="pointer-events-none fixed {wrapperPos} {className}">
+<div class="pointer-events-none fixed {wrapperPos}">
 	{#if minimal}
 		<button
 			type="button"
 			onclick={openModal}
 			aria-label="Legal disclaimer"
-			class="pointer-events-auto font-mono text-[8px] font-semibold text-[#6b6056] uppercase transition-colors hover:text-[#e0a63a] active:scale-95 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
+			class="pointer-events-auto font-mono text-[8px] font-semibold text-fg-faint uppercase transition-colors hover:text-accent active:scale-95 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
 		>
 			Notice
 		</button>
 	{:else}
 		<p
-			class="flex items-center gap-1.5 font-mono text-[8px] text-[#6b6056] 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs pointer-coarse:text-[8px]"
+			class="flex items-center gap-1.5 font-mono text-[8px] text-fg-faint 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs pointer-coarse:text-[8px]"
 		>
 			<span
 				>Unofficial fan project · Not affiliated with {@render embarkLink(
-					'pointer-events-auto text-[#8b8178]'
+					'pointer-events-auto text-fg-muted'
 				)}</span
 			>
 			<button
 				type="button"
 				onclick={openModal}
 				aria-label="Legal disclaimer"
-				class="pointer-events-auto flex size-4 shrink-0 items-center justify-center rounded-full text-[#8b8178] transition-colors hover:text-[#e0a63a] active:scale-90 2xl:size-[18px] 4xl:size-5"
+				class="pointer-events-auto flex size-4 shrink-0 items-center justify-center rounded-full text-fg-muted transition-colors hover:text-accent active:scale-90 2xl:size-[18px] 4xl:size-5"
 			>
-				{@render infoIcon()}
+				<Info />
 			</button>
 		</p>
 	{/if}
@@ -66,39 +69,39 @@
 		transition:fade={{ duration: 150 }}
 	>
 		<div
-			class="max-h-[88dvh] w-full max-w-[520px] overflow-y-auto rounded-md bg-background/95 p-6 shadow-2xl ring-1 ring-white/10 2xl:p-7 3xl:p-8"
+			class="max-h-[88dvh] w-full max-w-[520px] overflow-hidden rounded-md border border-accent/20 bg-gradient-to-b from-panel-top to-panel-bottom font-sans text-fg-body shadow-[0_40px_100px_rgba(0,0,0,0.6)]"
 			onclick={(e) => e.stopPropagation()}
 			transition:scale={{ duration: 200, start: 0.95 }}
 		>
-			<div class="mb-4 flex items-start justify-between gap-4">
-				<h2
-					class="font-sans text-base font-black tracking-tight text-white uppercase 2xl:text-lg 3xl:text-xl"
+			<div class="flex items-center justify-between gap-4 border-b border-hairline px-6 py-3.5">
+				<span
+					class="font-sans text-[13px] font-extrabold tracking-[0.22em] text-fg uppercase 2xl:text-[15px]"
 				>
 					Legal Disclaimer
-				</h2>
+				</span>
 				<button
 					type="button"
 					onclick={close}
 					aria-label="Close"
-					class="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/5 ring-1 ring-white/10 transition-transform hover:bg-white/10 active:scale-90"
+					class="flex size-8 shrink-0 items-center justify-center rounded-full border border-hairline bg-white/5 text-fg-muted transition-colors hover:border-accent/40 hover:text-accent active:scale-90"
 				>
 					<Cross />
 				</button>
 			</div>
 
 			<div
-				class="flex flex-col gap-3 text-[13px] leading-relaxed text-white/60 2xl:text-sm 3xl:text-[15px]"
+				class="flex max-h-[calc(88dvh-56px)] flex-col gap-3 overflow-y-auto px-6 py-5 text-[13px] leading-relaxed text-fg-muted 2xl:text-sm 3xl:text-[15px]"
 			>
 				<p>
 					Loot Raiders is an unofficial fan project inspired by ARC Raiders. This project is not
 					affiliated with, endorsed, sponsored, supported, or approved by {@render embarkLink(
-						'text-white/90'
+						'text-fg-body'
 					)}.
 				</p>
 				<p>
 					ARC RAIDERS, EMBARK, and all related names, trademarks, logos, characters, artwork, music,
 					sounds, game assets, and other intellectual property are the property of {@render embarkLink(
-						'text-white/90'
+						'text-fg-body'
 					)} or their respective rights holders.
 				</p>
 				<p>
@@ -113,29 +116,12 @@
 	</div>
 {/if}
 
-{#snippet infoIcon()}
-	<svg
-		viewBox="0 0 24 24"
-		class="size-full"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-		aria-hidden="true"
-	>
-		<circle cx="12" cy="12" r="10" />
-		<line x1="12" y1="16" x2="12" y2="12" />
-		<line x1="12" y1="8" x2="12.01" y2="8" />
-	</svg>
-{/snippet}
-
 {#snippet embarkLink(cls: string)}
 	<a
 		href="https://www.embark-studios.com/"
 		target="_blank"
 		rel="noopener noreferrer"
-		class="underline decoration-white/25 underline-offset-2 transition-colors hover:text-[#e0a63a] hover:decoration-[#e0a63a]/60 {cls}"
+		class="underline decoration-hairline underline-offset-2 transition-colors hover:text-accent hover:decoration-accent/60 {cls}"
 		>Embark Studios AB</a
 	>
 {/snippet}

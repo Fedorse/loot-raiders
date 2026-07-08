@@ -25,9 +25,6 @@ export class GameLoop {
 	private lastTime = 0;
 	private appliedShieldRarities = new Set<string>();
 	private pendingMatchTime = 0;
-	// Status to restore on resume(): a paused live run returns to 'playing', a paused Tutorial
-	// Mode session returns to 'tutorial' (no clock/rAF to restart).
-	private pausedFrom: 'playing' | 'tutorial' = 'playing';
 
 	timeLeft = $state(0);
 	elapsedTime = $state(0);
@@ -38,10 +35,6 @@ export class GameLoop {
 
 	// The game board is mounted for both a normal run and a Tutorial Mode session.
 	inSession = $derived(this.status === 'playing' || this.status === 'tutorial');
-
-	// True while the paused session came from Tutorial Mode — the pause menu hides Restart for it,
-	// since a tutorial has its own scripted flow and no live run to restart.
-	pausedTutorial = $derived(this.status === 'paused' && this.pausedFrom === 'tutorial');
 
 	constructor(
 		inventory: Inventory,
@@ -144,9 +137,9 @@ export class GameLoop {
 		this.audio.duckBGM();
 	}
 
+	// Tutorial Mode can't be paused: its clock is already frozen, so there is nothing to suspend.
 	pause() {
-		if (this.status !== 'playing' && this.status !== 'tutorial') return;
-		this.pausedFrom = this.status;
+		if (this.status !== 'playing') return;
 		cancelAnimationFrame(this.rafId);
 		this.status = 'paused';
 		this.audio.duckBGM();
@@ -155,11 +148,6 @@ export class GameLoop {
 	resume() {
 		if (this.status !== 'paused') return;
 		this.audio.unduckBGM();
-		// Tutorial Mode has a frozen clock and no rAF loop — hand control straight back.
-		if (this.pausedFrom === 'tutorial') {
-			this.status = 'tutorial';
-			return;
-		}
 		this.status = 'playing';
 		this.lastTime = performance.now();
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
@@ -172,7 +160,7 @@ export class GameLoop {
 				(document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement
 			);
 		const pauseIfActive = () => {
-			if (this.status === 'playing' || this.status === 'tutorial') this.pause();
+			if (this.status === 'playing') this.pause();
 		};
 		const onFullscreenChange = () => {
 			if (!isFullscreen()) pauseIfActive();

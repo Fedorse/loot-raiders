@@ -71,7 +71,6 @@ export class Augment {
 		this.upgradePulse++;
 	}
 
-	// Auto-upgrades through every level the player can currently afford.
 	autoUpgrade(): boolean {
 		let upgraded = false;
 		while (true) {

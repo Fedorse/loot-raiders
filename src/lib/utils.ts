@@ -38,10 +38,6 @@ export const formatTime = (seconds: number) => {
 	return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
 
-// Keeps a layout measurement in sync: runs `measure` once, then again on element resize and
-// any window resize/scroll. `getEls` returns the elements to observe, resolved at subscribe
-// time. Returns a cleanup that tears down every observer and listener — call it from an
-// `$effect` (compose with extra teardown by wrapping the returned cleanup).
 export function trackLayout(getEls: () => HTMLElement[], measure: () => void): () => void {
 	measure();
 	const ro = new ResizeObserver(measure);

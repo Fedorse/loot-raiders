@@ -169,7 +169,7 @@
 		</div>
 	</div>
 
-	<Disclaimer minimal class="z-20" />
+	<Disclaimer minimal />
 </div>
 
 {#snippet divider()}
@@ -186,27 +186,29 @@
 			data-tut="header-backpak"
 			data-wide-short-bar
 		>
-			<button
-				type="button"
-				onclick={() => {
-					audio.play('click');
-					gameLoop.pause();
-				}}
-				aria-label="Pause"
-				class="flex cursor-pointer items-center justify-center rounded-md bg-white/5 px-1.5 py-1 text-white/70 ring-1 ring-white/10 transition-colors hover:bg-white/10 hover:text-white/90 active:scale-95"
-			>
-				<svg
-					class="size-3 2xl:size-3.5 3xl:size-4 4xl:size-5"
-					viewBox="0 0 24 24"
-					fill="currentColor"
-					aria-hidden="true"
+			{#if gameLoop.status !== 'tutorial'}
+				<button
+					type="button"
+					onclick={() => {
+						audio.play('click');
+						gameLoop.pause();
+					}}
+					aria-label="Pause"
+					class="flex cursor-pointer items-center justify-center rounded-md bg-white/5 px-1.5 py-1 text-white/70 ring-1 ring-white/10 transition-colors hover:bg-white/10 hover:text-white/90 active:scale-95"
 				>
-					<rect x="6" y="5" width="4" height="14" rx="1" />
-					<rect x="14" y="5" width="4" height="14" rx="1" />
-				</svg>
-			</button>
+					<svg
+						class="size-3 2xl:size-3.5 3xl:size-4 4xl:size-5"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						aria-hidden="true"
+					>
+						<rect x="6" y="5" width="4" height="14" rx="1" />
+						<rect x="14" y="5" width="4" height="14" rx="1" />
+					</svg>
+				</button>
 
-			<div class="h-2.5 w-[1px] bg-white/20 2xl:h-3 3xl:h-3.5 4xl:h-4"></div>
+				<div class="h-2.5 w-[1px] bg-white/20 2xl:h-3 3xl:h-3.5 4xl:h-4"></div>
+			{/if}
 
 			<span
 				data-tut="timer"

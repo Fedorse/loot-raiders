@@ -1,5 +1,4 @@
 import type { LootProfile, QuestPity } from '$lib/store/loot-table';
-import { DEFAULT_STACK_RANGES } from '$lib/store/loot-table';
 
 export interface QuestDef {
 	defId: string;
@@ -36,8 +35,7 @@ export const STAGES: StageDef[] = [
 			typeWeights: { loot: 88, attachment: 5, weapon: 5, shield: 2, augment: 0 },
 			typeCaps: { weapon: 1, augment: 1, shield: 1 },
 			rarityWeights: { common: 55, uncommon: 30, rare: 12, epic: 3, legendary: 0 },
-			attachmentChance: 0,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+			attachmentChance: 0
 		}
 	},
 	{
@@ -58,8 +56,7 @@ export const STAGES: StageDef[] = [
 			typeWeights: { loot: 78, attachment: 8, weapon: 8, shield: 6, augment: 0 },
 			typeCaps: { weapon: 2, augment: 1, shield: 1 },
 			rarityWeights: { common: 40, uncommon: 35, rare: 19, epic: 6, legendary: 0 },
-			attachmentChance: 0.1,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+			attachmentChance: 0.1
 		}
 	},
 	{
@@ -80,8 +77,7 @@ export const STAGES: StageDef[] = [
 			typeWeights: { loot: 67, attachment: 10, weapon: 15, shield: 8, augment: 0 },
 			typeCaps: { weapon: 1, augment: 0, shield: 1 },
 			rarityWeights: { common: 30, uncommon: 35, rare: 26, epic: 8, legendary: 1 },
-			attachmentChance: 0.25,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+			attachmentChance: 0.25
 		}
 	},
 	{
@@ -102,8 +98,7 @@ export const STAGES: StageDef[] = [
 			typeWeights: { loot: 56, attachment: 14, weapon: 20, shield: 10, augment: 0 },
 			typeCaps: { weapon: 3, augment: 1, shield: 1 },
 			rarityWeights: { common: 20, uncommon: 33, rare: 35, epic: 10, legendary: 2 },
-			attachmentChance: 0.3,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+			attachmentChance: 0.3
 		}
 	},
 	{
@@ -124,8 +119,7 @@ export const STAGES: StageDef[] = [
 			typeWeights: { loot: 46, attachment: 17, weapon: 25, shield: 12, augment: 0 },
 			typeCaps: { weapon: 3, augment: 1, shield: 1 },
 			rarityWeights: { common: 10, uncommon: 20, rare: 50, epic: 15, legendary: 5 },
-			attachmentChance: 0.35,
-			getStackRange: (def) => DEFAULT_STACK_RANGES[def.rarity]
+			attachmentChance: 0.35
 		}
 	}
 ];

@@ -1,4 +1,3 @@
-// ---- Enums ----
 export type ItemType = 'loot' | 'weapon' | 'augment' | 'shield' | 'attachment';
 export type ItemRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type AttachmentType =

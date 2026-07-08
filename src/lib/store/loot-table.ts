@@ -9,7 +9,6 @@ export interface LootProfile {
 	typeCaps: Partial<Record<ItemType, number>>;
 	rarityWeights: Record<ItemRarity, number>;
 	attachmentChance: number;
-	getStackRange: (def: ItemDefinition) => [number, number];
 }
 
 export interface RawLootItem {
@@ -109,7 +108,7 @@ export function generateLootItems(profile: LootProfile, count: number): RawLootI
 
 		const def = pickRandom(itemPool[type][rarity]);
 
-		const [min, max] = profile.getStackRange(def);
+		const [min, max] = DEFAULT_STACK_RANGES[def.rarity];
 		const itemCount = type === 'loot' ? randInt(min, Math.min(max, def.maxStack ?? 1)) : 1;
 
 		const attachments = rollAttachmentsForWeapon(profile, def);
