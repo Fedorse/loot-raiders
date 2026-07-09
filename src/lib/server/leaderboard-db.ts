@@ -56,6 +56,8 @@ export async function submitScore(
 	extract: number,
 	time: number
 ): Promise<{ improved: boolean }> {
+	await redis.hset(playerKey(playerId), { nickname });
+
 	const changed = await redis.zadd(
 		LEADERBOARD_KEY,
 		{ gt: true, ch: true },
@@ -63,10 +65,9 @@ export async function submitScore(
 	);
 	const improved = changed === 1;
 
-	const fields: Partial<PlayerHash> = improved
-		? { nickname, time, createdAt: Date.now() }
-		: { nickname };
-	await redis.hset(playerKey(playerId), fields);
+	if (improved) {
+		await redis.hset(playerKey(playerId), { time, createdAt: Date.now() });
+	}
 
 	return { improved };
 }

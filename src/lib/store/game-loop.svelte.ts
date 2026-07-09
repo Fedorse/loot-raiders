@@ -166,7 +166,12 @@ export class GameLoop {
 			if (!isFullscreen()) pauseIfActive();
 		};
 		const onVisibilityChange = () => {
-			if (document.hidden) pauseIfActive();
+			if (document.hidden) {
+				this.audio.suspend();
+				pauseIfActive();
+			} else {
+				this.audio.resume();
+			}
 		};
 
 		document.addEventListener('fullscreenchange', onFullscreenChange);

@@ -1,6 +1,6 @@
 import { getDef } from '$lib/config/items';
 import { getRarityStyleTooltip } from '$lib/config/rarity';
-import { getAugmentUpgrade, getAugmentLevel } from '$lib/config/augments';
+import { getAugmentUpgrade, getAugmentLevel, formatAugmentBonus } from '$lib/config/augments';
 import type { AugmentUpgrade } from '$lib/config/augments';
 import type { Inventory } from './inventory.svelte';
 import type { Notifications } from './notifications.svelte';
@@ -66,7 +66,7 @@ export class Augment {
 		this.notifications.push({
 			kind: 'augment',
 			label: 'Augment upgraded',
-			message: upgrade.bonus
+			message: formatAugmentBonus(upgrade)
 		});
 		this.upgradePulse++;
 	}

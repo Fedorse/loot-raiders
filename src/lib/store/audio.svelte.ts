@@ -1,4 +1,4 @@
-import { Howl } from 'howler';
+import { Howl, Howler } from 'howler';
 import { SOUNDS, type SoundKey, type SoundConfig } from '$lib/config/sounds';
 
 const DUCK = 0.3;
@@ -67,6 +67,14 @@ export class AudioManager {
 
 	toggleMute() {
 		this.muted = !this.muted;
+		Howler.mute(this.muted);
+	}
+
+	suspend() {
+		Howler.mute(true);
+	}
+
+	resume() {
 		Howler.mute(this.muted);
 	}
 }

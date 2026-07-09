@@ -352,7 +352,7 @@ export class Tutorial {
 				badge: 'drag',
 				title: 'Drop the Dead Weight',
 				description:
-					"You're over capacity. Drag the bulky item back to the Loot Drop to clear the penalty.",
+					"You're over capacity. Drag the bulky item onto the Drop zone to ditch it and clear the penalty.",
 				platforms: ['desktop'],
 				targets: ['quest-bar', ...BOARD],
 				pulse: ['loot-dropzone'],
@@ -365,8 +365,8 @@ export class Tutorial {
 					);
 				},
 
-				predicate: () => !this.loadoutHas(OVERWEIGHT_SEED.defId),
-				autoPerform: () => this.dragItem('backpack', 'lootBack', OVERWEIGHT_SEED.defId)
+				predicate: () => !this.inventoryHas(OVERWEIGHT_SEED.defId),
+				autoPerform: () => this.dropSeeded(OVERWEIGHT_SEED.defId)
 			},
 			{
 				id: 'overweight-mobile',
@@ -385,7 +385,7 @@ export class Tutorial {
 						this.inventory.createItem(OVERWEIGHT_SEED.defId, OVERWEIGHT_SEED.count)
 					);
 				},
-				predicate: () => !this.loadoutHas(OVERWEIGHT_SEED.defId),
+				predicate: () => !this.inventoryHas(OVERWEIGHT_SEED.defId),
 				autoPerform: () => {
 					this.dropSeeded(OVERWEIGHT_SEED.defId);
 					this.overlay.closeContextMenu();
@@ -479,12 +479,12 @@ export class Tutorial {
 		).length;
 	}
 
-	private loadoutHas(defId: string): boolean {
+	// True while any copy of the seeded item still sits in the inventory, in any storage.
+	// The overweight step completes only once the item is actually discarded, so parking it
+	// in the weight-free lootBack must NOT satisfy it — hence "anywhere", not just the loadout.
+	private inventoryHas(defId: string): boolean {
 		return this.inventory.items.some(
-			(slot) =>
-				slot.location.type === 'slot' &&
-				slot.location.storageId === 'backpack' &&
-				slot.item.defId === defId
+			(slot) => slot.location.type === 'slot' && slot.item.defId === defId
 		);
 	}
 
@@ -504,8 +504,8 @@ export class Tutorial {
 		if (source) this.inventory.recycleItem(source.location);
 	}
 
-	// Overweight (mobile) skip path: runs the same inventory.removeItem the context-menu "Drop"
-	// invokes, so skip ≡ the manual drop.
+	// Overweight skip path: removes the seeded item outright, matching both manual discards —
+	// dragging onto the desktop trash zone (move → removeItem) and the mobile context-menu "Drop".
 	private dropSeeded(defId: string): void {
 		const source = this.backpackSlot(defId);
 		if (source) this.inventory.removeItem(source.location);

@@ -2,7 +2,6 @@ export interface AugmentUpgrade {
 	defId: string;
 	nextDefId: string;
 	materials: { defId: string; count: number }[];
-	bonus: string;
 	bonusSlots: number;
 }
 
@@ -11,7 +10,6 @@ export const AUGMENT_UPGRADES: AugmentUpgrade[] = [
 		defId: 'aug_free_loadout',
 		nextDefId: 'aug_looting_mk1',
 		materials: [{ defId: 'res_metal_parts', count: 8 }],
-		bonus: '+2 Backpack Slots',
 		bonusSlots: 2
 	},
 	{
@@ -21,7 +19,6 @@ export const AUGMENT_UPGRADES: AugmentUpgrade[] = [
 			{ defId: 'res_metal_parts', count: 14 },
 			{ defId: 'res_plastic_parts', count: 4 }
 		],
-		bonus: '+2 Backpack Slots',
 		bonusSlots: 2
 	},
 	{
@@ -31,7 +28,6 @@ export const AUGMENT_UPGRADES: AugmentUpgrade[] = [
 			{ defId: 'res_metal_parts', count: 22 },
 			{ defId: 'res_plastic_parts', count: 10 }
 		],
-		bonus: '+2 Backpack Slots',
 		bonusSlots: 2
 	}
 ];
@@ -52,4 +48,8 @@ export function getAugmentLevel(defId: string): number {
 export function getAugmentBonusSlots(defId: string): number {
 	const level = getAugmentLevel(defId);
 	return AUGMENT_UPGRADES.slice(0, level).reduce((sum, u) => sum + u.bonusSlots, 0);
+}
+
+export function formatAugmentBonus(upgrade: AugmentUpgrade): string {
+	return `+${upgrade.bonusSlots} Backpack Slots`;
 }
