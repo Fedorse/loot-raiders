@@ -38,6 +38,12 @@ export const formatTime = (seconds: number) => {
 	return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 };
 
+export function formatCompact(n: number): string {
+	if (n < 1000) return String(n);
+	const unit = n < 1_000_000 ? { div: 1000, suffix: 'k' } : { div: 1_000_000, suffix: 'M' };
+	return (n / unit.div).toFixed(1).replace(/\.0$/, '') + unit.suffix;
+}
+
 export function trackLayout(getEls: () => HTMLElement[], measure: () => void): () => void {
 	measure();
 	const ro = new ResizeObserver(measure);

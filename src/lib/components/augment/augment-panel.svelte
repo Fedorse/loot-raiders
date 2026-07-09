@@ -120,7 +120,7 @@
 						</div>
 					</div>
 
-					<div class="mt-2 flex gap-1 lg:mt-3 lg:gap-1.5 3xl:gap-2">
+					<div class="mt-2 flex gap-1 lg:mt-3 lg:gap-1.5 3xl:gap-2 pointer-coarse:hidden">
 						<div class="flex flex-col gap-0.5 lg:gap-1">
 							<div class="flex gap-0.5 lg:gap-1">
 								<div

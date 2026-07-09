@@ -10,7 +10,6 @@ import type { OccupiedSlot, InstanceItem, ItemLocation, StorageId, DragState } f
 
 const EQUIP_STORAGES: StorageId[] = ['backpack', 'weapon', 'augment', 'shield'];
 
-// Overweight is a soft bite: extract is cut 1% per 1% over capacity, never below this floor.
 const WEIGHT_PENALTY_FLOOR = 0.5;
 
 export class Inventory {

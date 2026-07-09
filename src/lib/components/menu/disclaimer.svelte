@@ -3,8 +3,7 @@
 	import { getGameContext } from '$lib/store/game.svelte';
 	import Cross from '$lib/ui-icon/cross.svelte';
 	import Info from '$lib/ui-icon/info.svelte';
-
-	let { minimal = false }: { minimal?: boolean } = $props();
+	import Github from '$lib/ui-icon/github.svelte';
 
 	const { audio, device } = getGameContext();
 
@@ -12,12 +11,8 @@
 
 	const wrapperPos = $derived(
 		!device.isCoarsePointer
-			? minimal
-				? 'bottom-3 right-4 z-20'
-				: 'bottom-3 right-4'
-			: minimal
-				? 'bottom-2 left-3 z-20'
-				: 'bottom-[max(24px,env(safe-area-inset-bottom))] left-[max(24px,env(safe-area-inset-left))]'
+			? 'bottom-5 right-4'
+			: 'bottom-[max(10px,env(safe-area-inset-bottom))] right-[max(24px,env(safe-area-inset-right))]'
 	);
 
 	function openModal() {
@@ -30,34 +25,40 @@
 </script>
 
 <div class="pointer-events-none fixed {wrapperPos}">
-	{#if minimal}
+	<div
+		class="pointer-events-auto inline-flex items-center gap-2 rounded-full px-2.5 py-1 backdrop-blur-xs 2xl:gap-2.5 2xl:px-3 2xl:py-1.5"
+	>
+		<span class="font-mono text-[8px] text-fg-faint 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
+			>A fan-made project inspired by ARC Raiders<span class="pointer-coarse:hidden"> · </span><br
+				class="hidden pointer-coarse:inline"
+			/>Not affiliated with
+			<a
+				href="https://www.embark-studios.com/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="text-fg-muted underline decoration-hairline underline-offset-2 transition-colors hover:text-accent hover:decoration-accent/60"
+				>Embark Studios AB</a
+			></span
+		>
+		<span class="h-4 w-px shrink-0 bg-hairline 2xl:h-[18px] 4xl:h-5"></span>
 		<button
 			type="button"
 			onclick={openModal}
 			aria-label="Legal disclaimer"
-			class="pointer-events-auto font-mono text-[8px] font-semibold text-fg-faint uppercase transition-colors hover:text-accent active:scale-95 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs"
+			class="flex size-4 shrink-0 items-center justify-center rounded-full text-fg-faint transition-colors hover:text-accent active:scale-90 2xl:size-[18px] 4xl:size-5"
 		>
-			Notice
+			<Info />
 		</button>
-	{:else}
-		<p
-			class="flex items-center gap-1.5 font-mono text-[8px] text-fg-faint 2xl:text-[10px] 3xl:text-[11px] 4xl:text-xs pointer-coarse:text-[8px]"
+		<a
+			href="https://github.com/Fedorse/loot-raiders"
+			target="_blank"
+			rel="noopener noreferrer"
+			aria-label="GitHub"
+			class="flex size-4 shrink-0 items-center justify-center rounded-full text-fg-faint transition-colors hover:text-accent active:scale-90 2xl:size-[18px] 4xl:size-5"
 		>
-			<span
-				>Unofficial fan project · Not affiliated with {@render embarkLink(
-					'pointer-events-auto text-fg-muted'
-				)}</span
-			>
-			<button
-				type="button"
-				onclick={openModal}
-				aria-label="Legal disclaimer"
-				class="pointer-events-auto flex size-4 shrink-0 items-center justify-center rounded-full text-fg-muted transition-colors hover:text-accent active:scale-90 2xl:size-[18px] 4xl:size-5"
-			>
-				<Info />
-			</button>
-		</p>
-	{/if}
+			<Github class="size-full" />
+		</a>
+	</div>
 </div>
 
 {#if open}
@@ -93,35 +94,26 @@
 				class="flex max-h-[calc(88dvh-56px)] flex-col gap-3 overflow-y-auto px-6 py-5 text-[13px] leading-relaxed text-fg-muted 2xl:text-sm 3xl:text-[15px]"
 			>
 				<p>
-					Loot Raiders is an unofficial fan project inspired by ARC Raiders. This project is not
-					affiliated with, endorsed, sponsored, supported, or approved by {@render embarkLink(
-						'text-fg-body'
-					)}.
+					Loot Raiders is an independent, unofficial fan project inspired by ARC Raiders. We are not
+					affiliated with, endorsed by, or approved by <a
+						href="https://www.embark-studios.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-fg-body underline decoration-hairline underline-offset-2 transition-colors hover:text-accent hover:decoration-accent/60"
+						>Embark Studios AB</a
+					>.
 				</p>
 				<p>
-					ARC RAIDERS, EMBARK, and all related names, trademarks, logos, characters, artwork, music,
-					sounds, game assets, and other intellectual property are the property of {@render embarkLink(
-						'text-fg-body'
-					)} or their respective rights holders.
-				</p>
-				<p>
-					Loot Raiders does not claim ownership of any ARC Raiders intellectual property. No
-					copyright or trademark infringement is intended. If you are a rights holder or
-					representative of Embark Studios AB and believe that any material used in this project
-					violates your rights, please contact us at [your email], and we will review and remove or
-					modify the relevant material.
+					All ARC RAIDERS names, trademarks, artwork, music, sound, and game assets are the property
+					of <a
+						href="https://www.embark-studios.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-fg-body underline decoration-hairline underline-offset-2 transition-colors hover:text-accent hover:decoration-accent/60"
+						>Embark Studios AB</a
+					> or their respective rights holders. We make no claim of ownership and intend no infringement.
 				</p>
 			</div>
 		</div>
 	</div>
 {/if}
-
-{#snippet embarkLink(cls: string)}
-	<a
-		href="https://www.embark-studios.com/"
-		target="_blank"
-		rel="noopener noreferrer"
-		class="underline decoration-hairline underline-offset-2 transition-colors hover:text-accent hover:decoration-accent/60 {cls}"
-		>Embark Studios AB</a
-	>
-{/snippet}

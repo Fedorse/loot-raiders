@@ -121,19 +121,16 @@ export class GameLoop {
 		this.rafId = requestAnimationFrame((t) => this.tick(t));
 	}
 
-	// Tutorial Mode: a real session that shares the board with a normal run, but the
-	// clock is frozen and the automatic loot cadence is suspended — no rAF loop runs,
-	// and the quest-match / auto-upgrade effects are gated on `status === 'playing'`.
 	startTutorial() {
 		this.setupSession();
 
 		this.status = 'tutorial';
-		this.audio.playBGM();
 	}
 
 	stop() {
 		cancelAnimationFrame(this.rafId);
 		this.status = 'over';
+		this.overlay.closeAll();
 		this.audio.duckBGM();
 	}
 

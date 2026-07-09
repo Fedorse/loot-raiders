@@ -8,7 +8,7 @@ export type SoundConfig = {
 export const SOUNDS = {
 	bgm: {
 		src: 'assets/audio/bgm.mp3',
-		volume: 0.011,
+		volume: 0.03,
 		loop: true
 	},
 	rare_loot: {

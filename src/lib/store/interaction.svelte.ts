@@ -244,6 +244,7 @@ export class Interaction {
 			return;
 		}
 		if (e.shiftKey) {
+			this.overlay.hideTooltip();
 			this.inventory.quickMove(this.pressedSlot.location);
 			return;
 		}
@@ -252,6 +253,7 @@ export class Interaction {
 		const isDouble = now - this.lastClickTime < DOUBLE_CLICK_DELAY && this.lastClickUid === itemUid;
 
 		if (isDouble) {
+			this.overlay.hideTooltip();
 			this.inventory.quickMove(this.pressedSlot.location);
 			this.lastClickTime = 0;
 			this.lastClickUid = '';

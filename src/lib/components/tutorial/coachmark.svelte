@@ -224,10 +224,10 @@
 				{/if}
 			</div>
 
-			<div class="mt-1 flex justify-start">
+			<div class="mt-1 flex justify-end">
 				<button
 					onclick={skipAll}
-					class="shrink-0 font-mono text-[10px] font-medium tracking-[0.1em] text-[#8291a3] uppercase underline decoration-dotted underline-offset-2 transition-colors active:text-[#c3ccd8]"
+					class="shrink-0 font-mono text-[8px] font-medium tracking-[0.1em] text-[#8291a3] uppercase underline decoration-dotted underline-offset-2 transition-colors active:text-[#c3ccd8]"
 				>
 					Skip tutorial
 				</button>

@@ -6,8 +6,7 @@
 	import QuestBar from '$lib/components/quest/quest-bar.svelte';
 	import DropZone from '$lib/components/inventory/drop-zone.svelte';
 	import QuestWidget from '$lib/components/quest/quest-widget.svelte';
-	import Disclaimer from '$lib/components/menu/disclaimer.svelte';
-	import { formatTime } from '$lib/utils';
+	import { formatTime, formatCompact } from '$lib/utils';
 
 	const { gameLoop, inventory, loot, selection, audio, overlay, device, augment } =
 		getGameContext();
@@ -168,8 +167,6 @@
 			<Shortcuts />
 		</div>
 	</div>
-
-	<Disclaimer minimal />
 </div>
 
 {#snippet divider()}
@@ -245,11 +242,11 @@
 						class="size-3 object-contain 2xl:size-3.5 3xl:size-4 4xl:size-5"
 					/>
 					<span
-						class="font-mono text-[10px] font-black tabular-nums transition-colors duration-300 xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px] {overweight
+						class="inline-block min-w-[6ch] text-center font-mono text-[10px] font-black tabular-nums transition-colors duration-300 xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px] {overweight
 							? 'text-amber-400'
 							: 'text-white'}"
 					>
-						{inventory.scoredExtract.toLocaleString()}
+						{formatCompact(inventory.scoredExtract)}
 					</span>
 					{#if overweight}
 						<span
@@ -286,9 +283,9 @@
 
 					<span class="relative z-10 flex items-baseline gap-1 font-mono tabular-nums">
 						<span
-							class="text-[10px] font-black transition-colors duration-300 xl:text-[11px] 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px] {weightPct >
+							class="min-w-3 text-[10px] font-black transition-colors duration-300 xl:text-[11px] 2xl:min-w-4 2xl:text-xs 3xl:text-[13px] 4xl:text-[14px] {weightPct >
 							90
-								? 'text-red-400 drop-shadow-[0_0_4px_rgba(239,68,68,0.8)]'
+								? 'text-red-400 '
 								: 'text-white'}"
 						>
 							{Math.round(inventory.totalWeight)}

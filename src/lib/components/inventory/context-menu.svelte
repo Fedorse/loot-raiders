@@ -25,7 +25,7 @@
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
 		{@attach clickOutside(close)}
-		class="fixed z-[100] flex w-32 flex-col rounded-sm border border-modal-border bg-modal py-1 shadow-xl md:w-36 md:py-1.5 lg:w-40 xl:w-44 2xl:w-48 3xl:w-56"
+		class="fixed z-[100] flex w-32 flex-col rounded-sm border border-modal-border bg-modal pt-1 shadow-xl md:w-36 md:pt-1.5 lg:w-40 xl:w-44 2xl:w-48 3xl:w-56 pointer-coarse:pb-1"
 		style="top: {menuData.y}px; left: {menuData.x}px;"
 		oncontextmenu={(e) => e.preventDefault()}
 	>

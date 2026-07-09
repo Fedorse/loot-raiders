@@ -14,6 +14,7 @@
 	let dragY = $state(0);
 	let dragStartY = 0;
 	let dragging = $state(false);
+	let animating = $state(false);
 	let pendingY = 0;
 	let rafId = 0;
 	const CLOSE_THRESHOLD = 100;
@@ -118,19 +119,22 @@
 		type="button"
 		aria-label="Close quests"
 		class="fixed inset-0 z-[120] bg-black/60"
-		class:backdrop-blur-sm={!dragging}
+		class:backdrop-blur-sm={!dragging && !animating}
 		onclick={() => overlay.closeQuestSheet()}
 		transition:fade={{ duration: 200 }}
 	></button>
 
 	<div
 		class="fixed inset-x-0 bottom-0 z-[121] flex flex-col rounded-t-2xl bg-[#0c101c]/95 pb-[env(safe-area-inset-bottom,12px)] shadow-[0_-8px_24px_rgba(0,0,0,0.5)] ring-1 ring-white/10"
-		class:backdrop-blur-md={!dragging}
-		class:will-change-transform={dragging}
+		class:backdrop-blur-md={!dragging && !animating}
+		class:will-change-transform={dragging || animating}
 		style="transform: translate3d(0, {dragY}px, 0);  transition: transform {dragging
 			? '0s'
 			: '220ms'} cubic-bezier(0.2, 0.8, 0.2, 1);"
 		transition:fly={{ y: 500, duration: 320, easing: quintOut }}
+		onintrostart={() => (animating = true)}
+		onintroend={() => (animating = false)}
+		onoutrostart={() => (animating = true)}
 	>
 		<button
 			type="button"

@@ -60,6 +60,9 @@ export interface TutorialStep {
 	// (e.g. mobileBadge) are substituted only when the active platform is mobile
 	platforms?: Platform[];
 	mobileBadge?: string;
+	// Mobile override for `description`, for steps whose instruction names a platform gesture
+	// (e.g. right-click vs long-press) that only makes sense on one input type.
+	mobileDescription?: string;
 	// Touch anchors differ where a HUD element is platform-specific: the quest panel is `quest-bar`
 	// on desktop but the `quest-widget` button on mobile, so the highlight/card track the real node.
 	mobileTargets?: string[];
@@ -124,10 +127,18 @@ export class Tutorial {
 		const s = this.steps[this.index] ?? null;
 		if (!s) return null;
 		if (this.platform !== 'mobile') return s;
-		if (!s.mobileBadge && !s.mobileTargets && !s.mobilePulse && !s.mobileItemPulse) return s;
+		if (
+			!s.mobileBadge &&
+			!s.mobileDescription &&
+			!s.mobileTargets &&
+			!s.mobilePulse &&
+			!s.mobileItemPulse
+		)
+			return s;
 		return {
 			...s,
 			badge: s.mobileBadge ?? s.badge,
+			description: s.mobileDescription ?? s.description,
 			targets: s.mobileTargets ?? s.targets,
 			pulse: s.mobilePulse ?? s.pulse,
 			itemPulse: s.mobileItemPulse ?? s.itemPulse
@@ -251,18 +262,29 @@ export class Tutorial {
 			{
 				id: 'intro',
 				badge: 'note',
-				title: 'Read Your HUD',
+				title: 'Welcome, Raider',
 				description:
-					'Three numbers run a raid: NEXT is when the next Loot Drop lands, the clock counts down to extraction, and EXTRACT is the value you bank when it hits zero.',
-				cta: 'Got it',
-				targets: ['header-loot', 'header-backpak'],
+					"Raid for loot, complete quests, beat the clock, and bank your Extract. I'll walk you through it — let's start.",
+				cta: "Let's go",
 				pulse: []
+			},
+			{
+				id: 'touch-controls',
+				badge: 'note',
+				title: 'Control with Your Finger',
+				description: 'Drag to move an item, hold for its menu, double-tap to quick-move.',
+				cta: 'Got it',
+				platforms: ['mobile'],
+				gestures: ['drag', 'double-tap', 'hold']
 			},
 			{
 				id: 'open-drop',
 				badge: 'click',
 				title: 'Open the Loot Drop',
-				description: 'Don\'t wait for the timer — hit "Open Now" to crack the drop open.',
+				description:
+					'This is a Loot Drop — your source of gear. Click "Open Now" to crack it open.',
+				mobileDescription:
+					'This is a Loot Drop — your source of gear. Tap "Open Now" to crack it open.',
 				targets: ['header-loot', 'loot-drop'],
 				pulse: ['open-now'],
 				exclude: ['loot-dropzone'],
@@ -279,19 +301,10 @@ export class Tutorial {
 				autoPerform: () => this.loot.next()
 			},
 			{
-				id: 'touch-controls',
-				badge: 'note',
-				title: 'Control with Your Finger',
-				description: 'Drag to move an item, hold for its menu, double-tap to quick-move.',
-				cta: 'Got it',
-				platforms: ['mobile'],
-				gestures: ['drag', 'double-tap', 'hold']
-			},
-			{
 				id: 'triage',
 				badge: 'drag',
 				title: 'Stash Your Loot',
-				description: 'Drag an item into your Loadout to keep it — only gear there counts.',
+				description: "Drag an item into your Loadout — that's what you bank at extraction.",
 				targets: [...BOARD],
 				pulse: ['backpack'],
 				exclude: ['loot-dropzone', 'shield', 'augment'],
@@ -352,7 +365,7 @@ export class Tutorial {
 				badge: 'drag',
 				title: 'Drop the Dead Weight',
 				description:
-					"You're over capacity. Drag the bulky item onto the Drop zone to ditch it and clear the penalty.",
+					'Your bag is too heavy. Drag the bulky item to the Drop zone to clear the penalty.',
 				platforms: ['desktop'],
 				targets: ['quest-bar', ...BOARD],
 				pulse: ['loot-dropzone'],
@@ -373,7 +386,7 @@ export class Tutorial {
 				badge: 'long-press',
 				title: 'Drop the Dead Weight',
 				description:
-					"You're over capacity. Long-press the bulky item, then choose Drop to ditch it.",
+					'Your bag is too heavy. Long-press the bulky item, then choose Drop to clear the penalty.',
 				platforms: ['mobile'],
 				targets: [...BOARD],
 				pulse: [],
@@ -435,8 +448,8 @@ export class Tutorial {
 				badge: 'right-click',
 				mobileBadge: 'long-press',
 				title: 'Recycle the Junk',
-				description:
-					'Long-press (or right-click) the item, then choose Recycle to break it into parts.',
+				description: 'Right-click the item, then choose Recycle to break it into parts.',
+				mobileDescription: 'Long-press the item, then choose Recycle to break it into parts.',
 				targets: ['quest-bar', ...BOARD],
 				// Ring the junk item itself rather than the whole backpack.
 				pulse: [],
@@ -460,7 +473,7 @@ export class Tutorial {
 				badge: 'finish',
 				title: "You're Ready to Raid",
 				description:
-					'Clock out and your Loadout is cashed in as Extract — but Overweight eats your score. Good luck out there.',
+					"You've got the basics: complete quests, watch your weight, and bank your Loadout as Extract. Good luck out there!",
 				cta: 'Start raiding'
 			}
 		];

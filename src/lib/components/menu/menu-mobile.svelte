@@ -5,12 +5,12 @@
 	import { getLeaderboard } from '$lib/leaderboard/leaderboard.remote';
 	import { formatTime } from '$lib/utils';
 	import { STAGES } from '$lib/config/stages';
-	import AudioSettings from './audio-settings.svelte';
 	import Play from '$lib/ui-icon/play.svelte';
 	import Restart from '$lib/ui-icon/restart.svelte';
 	import Exit from '$lib/ui-icon/exit.svelte';
 	import Video from '$lib/ui-icon/video.svelte';
 	import Fullscreen from '$lib/ui-icon/fullscreen.svelte';
+	import Sound from '$lib/ui-icon/sound.svelte';
 	import LeaderboardIcon from '$lib/ui-icon/leaderboard.svelte';
 
 	const { audio, overlay, tutorial, gameLoop, inventory, quest } = getGameContext();
@@ -59,6 +59,10 @@
 		audio.play('click');
 		toggleFullscreen();
 	}
+	function onMute() {
+		audio.play('click');
+		audio.toggleMute();
+	}
 </script>
 
 <div class="relative h-full w-full">
@@ -82,9 +86,17 @@
 	</header>
 
 	<nav
-		class="absolute bottom-[max(50px,env(safe-area-inset-bottom))] left-[max(24px,env(safe-area-inset-left))] flex w-[min(320px,38vw)] flex-col gap-2"
+		class="absolute bottom-[max(10px,env(safe-area-inset-bottom))] left-[max(24px,env(safe-area-inset-left))] flex w-[min(320px,38vw)] flex-col gap-2"
 		in:fly|global={{ x: -16, duration: 280, delay: 40 }}
 	>
+		<button
+			onclick={paused ? resume : play}
+			class="group flex items-center gap-2 rounded-md border border-transparent bg-gradient-to-b from-primary-top to-primary-bottom px-3.5 py-2.5 text-left font-extrabold text-primary-ink transition-all active:scale-[0.99] active:brightness-105"
+		>
+			<Play class="size-4 flex-none" />
+			<span class="flex-1 text-sm tracking-wider">{paused ? 'Resume' : 'Play'}</span>
+		</button>
+
 		{#if paused}
 			<button onclick={restart} class={optionClass}>
 				<Restart class="size-4 flex-none text-fg-muted" />
@@ -97,20 +109,22 @@
 			</button>
 		{/if}
 
-		<AudioSettings />
-
 		<div class="flex gap-2">
 			{#if paused}
-				<button onclick={exit} class="{optionClass} flex-1">
+				<button onclick={exit} class="{optionClass} min-w-0 flex-1">
 					<Exit class="size-4 flex-none text-fg-muted" />
-					<span class="flex-1 text-sm font-semibold tracking-wider text-fg-body">Exit to menu</span>
+					<span class="min-w-0 flex-1 truncate text-sm font-semibold tracking-wider text-fg-body"
+						>Exit to menu</span
+					>
 				</button>
 			{:else}
-				<button onclick={openLeaderboard} class="{optionClass} flex-1">
+				<button onclick={openLeaderboard} class="{optionClass} min-w-0 flex-1">
 					<LeaderboardIcon class="size-4 flex-none text-fg-muted" />
-					<span class="flex-1 text-sm font-semibold tracking-wider text-fg-body">Leaderboard</span>
+					<span class="min-w-0 flex-1 truncate text-sm font-semibold tracking-wider text-fg-body"
+						>Leaderboard</span
+					>
 					<span
-						class="flex items-center gap-1.5 font-mono text-xs font-bold tracking-wider uppercase 2xl:text-[10px] 3xl:text-sm 4xl:text-[15px] pointer-coarse:text-[8px]"
+						class="flex flex-none items-center gap-1.5 font-mono text-xs font-bold tracking-wider uppercase 2xl:text-[10px] 3xl:text-sm 4xl:text-[15px] pointer-coarse:text-[8px]"
 					>
 						{#if myRank !== null}
 							<span class="text-accent tabular-nums">Rank # {myRank}</span>
@@ -118,6 +132,17 @@
 					</span>
 				</button>
 			{/if}
+			<button
+				onclick={onMute}
+				aria-label={audio.muted ? 'Unmute' : 'Mute'}
+				aria-pressed={audio.muted}
+				class="{optionClass} w-12 flex-none justify-center"
+			>
+				<Sound
+					class="size-4 {audio.muted ? 'text-fg-faint' : 'text-fg-muted'}"
+					muted={audio.muted}
+				/>
+			</button>
 			<button
 				onclick={onFullscreen}
 				aria-label="Fullscreen"
@@ -127,15 +152,6 @@
 			</button>
 		</div>
 	</nav>
-
-	<button
-		onclick={paused ? resume : play}
-		class="absolute right-[max(24px,env(safe-area-inset-right))] bottom-[max(24px,env(safe-area-inset-bottom))] flex h-15 w-44 items-center justify-center gap-3 rounded-lg bg-gradient-to-b from-primary-top to-primary-bottom font-extrabold text-primary-ink transition-all active:translate-y-px active:brightness-105"
-		in:fly|global={{ x: 16, duration: 280, delay: 40 }}
-	>
-		<Play class="size-5 flex-none" />
-		<span class="text-2xl tracking-wide">{paused ? 'Resume' : 'Play'}</span>
-	</button>
 </div>
 
 {#snippet wordmark()}
