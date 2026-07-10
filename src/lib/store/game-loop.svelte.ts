@@ -29,7 +29,6 @@ export class GameLoop {
 	timeLeft = $state(0);
 	elapsedTime = $state(0);
 	status = $state<GameStatus>('idle');
-	gameOverReason = $state<'victory' | 'defeat' | null>(null);
 	shieldTimeBonus = $state(0);
 	questTimeBonus = $state(0);
 
@@ -103,7 +102,6 @@ export class GameLoop {
 		cancelAnimationFrame(this.rafId);
 		this.quest.reset();
 		this.elapsedTime = 0;
-		this.gameOverReason = null;
 
 		const augItem = this.inventory.createItem('aug_free_loadout', 1);
 		this.inventory.fillStorage('augment', [augItem]);
@@ -139,6 +137,7 @@ export class GameLoop {
 		if (this.status !== 'playing') return;
 		cancelAnimationFrame(this.rafId);
 		this.status = 'paused';
+		this.overlay.closeAll();
 		this.audio.duckBGM();
 	}
 
@@ -202,7 +201,6 @@ export class GameLoop {
 		this.elapsedTime += dt;
 		if (this.timeLeft <= 0) {
 			this.timeLeft = 0;
-			this.gameOverReason = this.quest.allStagesCompleted ? 'victory' : 'defeat';
 			this.stop();
 			return;
 		}
@@ -230,7 +228,6 @@ export class GameLoop {
 
 	private resetState() {
 		cancelAnimationFrame(this.rafId);
-		this.gameOverReason = null;
 
 		this.selection.clear();
 		this.overlay.closeAll();

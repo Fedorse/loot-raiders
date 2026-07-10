@@ -1,10 +1,38 @@
 import { getDef } from '$lib/config/items';
 import { getAllowedTypes } from '$lib/config/storages';
 import { RARITY_ORDER } from './config/rarity';
-import type { InstanceItem, ItemLocation, DragState, SlotState } from '$lib/types';
+import type { InstanceItem, ItemLocation, OccupiedSlot, DragState, SlotState } from '$lib/types';
 
 export type DropActionType = 'move' | 'stack' | 'attach' | 'swap' | 'delete' | 'invalid';
 export type ItemResolver = (loc: ItemLocation) => InstanceItem | null;
+
+// ---- Batch actions (Ctrl+click multi-selection) ----
+
+export interface BatchTargets {
+	dropLocations: ItemLocation[];
+	recycleLocations: ItemLocation[];
+}
+
+export const resolveBatchTargets = (
+	items: OccupiedSlot[],
+	selectedIds: ReadonlySet<string>
+): BatchTargets => {
+	const dropLocations: ItemLocation[] = [];
+	const recycleLocations: ItemLocation[] = [];
+
+	for (const slot of items) {
+		if (slot.location.type !== 'slot') continue;
+		if (slot.location.storageId === 'augment') continue;
+		if (!selectedIds.has(slot.item.uid)) continue;
+
+		dropLocations.push(slot.location);
+		if (getDef(slot.item.defId).recycling?.length) recycleLocations.push(slot.location);
+	}
+
+	return { dropLocations, recycleLocations };
+};
+
+export const isBatchEngaged = (targets: BatchTargets): boolean => targets.dropLocations.length >= 2;
 
 export const isAllowedInLocation = (
 	item: InstanceItem,

@@ -65,7 +65,9 @@
 				if (e.ctrlKey) return;
 				if (slotState.item) {
 					overlay.openContextMenu(e.clientX, e.clientY, slotState);
-					selection.select(slotState.item.uid);
+					// File-manager convention: keep an active multi-selection when right-clicking one
+					// of its members; otherwise collapse the selection to just this item.
+					if (!selection.isSelected(slotState.item.uid)) selection.select(slotState.item.uid);
 				}
 			}}
 			onclick={(e) => {

@@ -13,8 +13,8 @@ interface TooltipState {
 }
 
 interface RecycleModalState {
-	item: InstanceItem;
-	location: ItemLocation;
+	// A list so single-item recycle (length 1) and "Recycle all" share one modal path.
+	locations: ItemLocation[];
 }
 const CONTEXT_MENU_WIDTH = 192;
 const CONTEXT_MENU_HEIGHT = 260;
@@ -41,9 +41,9 @@ export class Overlay {
 		this.contextMenu = null;
 	}
 
-	openRecycleModal(item: InstanceItem, location: ItemLocation) {
+	openRecycleModal(locations: ItemLocation[]) {
 		this.closeAll();
-		this.recycleModal = { item, location };
+		this.recycleModal = { locations };
 	}
 
 	closeRecycleModal() {

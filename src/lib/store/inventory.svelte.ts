@@ -168,6 +168,33 @@ export class Inventory {
 		this.setItem(loc, null);
 	}
 
+	// ---- Domain operations: batch (called by the context menu) ----
+
+	// Drop every targeted item at once. removeItem already deselects each; the Drop sound
+	// fires exactly once for the whole batch.
+	dropItems(locations: ItemLocation[]): void {
+		for (const loc of locations) this.removeItem(loc);
+		this.audio.play('drop');
+	}
+
+	recycleItems(locations: ItemLocation[]): void {
+		let recycledAny = false;
+		for (const loc of locations) {
+			if (this.#recycleOne(loc)) recycledAny = true;
+		}
+		if (recycledAny) this.audio.play('recycle');
+	}
+
+	deselectUnrecyclable(): void {
+		for (const slot of this.items) {
+			if (slot.location.type !== 'slot') continue;
+			if (slot.location.storageId === 'augment') continue;
+			if (!this.selection.isSelected(slot.item.uid)) continue;
+			if (getDef(slot.item.defId).recycling?.length) continue;
+			this.selection.deselect(slot.item.uid);
+		}
+	}
+
 	// ---- Domain operations: drop (called by Interaction) ----
 
 	move(drag: DragState, targetLoc: ItemLocation): void {
@@ -336,6 +363,12 @@ export class Inventory {
 	}
 
 	recycleItem(loc: ItemLocation): boolean {
+		const recycled = this.#recycleOne(loc);
+		if (recycled) this.audio.play('recycle');
+		return recycled;
+	}
+
+	#recycleOne(loc: ItemLocation): boolean {
 		if (loc.type !== 'slot') return false;
 		const item = this.getItem(loc);
 		if (!item) return false;
@@ -370,7 +403,6 @@ export class Inventory {
 				this.setItem(slot, this.createItem(result.itemId, result.amount * item.count));
 			}
 		}
-		this.audio.play('recycle');
 		this.recyclePulse++;
 		return true;
 	}

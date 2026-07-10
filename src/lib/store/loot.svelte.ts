@@ -65,7 +65,7 @@ export class LootGenerator {
 
 	next(): void {
 		const modal = this.overlay.recycleModal;
-		if (modal && isInLootBack(modal.location)) {
+		if (modal && modal.locations.some(isInLootBack)) {
 			this.overlay.closeRecycleModal();
 		}
 

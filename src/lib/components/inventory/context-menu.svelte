@@ -4,14 +4,23 @@
 	import { getStorageConfig } from '$lib/config/storages';
 	import { getRarityStyleTooltip } from '$lib/config/rarity';
 	import { clickOutside } from '$lib/actions/actions';
+	import { resolveBatchTargets, isBatchEngaged } from '$lib/inventory-validation';
+	import { isEqualLocation } from '$lib/utils';
 
-	const { overlay, inventory, tutorial, audio } = getGameContext();
+	const { overlay, inventory, tutorial, audio, selection } = getGameContext();
 	const menuData = $derived(overlay.contextMenu);
 
 	const close = () => overlay.closeContextMenu();
 	const def = $derived(menuData ? getDef(menuData.slot.item.defId) : null);
 
-	// Drop is enabled only on its teaching step; recycle stays unlocked from its step onward.
+	const batchTargets = $derived(resolveBatchTargets(inventory.items, selection.ids));
+	const batchMode = $derived(
+		!!menuData &&
+			isBatchEngaged(batchTargets) &&
+			batchTargets.dropLocations.some((loc) => isEqualLocation(loc, menuData.slot.location))
+	);
+
+	// Drop is enabled only on its teaching step; recycle stays unlocked from its step onward
 	const dropDisabled = $derived(!tutorial.canDropFromMenu);
 	const recycleDisabled = $derived(!tutorial.canRecycle);
 </script>
@@ -32,19 +41,21 @@
 		<div
 			class="flex items-center gap-1 border-b border-modal-border px-2 pt-0.5 pb-1 md:gap-1.5 md:px-2.5 md:pt-0.5 md:pb-1 lg:px-3 lg:pt-1 lg:pb-2 3xl:px-3.5"
 		>
-			<img
-				src={def.categoryIcon}
-				alt=""
-				class="size-3 shrink-0 object-contain opacity-60 brightness-0 md:size-3.5 lg:size-4 3xl:size-5"
-			/>
+			{#if !batchMode}
+				<img
+					src={def.categoryIcon}
+					alt=""
+					class="size-3 shrink-0 object-contain opacity-60 brightness-0 md:size-3.5 lg:size-4 3xl:size-5"
+				/>
+			{/if}
 			<span
 				class="text-[9px] font-bold tracking-wider text-muted uppercase md:text-[10px] lg:text-[11px] 2xl:text-xs 3xl:text-[13px]"
 			>
-				{def.name}
+				{batchMode ? `${batchTargets.dropLocations.length} items selected` : def.name}
 			</span>
 		</div>
 
-		{#if moveTargetId}
+		{#if moveTargetId && !batchMode}
 			<button
 				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				onclick={() => {
@@ -56,7 +67,7 @@
 			</button>
 		{/if}
 
-		{#if def.maxStack && menuData.slot.item.count > 1}
+		{#if def.maxStack && menuData.slot.item.count > 1 && !batchMode}
 			<button
 				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				onclick={() => {
@@ -74,20 +85,35 @@
 			class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent disabled:cursor-not-allowed disabled:text-muted disabled:opacity-40 disabled:hover:bg-transparent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 			disabled={dropDisabled}
 			onclick={() => {
-				inventory.removeItem(menuData.slot.location);
-				audio.play('drop');
+				if (batchMode) {
+					inventory.dropItems(batchTargets.dropLocations);
+				} else {
+					inventory.removeItem(menuData.slot.location);
+					audio.play('drop');
+				}
 				close();
 			}}
 		>
-			Drop
+			{batchMode ? 'Drop all' : 'Drop'}
 		</button>
 
-		{#if def.recycling?.length}
+		{#if batchMode}
+			<button
+				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt disabled:cursor-not-allowed disabled:text-muted disabled:opacity-40 disabled:hover:bg-transparent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
+				disabled={recycleDisabled || batchTargets.recycleLocations.length === 0}
+				onclick={() => {
+					overlay.openRecycleModal(batchTargets.recycleLocations);
+					close();
+				}}
+			>
+				Recycle all
+			</button>
+		{:else if def.recycling?.length}
 			<button
 				class="flex w-full px-2 py-1 text-left text-[10px] font-medium text-modal-foreground hover:bg-accent-alt disabled:cursor-not-allowed disabled:text-muted disabled:opacity-40 disabled:hover:bg-transparent md:px-2.5 md:py-1.5 md:text-[11px] lg:px-3 lg:text-xs 2xl:text-[13px] 3xl:px-3.5 3xl:text-sm"
 				disabled={recycleDisabled}
 				onclick={() => {
-					overlay.openRecycleModal(menuData.slot.item, menuData.slot.location);
+					overlay.openRecycleModal([menuData.slot.location]);
 					close();
 				}}
 			>

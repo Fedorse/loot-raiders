@@ -1,6 +1,8 @@
 import { SvelteSet } from 'svelte/reactivity';
 import type { AudioManager } from './audio.svelte';
 
+const MAX_SELECTION = 10;
+
 export class Selection {
 	private audio: AudioManager;
 	ids = new SvelteSet<string>();
@@ -23,6 +25,7 @@ export class Selection {
 		if (this.ids.has(uid)) {
 			this.ids.delete(uid);
 		} else {
+			if (this.ids.size >= MAX_SELECTION) return;
 			this.ids.add(uid);
 		}
 	}
