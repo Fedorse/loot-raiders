@@ -16,7 +16,7 @@ export const AUGMENT_UPGRADES: AugmentUpgrade[] = [
 		defId: 'aug_looting_mk1',
 		nextDefId: 'aug_looting_mk2',
 		materials: [
-			{ defId: 'res_metal_parts', count: 14 },
+			{ defId: 'res_metal_parts', count: 12 },
 			{ defId: 'res_plastic_parts', count: 4 }
 		],
 		bonusSlots: 2
@@ -25,7 +25,7 @@ export const AUGMENT_UPGRADES: AugmentUpgrade[] = [
 		defId: 'aug_looting_mk2',
 		nextDefId: 'aug_looting_mk3_cautious',
 		materials: [
-			{ defId: 'res_metal_parts', count: 22 },
+			{ defId: 'res_metal_parts', count: 10 },
 			{ defId: 'res_plastic_parts', count: 10 }
 		],
 		bonusSlots: 2

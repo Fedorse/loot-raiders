@@ -25,11 +25,11 @@ export const STAGES: StageDef[] = [
 		chestSize: { min: 5, max: 10 },
 		questPity: { chance: 1.0, count: 2 },
 		quests: [
-			{ defId: 'loot_crude_explosives', count: 5 },
-			{ defId: 'loot_battery', count: 6 },
-			{ defId: 'loot_fabric', count: 6 },
-			{ defId: 'loot_oil', count: 4 },
-			{ defId: 'loot_bandage', count: 4 }
+			{ defId: 'loot_crude_explosives', count: 4 },
+			{ defId: 'loot_battery', count: 4 },
+			{ defId: 'loot_fabric', count: 4 },
+			{ defId: 'loot_oil', count: 3 },
+			{ defId: 'loot_bandage', count: 3 }
 		],
 		lootProfile: {
 			typeWeights: { loot: 88, attachment: 5, weapon: 5, shield: 2, augment: 0 },
@@ -46,11 +46,11 @@ export const STAGES: StageDef[] = [
 		chestSize: { min: 6, max: 12 },
 		questPity: { chance: 0.92, count: 3 },
 		quests: [
-			{ defId: 'res_steel_spring', count: 6 },
-			{ defId: 'res_rubber_parts', count: 7 },
-			{ defId: 'res_wires', count: 7 },
-			{ defId: 'loot_electrical_components', count: 4 },
-			{ defId: 'res_arc_circuitry', count: 4 }
+			{ defId: 'res_steel_spring', count: 4 },
+			{ defId: 'res_rubber_parts', count: 5 },
+			{ defId: 'res_wires', count: 5 },
+			{ defId: 'loot_electrical_components', count: 3 },
+			{ defId: 'res_arc_circuitry', count: 2 }
 		],
 		lootProfile: {
 			typeWeights: { loot: 78, attachment: 8, weapon: 8, shield: 6, augment: 0 },
