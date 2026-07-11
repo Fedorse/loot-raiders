@@ -4,7 +4,8 @@ An inventory-management extraction game made with Svelte 5. Open loot drops, tri
 
 Playable on Mobile and Desktop — [Live Demo](https://loot-raiders.vercel.app)
 
-![Loot Raiders gameplay](docs/demo.gif)
+<img width="720" alt="Loot Raiders gameplay" src="https://github.com/user-attachments/assets/c159ce0e-1d98-4d68-a990-d09a4dbd2afb" />
+
 
 ## Core loop
 
@@ -27,14 +28,6 @@ Requires Node 20+ and [pnpm](https://pnpm.io).
 pnpm install
 pnpm dev
 ```
-
-Build a production version:
-
-```sh
-pnpm build
-pnpm preview
-```
-
 ## Contribution
 
 Contributions are welcome — feel free to fork the repository and open a pull request.
