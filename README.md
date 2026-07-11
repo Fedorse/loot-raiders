@@ -6,7 +6,6 @@ Playable on Mobile and Desktop — [Live Demo](https://loot-raiders.vercel.app)
 
 <img width="720" alt="Loot Raiders gameplay" src="https://github.com/user-attachments/assets/c159ce0e-1d98-4d68-a990-d09a4dbd2afb" />
 
-
 ## Core loop
 
 - **Loot Drop** — a batch of items appears in the container to triage. Items here count toward nothing until you drag them into the loadout.
