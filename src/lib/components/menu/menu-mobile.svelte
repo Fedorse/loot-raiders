@@ -114,7 +114,7 @@
 				<button onclick={exit} class="{optionClass} min-w-0 flex-1">
 					<Exit class="size-4 flex-none text-fg-muted" />
 					<span class="min-w-0 flex-1 truncate text-sm font-semibold tracking-wider text-fg-body"
-						>Exit to menu</span
+						>End the Raid</span
 					>
 				</button>
 			{:else}

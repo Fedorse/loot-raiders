@@ -135,7 +135,7 @@
 			/>
 			<span
 				class="flex-1 text-[15px] font-semibold tracking-wider text-fg-body group-hover:text-fg lg:text-base 2xl:text-[17px] 3xl:text-lg 4xl:text-xl pointer-coarse:text-sm"
-				>Exit to menu</span
+				>End the Raid</span
 			>
 		</button>
 		<div

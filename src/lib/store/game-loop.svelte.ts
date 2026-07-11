@@ -55,6 +55,7 @@ export class GameLoop {
 		this.augment = augment;
 
 		$effect.root(() => {
+			/* shield bonus */
 			$effect(() => {
 				const shield = this.inventory.shieldItem;
 				if (!shield) return;
@@ -77,9 +78,7 @@ export class GameLoop {
 				}
 			});
 
-			// Runs in Tutorial Mode too (not just a live run): step 3 needs the quest to
-			// auto-match the instant the item lands in the Loadout. The frozen clock means
-			// pendingMatchTime simply never drains in tutorial — harmless, cleared on teardown.
+			/* quest checkMatches */
 			$effect(() => {
 				if (!this.inSession) return;
 				const completed = this.quest.checkMatches();
@@ -88,9 +87,7 @@ export class GameLoop {
 				this.questTimeBonus = completed.length * QUEST_TIME_BONUS;
 			});
 
-			// Also runs in Tutorial Mode so step 7's seeded resources trigger the auto-upgrade.
-			// Lazy per-step seeding (ADR-0004) keeps resources absent until then, so it cannot
-			// fire early despite running for the whole session.
+			/* augment autoUpgrade */
 			$effect(() => {
 				if (!this.inSession) return;
 				this.augment.autoUpgrade();

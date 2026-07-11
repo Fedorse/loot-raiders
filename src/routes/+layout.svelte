@@ -58,7 +58,10 @@
 	class:dragging-attachment={interaction.dragType === 'attachment'}
 />
 
-<svelte:window onkeydown={(e) => handleGlobalKeydown(e, game)} />
+<svelte:window
+	onkeydown={(e) => handleGlobalKeydown(e, game)}
+	oncontextmenu={(e) => e.preventDefault()}
+/>
 
 <main class="relative h-dvh font-sans text-white selection:bg-blue-500/30">
 	<LivingBackground revealed={!showPreloader} />
