@@ -9,8 +9,8 @@ import { validateDrop, getDropActionType } from '$lib/inventory-validation';
 
 import type { SlotState, ItemLocation, InstanceItem, DragState } from '$lib/types';
 
-const DRAG_THRESHOLD = 1;
-const DOUBLE_CLICK_DELAY = 700;
+const DRAG_THRESHOLD = 3;
+const DOUBLE_CLICK_DELAY = 600;
 const LONG_PRESS_DELAY = 450;
 
 type InteractionStatus = 'idle' | 'pressing' | 'dragging';

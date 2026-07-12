@@ -7,10 +7,37 @@
 	import DropZone from '$lib/components/inventory/drop-zone.svelte';
 	import QuestWidget from '$lib/components/quest/quest-widget.svelte';
 	import { formatTime, formatCompact } from '$lib/utils';
+	import { SCENES } from '$lib/components/backdrop/scenes';
+
+	// Canonical production origin — adjust if a custom domain is added.
+	const SITE_URL = 'https://loot-raiders.vercel.app';
+	const TITLE = 'Loot Raiders — Timed Inventory Looting Game';
+	const DESCRIPTION =
+		'Timed inventory game — manage drag-and-drop loot, complete quests, survive the raid.';
+	const OG_IMAGE = SITE_URL + SCENES.menu.image;
 
 	const { gameLoop, inventory, loot, selection, audio, overlay, device, augment } =
 		getGameContext();
 </script>
+
+<svelte:head>
+	<title>{TITLE}</title>
+	<meta name="description" content={DESCRIPTION} />
+	<link rel="canonical" href={SITE_URL} />
+
+	<meta property="og:type" content="website" />
+	<meta property="og:site_name" content="Loot Raiders" />
+	<meta property="og:title" content={TITLE} />
+	<meta property="og:description" content={DESCRIPTION} />
+	<meta property="og:url" content={SITE_URL} />
+	<meta property="og:image" content={OG_IMAGE} />
+	<meta property="og:image:alt" content="Loot Raiders gameplay" />
+
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={TITLE} />
+	<meta name="twitter:description" content={DESCRIPTION} />
+	<meta name="twitter:image" content={OG_IMAGE} />
+</svelte:head>
 
 <div
 	class="flex h-full items-center justify-center transition-opacity duration-300 {gameLoop.inSession
