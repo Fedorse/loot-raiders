@@ -1,8 +1,15 @@
 # Loot Raiders
 
-An inventory-management extraction game made with Svelte 5. Open loot drops, triage items into a weight-limited backpack, complete quests for extra time, and maximise the value of what you're holding when the clock hits zero.
+A fan-made inventory-management game inspired by *ARC Raiders* and created by a huge fan of the game.
 
-Playable on Mobile and Desktop — [Live Demo](https://loot-raiders.vercel.app)
+Open loot drops, manage a weight-limited backpack, complete quests for extra time, and maximize the value of your inventory before the clock runs out.
+
+Built with Svelte 5. Playable on mobile and desktop.
+
+**[Play the live demo →](https://loot-raiders.vercel.app)**  
+**[View the source →](https://github.com/Fedorse/loot-raiders)**
+
+*This is an unofficial fan project and is not affiliated with Embark Studios.*
 
 <img width="720" alt="Loot Raiders gameplay" src="https://github.com/user-attachments/assets/c159ce0e-1d98-4d68-a990-d09a4dbd2afb" />
 
