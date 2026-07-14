@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { toggleFullscreen, enterFullscreen, isTouchDevice } from '$lib/fullscreen';
-	import { getLeaderboard } from '$lib/leaderboard/leaderboard.remote';
+	import { getMyRank } from '$lib/leaderboard/leaderboard.remote';
 	import AudioSettings from './audio-settings.svelte';
 	import Play from '$lib/ui-icon/play.svelte';
 	import Restart from '$lib/ui-icon/restart.svelte';
@@ -15,8 +15,8 @@
 
 	const isIdle = $derived(gameLoop.status === 'idle');
 
-	const rankQuery = getLeaderboard();
-	const myRank = $derived(rankQuery.current?.myRank ?? null);
+	const rankQuery = getMyRank();
+	const myRank = $derived(rankQuery.current ?? null);
 
 	function play() {
 		audio.play('click');

@@ -14,6 +14,7 @@
 		"tut": "vite-node scripts/tutorial-sim.ts",
 		"batch": "vite-node scripts/batch-actions-sim.ts",
 		"bg": "vite-node scripts/backdrop-sim.ts",
+		"backup": "vite-node scripts/leaderboard-backup.ts",
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint ."
 	},

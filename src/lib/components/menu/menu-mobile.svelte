@@ -2,7 +2,7 @@
 	import { fly } from 'svelte/transition';
 	import { getGameContext } from '$lib/store/game.svelte';
 	import { toggleFullscreen, enterFullscreen, isTouchDevice } from '$lib/fullscreen';
-	import { getLeaderboard } from '$lib/leaderboard/leaderboard.remote';
+	import { getMyRank } from '$lib/leaderboard/leaderboard.remote';
 	import { formatTime } from '$lib/utils';
 	import { STAGES } from '$lib/config/stages';
 	import Play from '$lib/ui-icon/play.svelte';
@@ -20,8 +20,8 @@
 
 	const paused = $derived(gameLoop.status === 'paused');
 
-	const rankQuery = getLeaderboard();
-	const myRank = $derived(rankQuery.current?.myRank ?? null);
+	const rankQuery = getMyRank();
+	const myRank = $derived(rankQuery.current ?? null);
 
 	const runTime = $derived(formatTime(gameLoop.timeLeft));
 	const runLoot = $derived(inventory.scoredExtract.toLocaleString('en-US'));

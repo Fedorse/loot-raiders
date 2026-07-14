@@ -38,3 +38,6 @@ docs
 
 # Local dev tooling (Monte-Carlo simulator)
 /scripts/
+
+# Leaderboard backups (contain player nicknames — local only)
+/.backups/

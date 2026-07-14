@@ -18,6 +18,11 @@ export const getLeaderboard = query(async (): Promise<LeaderboardResponse> => {
 	return { entries, myPlayerId: locals.playerId, myRank };
 });
 
+export const getMyRank = query(async (): Promise<number | null> => {
+	const { locals } = getRequestEvent();
+	return db.getPlayerRank(locals.playerId);
+});
+
 export const submitScore = command(
 	submitSchema,
 	async ({ nickname, extract, time }): Promise<SubmitResponse> => {
